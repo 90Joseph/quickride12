@@ -109,37 +109,37 @@ export default function ProfileScreen() {
         </View>
 
         <View style={styles.section}>
-          <TouchableOpacity style={styles.menuItem}>
+          <TouchableOpacity style={styles.menuItem} onPress={handleEditProfile}>
             <Ionicons name="person-outline" size={24} color="#333" />
             <Text style={styles.menuItemText}>Edit Profile</Text>
             <Ionicons name="chevron-forward" size={24} color="#999" />
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.menuItem}>
+          <TouchableOpacity style={styles.menuItem} onPress={handleSavedAddresses}>
             <Ionicons name="location-outline" size={24} color="#333" />
             <Text style={styles.menuItemText}>Saved Addresses</Text>
             <Ionicons name="chevron-forward" size={24} color="#999" />
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.menuItem}>
+          <TouchableOpacity style={styles.menuItem} onPress={handlePaymentMethods}>
             <Ionicons name="card-outline" size={24} color="#333" />
             <Text style={styles.menuItemText}>Payment Methods</Text>
             <Ionicons name="chevron-forward" size={24} color="#999" />
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.menuItem}>
+          <TouchableOpacity style={styles.menuItem} onPress={handleNotifications}>
             <Ionicons name="notifications-outline" size={24} color="#333" />
             <Text style={styles.menuItemText}>Notifications</Text>
             <Ionicons name="chevron-forward" size={24} color="#999" />
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.menuItem}>
+          <TouchableOpacity style={styles.menuItem} onPress={handleHelpSupport}>
             <Ionicons name="help-circle-outline" size={24} color="#333" />
             <Text style={styles.menuItemText}>Help & Support</Text>
             <Ionicons name="chevron-forward" size={24} color="#999" />
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.menuItem}>
+          <TouchableOpacity style={styles.menuItem} onPress={handleAbout}>
             <Ionicons name="information-circle-outline" size={24} color="#333" />
             <Text style={styles.menuItemText}>About</Text>
             <Ionicons name="chevron-forward" size={24} color="#999" />
