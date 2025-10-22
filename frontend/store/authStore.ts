@@ -5,7 +5,7 @@ interface User {
   email: string;
   name: string;
   picture?: string;
-  role: 'customer' | 'restaurant' | 'rider';
+  role: 'customer' | 'restaurant' | 'rider' | 'admin';
   phone?: string;
 }
 
