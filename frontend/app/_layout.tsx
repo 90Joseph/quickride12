@@ -1,8 +1,8 @@
 import React, { useEffect } from 'react';
-import { Stack, useRouter, useSegments, ThemeProvider, DarkTheme, DefaultTheme } from 'expo-router';
+import { Stack, useRouter, useSegments } from 'expo-router';
 import { useAuthStore } from '../store/authStore';
 import { setAuthToken } from '../utils/api';
-import { View, ActivityIndicator, useColorScheme } from 'react-native';
+import { View, ActivityIndicator } from 'react-native';
 
 export default function RootLayout() {
   const { user, isLoading, setUser, setLoading, sessionToken } = useAuthStore();
