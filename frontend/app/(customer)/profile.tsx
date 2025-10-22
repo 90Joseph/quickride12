@@ -20,6 +20,54 @@ export default function ProfileScreen() {
   const { user, logout: authLogout } = useAuthStore();
   const { clearCart } = useCartStore();
 
+  const handleEditProfile = () => {
+    Alert.alert(
+      'Edit Profile',
+      'Update your name, phone number, and profile picture.',
+      [{ text: 'OK' }]
+    );
+  };
+
+  const handleSavedAddresses = () => {
+    Alert.alert(
+      'Saved Addresses',
+      'Manage your delivery addresses for faster checkout.',
+      [{ text: 'OK' }]
+    );
+  };
+
+  const handlePaymentMethods = () => {
+    Alert.alert(
+      'Payment Methods',
+      'Add and manage your payment methods including GCash, Credit Cards, and Cash on Delivery.',
+      [{ text: 'OK' }]
+    );
+  };
+
+  const handleNotifications = () => {
+    Alert.alert(
+      'Notifications',
+      'Manage your notification preferences for orders, promotions, and updates.',
+      [{ text: 'OK' }]
+    );
+  };
+
+  const handleHelpSupport = () => {
+    Alert.alert(
+      'Help & Support',
+      'Contact us:\n\nEmail: support@quickbite.ph\nPhone: +63 917 123 4567\n\nOperating Hours:\n9:00 AM - 9:00 PM (Mon-Sun)',
+      [{ text: 'OK' }]
+    );
+  };
+
+  const handleAbout = () => {
+    Alert.alert(
+      'About QuickBite',
+      'Version 1.0.0\n\nQuickBite is your favorite food delivery platform in the Philippines. Order from the best restaurants and get your food delivered fast!\n\n© 2025 QuickBite Philippines',
+      [{ text: 'OK' }]
+    );
+  };
+
   const handleLogout = () => {
     Alert.alert('Logout', 'Are you sure you want to logout?', [
       { text: 'Cancel', style: 'cancel' },
