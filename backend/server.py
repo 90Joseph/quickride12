@@ -778,6 +778,17 @@ async def get_admin_dashboard(request: Request):
         delivered_orders = await db.orders.find({"status": "delivered"}).to_list(1000)
         total_revenue = sum(order.get("total_amount", 0) for order in delivered_orders)
         
+        # Serialize recent orders properly
+        serialized_orders = []
+        for order in recent_orders:
+            order_dict = Order(**order).model_dump()
+            # Convert datetime fields to strings
+            if "created_at" in order_dict and isinstance(order_dict["created_at"], datetime):
+                order_dict["created_at"] = order_dict["created_at"].isoformat()
+            if "updated_at" in order_dict and isinstance(order_dict["updated_at"], datetime):
+                order_dict["updated_at"] = order_dict["updated_at"].isoformat()
+            serialized_orders.append(order_dict)
+        
         return {
             "users": {
                 "total": total_users,
@@ -794,7 +805,7 @@ async def get_admin_dashboard(request: Request):
             "revenue": {
                 "total": total_revenue
             },
-            "recent_orders": [Order(**order) for order in recent_orders]
+            "recent_orders": serialized_orders
         }
     except Exception as e:
         logger.error(f"Admin dashboard error: {str(e)}")
