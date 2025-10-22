@@ -3,6 +3,7 @@ import { Stack, useRouter, useSegments } from 'expo-router';
 import { useAuthStore } from '../store/authStore';
 import { setAuthToken } from '../utils/api';
 import { View, ActivityIndicator } from 'react-native';
+import { NavigationThemeProvider } from '../components/NavigationThemeProvider';
 
 export default function RootLayout() {
   const { user, isLoading, setUser, setLoading, sessionToken } = useAuthStore();
