@@ -1,4 +1,5 @@
-from fastapi import FastAPI, APIRouter
+from fastapi import FastAPI, APIRouter, HTTPException, Request, Header, Depends
+from fastapi.responses import JSONResponse
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
@@ -6,10 +7,13 @@ import os
 import logging
 from pathlib import Path
 from pydantic import BaseModel, Field
-from typing import List
+from typing import List, Optional, Dict, Any
 import uuid
-from datetime import datetime
-
+from datetime import datetime, timezone, timedelta
+import socketio
+import requests
+from bson import ObjectId
+from enum import Enum
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
@@ -19,49 +23,20 @@ mongo_url = os.environ['MONGO_URL']
 client = AsyncIOMotorClient(mongo_url)
 db = client[os.environ['DB_NAME']]
 
-# Create the main app without a prefix
-app = FastAPI()
+# Create the main app
+app = FastAPI(title="QuickBite Food Delivery API")
+
+# Socket.IO setup for real-time features
+sio = socketio.AsyncServer(
+    async_mode='asgi',
+    cors_allowed_origins='*',
+    logger=True,
+    engineio_logger=True
+)
+socket_app = socketio.ASGIApp(sio, app)
 
 # Create a router with the /api prefix
 api_router = APIRouter(prefix="/api")
-
-
-# Define Models
-class StatusCheck(BaseModel):
-    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    client_name: str
-    timestamp: datetime = Field(default_factory=datetime.utcnow)
-
-class StatusCheckCreate(BaseModel):
-    client_name: str
-
-# Add your routes to the router instead of directly to app
-@api_router.get("/")
-async def root():
-    return {"message": "Hello World"}
-
-@api_router.post("/status", response_model=StatusCheck)
-async def create_status_check(input: StatusCheckCreate):
-    status_dict = input.dict()
-    status_obj = StatusCheck(**status_dict)
-    _ = await db.status_checks.insert_one(status_obj.dict())
-    return status_obj
-
-@api_router.get("/status", response_model=List[StatusCheck])
-async def get_status_checks():
-    status_checks = await db.status_checks.find().to_list(1000)
-    return [StatusCheck(**status_check) for status_check in status_checks]
-
-# Include the router in the main app
-app.include_router(api_router)
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_credentials=True,
-    allow_origins=["*"],
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
 
 # Configure logging
 logging.basicConfig(
@@ -69,6 +44,574 @@ logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 )
 logger = logging.getLogger(__name__)
+
+# ============= ENUMS =============
+class UserRole(str, Enum):
+    CUSTOMER = "customer"
+    RESTAURANT = "restaurant"
+    RIDER = "rider"
+
+class OrderStatus(str, Enum):
+    PENDING = "pending"
+    PAYMENT_PENDING = "payment_pending"
+    PAID = "paid"
+    ACCEPTED = "accepted"
+    PREPARING = "preparing"
+    READY_FOR_PICKUP = "ready_for_pickup"
+    RIDER_ASSIGNED = "rider_assigned"
+    PICKED_UP = "picked_up"
+    OUT_FOR_DELIVERY = "out_for_delivery"
+    DELIVERED = "delivered"
+    CANCELLED = "cancelled"
+
+class RiderStatus(str, Enum):
+    OFFLINE = "offline"
+    AVAILABLE = "available"
+    BUSY = "busy"
+
+# ============= MODELS =============
+class User(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    email: str
+    name: str
+    picture: Optional[str] = None
+    role: UserRole
+    phone: Optional[str] = None
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class UserSession(BaseModel):
+    user_id: str
+    session_token: str
+    expires_at: datetime
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class Location(BaseModel):
+    latitude: float
+    longitude: float
+    address: str
+
+class MenuItem(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    name: str
+    description: Optional[str] = None
+    price: float
+    image_base64: Optional[str] = None
+    category: str
+    available: bool = True
+
+class Restaurant(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    owner_id: str
+    name: str
+    description: Optional[str] = None
+    image_base64: Optional[str] = None
+    location: Location
+    phone: str
+    menu: List[MenuItem] = []
+    operating_hours: Optional[str] = "9:00 AM - 10:00 PM"
+    rating: float = 0.0
+    is_open: bool = True
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class OrderItem(BaseModel):
+    menu_item_id: str
+    name: str
+    price: float
+    quantity: int
+
+class Order(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    customer_id: str
+    customer_name: str
+    customer_phone: str
+    restaurant_id: str
+    restaurant_name: str
+    items: List[OrderItem]
+    total_amount: float
+    delivery_address: Location
+    status: OrderStatus = OrderStatus.PENDING
+    rider_id: Optional[str] = None
+    payment_source_id: Optional[str] = None
+    payment_id: Optional[str] = None
+    special_instructions: Optional[str] = None
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class Rider(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    user_id: str
+    name: str
+    phone: str
+    vehicle_type: str = "Motorcycle"
+    status: RiderStatus = RiderStatus.OFFLINE
+    current_location: Optional[Location] = None
+    current_order_id: Optional[str] = None
+    total_deliveries: int = 0
+    rating: float = 0.0
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+# ============= AUTH HELPERS =============
+async def get_current_user(request: Request) -> Optional[User]:
+    """Get current user from session token"""
+    # Try cookie first
+    session_token = request.cookies.get("session_token")
+    
+    # Fallback to Authorization header
+    if not session_token:
+        auth_header = request.headers.get("Authorization")
+        if auth_header and auth_header.startswith("Bearer "):
+            session_token = auth_header.replace("Bearer ", "")
+    
+    if not session_token:
+        return None
+    
+    # Find session
+    session = await db.user_sessions.find_one({"session_token": session_token})
+    if not session or session["expires_at"] < datetime.now(timezone.utc):
+        return None
+    
+    # Find user
+    user_doc = await db.users.find_one({"id": session["user_id"]})
+    if not user_doc:
+        return None
+    
+    return User(**user_doc)
+
+async def require_auth(request: Request) -> User:
+    """Require authentication"""
+    user = await get_current_user(request)
+    if not user:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+    return user
+
+# ============= AUTH ENDPOINTS =============
+@api_router.post("/auth/session")
+async def create_session(request: Request):
+    """Process session_id from Emergent Auth and create session"""
+    try:
+        body = await request.json()
+        session_id = body.get("session_id")
+        role = body.get("role", "customer")  # Default to customer
+        
+        if not session_id:
+            raise HTTPException(status_code=400, detail="session_id required")
+        
+        # Get session data from Emergent Auth
+        response = requests.get(
+            "https://demobackend.emergentagent.com/auth/v1/env/oauth/session-data",
+            headers={"X-Session-ID": session_id},
+            timeout=10
+        )
+        
+        if response.status_code != 200:
+            raise HTTPException(status_code=400, detail="Invalid session_id")
+        
+        session_data = response.json()
+        
+        # Check if user exists
+        existing_user = await db.users.find_one({"email": session_data["email"]})
+        
+        if existing_user:
+            user = User(**existing_user)
+        else:
+            # Create new user with specified role
+            user = User(
+                email=session_data["email"],
+                name=session_data["name"],
+                picture=session_data.get("picture"),
+                role=role
+            )
+            await db.users.insert_one(user.dict())
+        
+        # Create session
+        session_token = session_data["session_token"]
+        expires_at = datetime.now(timezone.utc) + timedelta(days=7)
+        
+        user_session = UserSession(
+            user_id=user.id,
+            session_token=session_token,
+            expires_at=expires_at
+        )
+        
+        await db.user_sessions.insert_one(user_session.dict())
+        
+        # Set cookie
+        response = JSONResponse({
+            "user": user.dict(),
+            "session_token": session_token
+        })
+        response.set_cookie(
+            key="session_token",
+            value=session_token,
+            httponly=True,
+            secure=True,
+            samesite="none",
+            max_age=7 * 24 * 60 * 60
+        )
+        
+        return response
+        
+    except Exception as e:
+        logger.error(f"Session creation failed: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.get("/auth/me")
+async def get_me(request: Request):
+    """Get current user"""
+    user = await require_auth(request)
+    return user
+
+@api_router.post("/auth/logout")
+async def logout(request: Request):
+    """Logout user"""
+    session_token = request.cookies.get("session_token")
+    if session_token:
+        await db.user_sessions.delete_one({"session_token": session_token})
+    
+    response = JSONResponse({"message": "Logged out"})
+    response.delete_cookie("session_token")
+    return response
+
+# ============= RESTAURANT ENDPOINTS =============
+@api_router.post("/restaurants")
+async def create_restaurant(restaurant_data: Dict[str, Any], request: Request):
+    """Create a new restaurant (restaurant owners only)"""
+    user = await require_auth(request)
+    
+    if user.role != UserRole.RESTAURANT:
+        raise HTTPException(status_code=403, detail="Only restaurant owners can create restaurants")
+    
+    restaurant = Restaurant(
+        owner_id=user.id,
+        **restaurant_data
+    )
+    
+    await db.restaurants.insert_one(restaurant.dict())
+    logger.info(f"Restaurant {restaurant.name} created by {user.email}")
+    
+    return restaurant
+
+@api_router.get("/restaurants")
+async def get_restaurants():
+    """Get all restaurants"""
+    restaurants = await db.restaurants.find().to_list(100)
+    return [Restaurant(**r) for r in restaurants]
+
+@api_router.get("/restaurants/{restaurant_id}")
+async def get_restaurant(restaurant_id: str):
+    """Get restaurant by ID"""
+    restaurant = await db.restaurants.find_one({"id": restaurant_id})
+    if not restaurant:
+        raise HTTPException(status_code=404, detail="Restaurant not found")
+    return Restaurant(**restaurant)
+
+@api_router.put("/restaurants/{restaurant_id}")
+async def update_restaurant(restaurant_id: str, updates: Dict[str, Any], request: Request):
+    """Update restaurant (owner only)"""
+    user = await require_auth(request)
+    
+    restaurant = await db.restaurants.find_one({"id": restaurant_id})
+    if not restaurant:
+        raise HTTPException(status_code=404, detail="Restaurant not found")
+    
+    if restaurant["owner_id"] != user.id:
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    await db.restaurants.update_one(
+        {"id": restaurant_id},
+        {"$set": updates}
+    )
+    
+    return {"message": "Restaurant updated"}
+
+@api_router.get("/restaurants/owner/my")
+async def get_my_restaurant(request: Request):
+    """Get restaurant owned by current user"""
+    user = await require_auth(request)
+    
+    if user.role != UserRole.RESTAURANT:
+        raise HTTPException(status_code=403, detail="Not a restaurant owner")
+    
+    restaurant = await db.restaurants.find_one({"owner_id": user.id})
+    if not restaurant:
+        return None
+    
+    return Restaurant(**restaurant)
+
+# ============= ORDER ENDPOINTS =============
+@api_router.post("/orders")
+async def create_order(order_data: Dict[str, Any], request: Request):
+    """Create a new order"""
+    user = await require_auth(request)
+    
+    if user.role != UserRole.CUSTOMER:
+        raise HTTPException(status_code=403, detail="Only customers can create orders")
+    
+    # Get restaurant details
+    restaurant = await db.restaurants.find_one({"id": order_data["restaurant_id"]})
+    if not restaurant:
+        raise HTTPException(status_code=404, detail="Restaurant not found")
+    
+    order = Order(
+        customer_id=user.id,
+        customer_name=user.name,
+        customer_phone=order_data.get("customer_phone", user.phone or ""),
+        restaurant_name=restaurant["name"],
+        **order_data
+    )
+    
+    await db.orders.insert_one(order.dict())
+    logger.info(f"Order {order.id} created by {user.email}")
+    
+    # Emit real-time event to restaurant
+    await sio.emit('new_order', order.dict(), room=f"restaurant_{order.restaurant_id}")
+    
+    return order
+
+@api_router.get("/orders")
+async def get_orders(request: Request):
+    """Get orders for current user"""
+    user = await require_auth(request)
+    
+    if user.role == UserRole.CUSTOMER:
+        orders = await db.orders.find({"customer_id": user.id}).sort("created_at", -1).to_list(100)
+    elif user.role == UserRole.RESTAURANT:
+        restaurant = await db.restaurants.find_one({"owner_id": user.id})
+        if not restaurant:
+            return []
+        orders = await db.orders.find({"restaurant_id": restaurant["id"]}).sort("created_at", -1).to_list(100)
+    elif user.role == UserRole.RIDER:
+        rider = await db.riders.find_one({"user_id": user.id})
+        if not rider:
+            return []
+        orders = await db.orders.find({"rider_id": rider["id"]}).sort("created_at", -1).to_list(100)
+    else:
+        orders = []
+    
+    return [Order(**o) for o in orders]
+
+@api_router.get("/orders/{order_id}")
+async def get_order(order_id: str, request: Request):
+    """Get order by ID"""
+    user = await require_auth(request)
+    
+    order = await db.orders.find_one({"id": order_id})
+    if not order:
+        raise HTTPException(status_code=404, detail="Order not found")
+    
+    return Order(**order)
+
+@api_router.put("/orders/{order_id}/status")
+async def update_order_status(order_id: str, status_update: Dict[str, str], request: Request):
+    """Update order status"""
+    user = await require_auth(request)
+    
+    order = await db.orders.find_one({"id": order_id})
+    if not order:
+        raise HTTPException(status_code=404, detail="Order not found")
+    
+    new_status = status_update.get("status")
+    
+    await db.orders.update_one(
+        {"id": order_id},
+        {"$set": {"status": new_status, "updated_at": datetime.now(timezone.utc)}}
+    )
+    
+    # Emit real-time status update
+    await sio.emit('order_status_update', {
+        "order_id": order_id,
+        "status": new_status
+    }, room=f"order_{order_id}")
+    
+    await sio.emit('order_status_update', {
+        "order_id": order_id,
+        "status": new_status
+    }, room=f"customer_{order['customer_id']}")
+    
+    return {"message": "Order status updated", "status": new_status}
+
+@api_router.get("/orders/available/riders")
+async def get_available_orders_for_riders(request: Request):
+    """Get orders available for pickup by riders"""
+    user = await require_auth(request)
+    
+    if user.role != UserRole.RIDER:
+        raise HTTPException(status_code=403, detail="Only riders can access this")
+    
+    orders = await db.orders.find({
+        "status": OrderStatus.READY_FOR_PICKUP,
+        "rider_id": None
+    }).to_list(50)
+    
+    return [Order(**o) for o in orders]
+
+@api_router.post("/orders/{order_id}/accept-delivery")
+async def accept_delivery(order_id: str, request: Request):
+    """Rider accepts delivery"""
+    user = await require_auth(request)
+    
+    if user.role != UserRole.RIDER:
+        raise HTTPException(status_code=403, detail="Only riders can accept deliveries")
+    
+    rider = await db.riders.find_one({"user_id": user.id})
+    if not rider:
+        raise HTTPException(status_code=404, detail="Rider profile not found")
+    
+    order = await db.orders.find_one({"id": order_id})
+    if not order:
+        raise HTTPException(status_code=404, detail="Order not found")
+    
+    if order["status"] != OrderStatus.READY_FOR_PICKUP:
+        raise HTTPException(status_code=400, detail="Order not ready for pickup")
+    
+    await db.orders.update_one(
+        {"id": order_id},
+        {"$set": {
+            "rider_id": rider["id"],
+            "status": OrderStatus.RIDER_ASSIGNED,
+            "updated_at": datetime.now(timezone.utc)
+        }}
+    )
+    
+    await db.riders.update_one(
+        {"id": rider["id"]},
+        {"$set": {
+            "current_order_id": order_id,
+            "status": RiderStatus.BUSY
+        }}
+    )
+    
+    # Emit real-time update
+    await sio.emit('rider_assigned', {
+        "order_id": order_id,
+        "rider_name": rider["name"]
+    }, room=f"customer_{order['customer_id']}")
+    
+    return {"message": "Delivery accepted"}
+
+# ============= RIDER ENDPOINTS =============
+@api_router.post("/riders")
+async def create_rider_profile(rider_data: Dict[str, Any], request: Request):
+    """Create rider profile"""
+    user = await require_auth(request)
+    
+    if user.role != UserRole.RIDER:
+        raise HTTPException(status_code=403, detail="Only riders can create rider profiles")
+    
+    existing = await db.riders.find_one({"user_id": user.id})
+    if existing:
+        raise HTTPException(status_code=400, detail="Rider profile already exists")
+    
+    rider = Rider(
+        user_id=user.id,
+        name=user.name,
+        phone=rider_data.get("phone", user.phone or ""),
+        vehicle_type=rider_data.get("vehicle_type", "Motorcycle")
+    )
+    
+    await db.riders.insert_one(rider.dict())
+    return rider
+
+@api_router.get("/riders/me")
+async def get_my_rider_profile(request: Request):
+    """Get current user's rider profile"""
+    user = await require_auth(request)
+    
+    if user.role != UserRole.RIDER:
+        raise HTTPException(status_code=403, detail="Not a rider")
+    
+    rider = await db.riders.find_one({"user_id": user.id})
+    if not rider:
+        return None
+    
+    return Rider(**rider)
+
+@api_router.put("/riders/location")
+async def update_rider_location(location: Location, request: Request):
+    """Update rider's current location"""
+    user = await require_auth(request)
+    
+    if user.role != UserRole.RIDER:
+        raise HTTPException(status_code=403, detail="Only riders can update location")
+    
+    rider = await db.riders.find_one({"user_id": user.id})
+    if not rider:
+        raise HTTPException(status_code=404, detail="Rider profile not found")
+    
+    await db.riders.update_one(
+        {"user_id": user.id},
+        {"$set": {"current_location": location.dict()}}
+    )
+    
+    # If rider has active order, emit location update
+    if rider.get("current_order_id"):
+        order = await db.orders.find_one({"id": rider["current_order_id"]})
+        if order:
+            await sio.emit('rider_location_update', {
+                "order_id": order["id"],
+                "location": location.dict()
+            }, room=f"customer_{order['customer_id']}")
+    
+    return {"message": "Location updated"}
+
+@api_router.put("/riders/status")
+async def update_rider_status(status_update: Dict[str, str], request: Request):
+    """Update rider availability status"""
+    user = await require_auth(request)
+    
+    if user.role != UserRole.RIDER:
+        raise HTTPException(status_code=403, detail="Only riders can update status")
+    
+    new_status = status_update.get("status")
+    
+    await db.riders.update_one(
+        {"user_id": user.id},
+        {"$set": {"status": new_status}}
+    )
+    
+    return {"message": "Status updated", "status": new_status}
+
+# ============= SOCKET.IO EVENTS =============
+@sio.event
+async def connect(sid, environ):
+    logger.info(f"Client connected: {sid}")
+
+@sio.event
+async def disconnect(sid):
+    logger.info(f"Client disconnected: {sid}")
+
+@sio.event
+async def join_room(sid, data):
+    """Join a specific room for real-time updates"""
+    room = data.get('room')
+    if room:
+        await sio.enter_room(sid, room)
+        logger.info(f"Client {sid} joined room {room}")
+
+@sio.event
+async def leave_room(sid, data):
+    """Leave a room"""
+    room = data.get('room')
+    if room:
+        await sio.leave_room(sid, room)
+        logger.info(f"Client {sid} left room {room}")
+
+# ============= HEALTH CHECK =============
+@api_router.get("/health")
+async def health_check():
+    return {"status": "healthy", "service": "QuickBite API"}
+
+# Include router
+app.include_router(api_router)
+
+# CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_credentials=True,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.on_event("shutdown")
 async def shutdown_db_client():
