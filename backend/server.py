@@ -50,6 +50,7 @@ class UserRole(str, Enum):
     CUSTOMER = "customer"
     RESTAURANT = "restaurant"
     RIDER = "rider"
+    ADMIN = "admin"
 
 class OrderStatus(str, Enum):
     PENDING = "pending"
