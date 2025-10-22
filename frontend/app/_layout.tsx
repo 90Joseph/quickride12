@@ -80,6 +80,7 @@ export default function RootLayout() {
         <Stack.Screen name="(customer)" />
         <Stack.Screen name="(restaurant)" />
         <Stack.Screen name="(rider)" />
+        <Stack.Screen name="(admin)" />
       </Stack>
     </NavigationThemeProvider>
   );
