@@ -734,6 +734,128 @@ async def leave_room(sid, data):
         await sio.leave_room(sid, room)
         logger.info(f"Client {sid} left room {room}")
 
+# ============= ADMIN ENDPOINTS =============
+async def require_admin(request: Request) -> User:
+    """Require admin role"""
+    user = await require_auth(request)
+    if user.role != UserRole.ADMIN:
+        raise HTTPException(status_code=403, detail="Admin access required")
+    return user
+
+@api_router.get("/admin/dashboard")
+async def get_admin_dashboard(request: Request):
+    """Get admin dashboard statistics"""
+    await require_admin(request)
+    
+    try:
+        # Get counts
+        total_users = await db.users.count_documents({})
+        total_customers = await db.users.count_documents({"role": "customer"})
+        total_restaurants = await db.restaurants.count_documents({})
+        total_riders = await db.riders.count_documents({})
+        total_orders = await db.orders.count_documents({})
+        
+        # Get recent orders
+        recent_orders = await db.orders.find().sort("created_at", -1).limit(10).to_list(10)
+        
+        # Get order statistics
+        pending_orders = await db.orders.count_documents({"status": {"$in": ["pending", "payment_pending", "paid"]}})
+        active_orders = await db.orders.count_documents({"status": {"$in": ["accepted", "preparing", "ready_for_pickup", "rider_assigned", "picked_up", "out_for_delivery"]}})
+        completed_orders = await db.orders.count_documents({"status": "delivered"})
+        
+        # Calculate total revenue (assuming all delivered orders)
+        delivered_orders = await db.orders.find({"status": "delivered"}).to_list(1000)
+        total_revenue = sum(order.get("total_amount", 0) for order in delivered_orders)
+        
+        return {
+            "users": {
+                "total": total_users,
+                "customers": total_customers,
+                "restaurants": total_restaurants,
+                "riders": total_riders
+            },
+            "orders": {
+                "total": total_orders,
+                "pending": pending_orders,
+                "active": active_orders,
+                "completed": completed_orders
+            },
+            "revenue": {
+                "total": total_revenue
+            },
+            "recent_orders": [Order(**order) for order in recent_orders]
+        }
+    except Exception as e:
+        logger.error(f"Admin dashboard error: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.get("/admin/users")
+async def get_all_users(request: Request):
+    """Get all users (admin only)"""
+    await require_admin(request)
+    
+    users = await db.users.find().to_list(1000)
+    # Remove password hashes from response
+    for user in users:
+        user.pop("password_hash", None)
+    return users
+
+@api_router.get("/admin/orders/all")
+async def get_all_orders_admin(request: Request):
+    """Get all orders (admin only)"""
+    await require_admin(request)
+    
+    orders = await db.orders.find().sort("created_at", -1).to_list(1000)
+    return [Order(**order) for order in orders]
+
+@api_router.delete("/admin/users/{user_id}")
+async def delete_user(user_id: str, request: Request):
+    """Delete user (admin only)"""
+    await require_admin(request)
+    
+    result = await db.users.delete_one({"id": user_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    return {"message": "User deleted"}
+
+@api_router.get("/admin/activities")
+async def get_recent_activities(request: Request):
+    """Get recent system activities"""
+    await require_admin(request)
+    
+    # Get recent orders
+    recent_orders = await db.orders.find().sort("created_at", -1).limit(20).to_list(20)
+    
+    # Get recently registered users
+    recent_users = await db.users.find().sort("created_at", -1).limit(20).to_list(20)
+    
+    # Format activities
+    activities = []
+    
+    for order in recent_orders:
+        activities.append({
+            "type": "order",
+            "action": f"New order from {order.get('customer_name')}",
+            "details": f"Order #{order.get('id')[:8]} - ₱{order.get('total_amount')}",
+            "timestamp": order.get("created_at"),
+            "status": order.get("status")
+        })
+    
+    for user in recent_users:
+        activities.append({
+            "type": "user",
+            "action": f"New {user.get('role')} registered",
+            "details": user.get('name'),
+            "timestamp": user.get("created_at"),
+            "status": "active"
+        })
+    
+    # Sort by timestamp
+    activities.sort(key=lambda x: x["timestamp"], reverse=True)
+    
+    return activities[:30]
+
 # ============= HEALTH CHECK =============
 @api_router.get("/health")
 async def health_check():
