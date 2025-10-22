@@ -78,6 +78,7 @@ class User(BaseModel):
     picture: Optional[str] = None
     role: UserRole
     phone: Optional[str] = None
+    password_hash: Optional[str] = None  # For username/password auth
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 class UserSession(BaseModel):
