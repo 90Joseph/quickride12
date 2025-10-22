@@ -380,8 +380,13 @@ async def create_session(request: Request):
         await db.user_sessions.insert_one(user_session.dict())
         
         # Set cookie
+        user_dict = user.model_dump()
+        # Convert datetime to string
+        if "created_at" in user_dict and isinstance(user_dict["created_at"], datetime):
+            user_dict["created_at"] = user_dict["created_at"].isoformat()
+        
         response = JSONResponse({
-            "user": user.dict(),
+            "user": user_dict,
             "session_token": session_token
         })
         response.set_cookie(
