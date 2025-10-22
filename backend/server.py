@@ -186,7 +186,143 @@ async def require_auth(request: Request) -> User:
         raise HTTPException(status_code=401, detail="Not authenticated")
     return user
 
+# Password hashing utilities
+from passlib.context import CryptContext
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+def hash_password(password: str) -> str:
+    return pwd_context.hash(password)
+
+def verify_password(plain_password: str, hashed_password: str) -> bool:
+    return pwd_context.verify(plain_password, hashed_password)
+
 # ============= AUTH ENDPOINTS =============
+@api_router.post("/auth/register")
+async def register(request: Request):
+    """Register with username/password"""
+    try:
+        body = await request.json()
+        email = body.get("email")
+        password = body.get("password")
+        name = body.get("name")
+        role = body.get("role", "customer")
+        phone = body.get("phone")
+        
+        if not email or not password or not name:
+            raise HTTPException(status_code=400, detail="Email, password, and name required")
+        
+        # Check if user exists
+        existing = await db.users.find_one({"email": email})
+        if existing:
+            raise HTTPException(status_code=400, detail="Email already registered")
+        
+        # Create user
+        user = User(
+            email=email,
+            name=name,
+            role=role,
+            phone=phone,
+            password_hash=hash_password(password)
+        )
+        
+        await db.users.insert_one(user.dict())
+        
+        # Create session
+        session_token = str(uuid.uuid4())
+        expires_at = datetime.now(timezone.utc) + timedelta(days=7)
+        
+        user_session = UserSession(
+            user_id=user.id,
+            session_token=session_token,
+            expires_at=expires_at
+        )
+        
+        await db.user_sessions.insert_one(user_session.dict())
+        
+        # Return user without password hash
+        user_dict = user.dict()
+        user_dict.pop("password_hash", None)
+        
+        response = JSONResponse({
+            "user": user_dict,
+            "session_token": session_token
+        })
+        response.set_cookie(
+            key="session_token",
+            value=session_token,
+            httponly=True,
+            secure=True,
+            samesite="none",
+            max_age=7 * 24 * 60 * 60
+        )
+        
+        return response
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Registration failed: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.post("/auth/login")
+async def login(request: Request):
+    """Login with username/password"""
+    try:
+        body = await request.json()
+        email = body.get("email")
+        password = body.get("password")
+        
+        if not email or not password:
+            raise HTTPException(status_code=400, detail="Email and password required")
+        
+        # Find user
+        user_doc = await db.users.find_one({"email": email})
+        if not user_doc or not user_doc.get("password_hash"):
+            raise HTTPException(status_code=401, detail="Invalid credentials")
+        
+        # Verify password
+        if not verify_password(password, user_doc["password_hash"]):
+            raise HTTPException(status_code=401, detail="Invalid credentials")
+        
+        user = User(**user_doc)
+        
+        # Create session
+        session_token = str(uuid.uuid4())
+        expires_at = datetime.now(timezone.utc) + timedelta(days=7)
+        
+        user_session = UserSession(
+            user_id=user.id,
+            session_token=session_token,
+            expires_at=expires_at
+        )
+        
+        await db.user_sessions.insert_one(user_session.dict())
+        
+        # Return user without password hash
+        user_dict = user.dict()
+        user_dict.pop("password_hash", None)
+        
+        response = JSONResponse({
+            "user": user_dict,
+            "session_token": session_token
+        })
+        response.set_cookie(
+            key="session_token",
+            value=session_token,
+            httponly=True,
+            secure=True,
+            samesite="none",
+            max_age=7 * 24 * 60 * 60
+        )
+        
+        return response
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Login failed: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 @api_router.post("/auth/session")
 async def create_session(request: Request):
     """Process session_id from Emergent Auth and create session"""
