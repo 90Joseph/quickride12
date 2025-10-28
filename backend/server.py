@@ -514,12 +514,21 @@ async def create_order(order_data: Dict[str, Any], request: Request):
     if not restaurant:
         raise HTTPException(status_code=404, detail="Restaurant not found")
     
+    # Create order with proper field mapping
     order = Order(
         customer_id=user.id,
         customer_name=user.name,
         customer_phone=order_data.get("customer_phone", user.phone or ""),
+        restaurant_id=order_data["restaurant_id"],
         restaurant_name=restaurant["name"],
-        **order_data
+        items=order_data["items"],
+        total_amount=order_data["total_amount"],
+        subtotal=order_data.get("subtotal"),
+        delivery_fee=order_data.get("delivery_fee"),
+        rider_fee=order_data.get("rider_fee"),
+        app_fee=order_data.get("app_fee"),
+        delivery_address=order_data["delivery_address"],
+        special_instructions=order_data.get("special_instructions")
     )
     
     await db.orders.insert_one(order.dict())
