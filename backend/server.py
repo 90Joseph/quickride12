@@ -611,10 +611,16 @@ async def get_available_orders_for_riders(request: Request):
     if user.role != UserRole.RIDER:
         raise HTTPException(status_code=403, detail="Only riders can access this")
     
+    # Riders can see orders that are paid, accepted, preparing, or ready for pickup
     orders = await db.orders.find({
-        "status": OrderStatus.READY_FOR_PICKUP,
+        "status": {"$in": [
+            OrderStatus.PAID,
+            OrderStatus.ACCEPTED,
+            OrderStatus.PREPARING,
+            OrderStatus.READY_FOR_PICKUP
+        ]},
         "rider_id": None
-    }).to_list(50)
+    }).sort("created_at", -1).to_list(50)
     
     return [Order(**o) for o in orders]
 
