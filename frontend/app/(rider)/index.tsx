@@ -57,22 +57,47 @@ export default function RiderAvailableScreen() {
   };
 
   const handleAcceptDelivery = async (orderId: string) => {
-    Alert.alert('Accept Delivery', 'Accept this delivery?', [
-      { text: 'Cancel', style: 'cancel' },
-      {
-        text: 'Accept',
-        onPress: async () => {
-          try {
-            await api.post(`/orders/${orderId}/accept-delivery`);
-            Alert.alert('Success', 'Delivery accepted!');
-            fetchOrders();
-          } catch (error) {
-            console.error('Error accepting delivery:', error);
-            Alert.alert('Error', 'Failed to accept delivery');
-          }
-        },
-      },
-    ]);
+    console.log('Accept delivery clicked for order:', orderId);
+    
+    // Cross-platform confirmation
+    const confirmed = Platform.OS === 'web' 
+      ? window.confirm('Accept this delivery?')
+      : await new Promise((resolve) => {
+          Alert.alert('Accept Delivery', 'Accept this delivery?', [
+            { text: 'Cancel', style: 'cancel', onPress: () => resolve(false) },
+            { text: 'Accept', onPress: () => resolve(true) },
+          ]);
+        });
+
+    if (!confirmed) {
+      console.log('Delivery acceptance cancelled');
+      return;
+    }
+
+    console.log('Processing delivery acceptance...');
+    try {
+      const response = await api.post(`/orders/${orderId}/accept-delivery`);
+      console.log('Delivery accepted successfully:', response.data);
+      
+      if (Platform.OS === 'web') {
+        window.alert('Delivery accepted! Check your Active tab.');
+      } else {
+        Alert.alert('Success', 'Delivery accepted! Check your Active tab.');
+      }
+      
+      fetchOrders();
+    } catch (error: any) {
+      console.error('Error accepting delivery:', error);
+      console.error('Error response:', error.response?.data);
+      
+      const message = error.response?.data?.detail || 'Failed to accept delivery. Please try again.';
+      
+      if (Platform.OS === 'web') {
+        window.alert(`Error: ${message}`);
+      } else {
+        Alert.alert('Error', message);
+      }
+    }
   };
 
   const renderOrder = ({ item }: { item: Order }) => (
