@@ -515,6 +515,7 @@ async def create_order(order_data: Dict[str, Any], request: Request):
         raise HTTPException(status_code=404, detail="Restaurant not found")
     
     # Create order with proper field mapping
+    # Set status to "paid" for COD orders (Cash on Delivery)
     order = Order(
         customer_id=user.id,
         customer_name=user.name,
@@ -528,7 +529,8 @@ async def create_order(order_data: Dict[str, Any], request: Request):
         rider_fee=order_data.get("rider_fee"),
         app_fee=order_data.get("app_fee"),
         delivery_address=order_data["delivery_address"],
-        special_instructions=order_data.get("special_instructions")
+        special_instructions=order_data.get("special_instructions"),
+        status=OrderStatus.PAID  # COD orders are automatically marked as paid
     )
     
     await db.orders.insert_one(order.dict())
