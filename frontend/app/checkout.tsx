@@ -526,6 +526,7 @@ const styles = StyleSheet.create({
     padding: 16,
     borderTopWidth: 1,
     borderTopColor: '#E0E0E0',
+    zIndex: 1000,
   },
   placeOrderButton: {
     backgroundColor: '#FF6B6B',
