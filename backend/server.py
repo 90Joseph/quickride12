@@ -887,6 +887,36 @@ async def get_recent_activities(request: Request):
     
     return activities[:30]
 
+# ============= USER PROFILE ENDPOINTS =============
+@api_router.put("/users/{user_id}")
+async def update_user_profile(user_id: str, updates: Dict[str, Any], request: Request):
+    """Update user profile"""
+    user = await require_auth(request)
+    
+    # Users can only update their own profile
+    if user.id != user_id:
+        raise HTTPException(status_code=403, detail="Not authorized to update this profile")
+    
+    # Only allow updating certain fields
+    allowed_fields = ["name", "phone"]
+    update_data = {k: v for k, v in updates.items() if k in allowed_fields}
+    
+    if not update_data:
+        raise HTTPException(status_code=400, detail="No valid fields to update")
+    
+    # Update user in database
+    await db.users.update_one(
+        {"id": user_id},
+        {"$set": update_data}
+    )
+    
+    # Return updated user
+    updated_user = await db.users.find_one({"id": user_id})
+    if updated_user:
+        updated_user.pop("password_hash", None)
+    
+    return updated_user
+
 # ============= HEALTH CHECK =============
 @api_router.get("/health")
 async def health_check():
