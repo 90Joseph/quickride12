@@ -20,6 +20,8 @@ interface Order {
   status: string;
   created_at: string;
   items: any[];
+  rider_name?: string;
+  rider_phone?: string;
 }
 
 export default function OrdersScreen() {
