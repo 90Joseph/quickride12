@@ -57,9 +57,18 @@ export default function OrdersScreen() {
         return '#F44336';
       case 'pending':
       case 'payment_pending':
+      case 'paid':
         return '#FFC107';
-      default:
+      case 'preparing':
+        return '#FF9800';
+      case 'ready_for_pickup':
+        return '#9C27B0';
+      case 'rider_assigned':
+        return '#673AB7';
+      case 'out_for_delivery':
         return '#2196F3';
+      default:
+        return '#607D8B';
     }
   };
 
@@ -70,9 +79,15 @@ export default function OrdersScreen() {
       case 'cancelled':
         return 'close-circle';
       case 'pending':
+      case 'paid':
+      case 'payment_pending':
         return 'time';
       case 'preparing':
         return 'restaurant';
+      case 'ready_for_pickup':
+        return 'cube';
+      case 'rider_assigned':
+        return 'person';
       case 'out_for_delivery':
         return 'bicycle';
       default:
