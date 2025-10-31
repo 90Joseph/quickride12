@@ -689,6 +689,8 @@ async def update_order_status(order_id: str, status_update: Dict[str, str], requ
         available_rider = await db.riders.find_one({"status": RiderStatus.AVAILABLE})
         if available_rider:
             update_data["rider_id"] = available_rider["id"]
+            update_data["rider_name"] = available_rider["name"]
+            update_data["rider_phone"] = available_rider["phone"]
             # Update status to rider_assigned
             update_data["status"] = OrderStatus.RIDER_ASSIGNED
             new_status = OrderStatus.RIDER_ASSIGNED
@@ -699,7 +701,7 @@ async def update_order_status(order_id: str, status_update: Dict[str, str], requ
                 {"$set": {"status": RiderStatus.BUSY}}
             )
             
-            logger.info(f"Auto-assigned rider {available_rider['id']} to order {order_id}")
+            logger.info(f"Auto-assigned rider {available_rider['name']} ({available_rider['id']}) to order {order_id}")
             
             # Emit event to rider
             await sio.emit('new_delivery_assignment', {
