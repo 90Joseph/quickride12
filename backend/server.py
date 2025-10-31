@@ -151,7 +151,7 @@ class Rider(BaseModel):
     name: str
     phone: str
     vehicle_type: str = "Motorcycle"
-    status: RiderStatus = RiderStatus.OFFLINE
+    status: RiderStatus = RiderStatus.AVAILABLE
     current_location: Optional[Location] = None
     current_order_id: Optional[str] = None
     total_deliveries: int = 0
