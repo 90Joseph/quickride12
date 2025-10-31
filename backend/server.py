@@ -709,6 +709,14 @@ async def update_order_status(order_id: str, status_update: Dict[str, str], requ
                 "order": Order(**order).dict()
             }, room=f"rider_{available_rider['user_id']}")
     
+    # When order is delivered, set rider back to available
+    if new_status == OrderStatus.DELIVERED and order.get("rider_id"):
+        await db.riders.update_one(
+            {"id": order["rider_id"]},
+            {"$set": {"status": RiderStatus.AVAILABLE}}
+        )
+        logger.info(f"Rider {order.get('rider_name')} set back to available after delivery")
+    
     await db.orders.update_one(
         {"id": order_id},
         {"$set": update_data}
