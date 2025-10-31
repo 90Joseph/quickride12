@@ -137,6 +137,8 @@ class Order(BaseModel):
     delivery_address: Location
     status: OrderStatus = OrderStatus.PENDING
     rider_id: Optional[str] = None
+    rider_name: Optional[str] = None
+    rider_phone: Optional[str] = None
     payment_source_id: Optional[str] = None
     payment_id: Optional[str] = None
     special_instructions: Optional[str] = None
