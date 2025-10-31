@@ -756,6 +756,56 @@ async def get_available_orders_for_riders(request: Request):
     
     return [Order(**o) for o in orders]
 
+# ============= RIDER PROFILE ENDPOINTS =============
+@api_router.get("/riders/me")
+async def get_my_rider_profile(request: Request):
+    """Get current rider's profile"""
+    user = await require_auth(request)
+    
+    if user.role != UserRole.RIDER:
+        raise HTTPException(status_code=403, detail="Only riders can access this endpoint")
+    
+    rider = await db.riders.find_one({"user_id": user.id})
+    if not rider:
+        # Auto-create rider profile if not exists
+        new_rider = Rider(
+            user_id=user.id,
+            name=user.name,
+            phone=user.phone or "",
+            vehicle_type="Motorcycle"
+        )
+        await db.riders.insert_one(new_rider.dict())
+        logger.info(f"Auto-created rider profile for user {user.email}")
+        return new_rider
+    
+    return Rider(**rider)
+
+@api_router.put("/riders/me/status")
+async def update_my_rider_status(status_update: Dict[str, str], request: Request):
+    """Update current rider's status"""
+    user = await require_auth(request)
+    
+    if user.role != UserRole.RIDER:
+        raise HTTPException(status_code=403, detail="Only riders can access this endpoint")
+    
+    new_status = status_update.get("status")
+    if new_status not in ["available", "busy", "offline"]:
+        raise HTTPException(status_code=400, detail="Invalid status. Must be 'available', 'busy', or 'offline'")
+    
+    rider = await db.riders.find_one({"user_id": user.id})
+    if not rider:
+        raise HTTPException(status_code=404, detail="Rider profile not found")
+    
+    await db.riders.update_one(
+        {"user_id": user.id},
+        {"$set": {"status": new_status}}
+    )
+    
+    logger.info(f"Rider {user.email} status updated to {new_status}")
+    
+    return {"message": "Status updated successfully", "status": new_status}
+
+# ============= RIDER DELIVERY ENDPOINTS =============
 @api_router.post("/orders/{order_id}/accept-delivery")
 async def accept_delivery(order_id: str, request: Request):
     """Rider accepts delivery"""
