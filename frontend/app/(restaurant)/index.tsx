@@ -127,6 +127,18 @@ export default function RestaurantOrdersScreen() {
         </Text>
       </View>
 
+      {item.rider_name && (
+        <View style={styles.riderInfo}>
+          <Ionicons name="bicycle" size={18} color="#4CAF50" />
+          <View style={styles.riderDetails}>
+            <Text style={styles.riderName}>Rider: {item.rider_name}</Text>
+            {item.rider_phone && (
+              <Text style={styles.riderPhone}>{item.rider_phone}</Text>
+            )}
+          </View>
+        </View>
+      )}
+
       <View style={styles.orderActions}>
         {item.status === 'preparing' && (
           <TouchableOpacity
