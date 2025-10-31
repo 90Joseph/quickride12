@@ -130,23 +130,7 @@ export default function RestaurantOrdersScreen() {
       </View>
 
       <View style={styles.orderActions}>
-        {item.status === 'paid' && (
-          <>
-            <TouchableOpacity
-              style={[styles.actionButton, styles.rejectButton]}
-              onPress={() => handleRejectOrder(item.id)}
-            >
-              <Text style={styles.rejectButtonText}>Reject</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.actionButton, styles.acceptButton]}
-              onPress={() => handleAcceptOrder(item.id)}
-            >
-              <Text style={styles.acceptButtonText}>Accept</Text>
-            </TouchableOpacity>
-          </>
-        )}
-        {(item.status === 'accepted' || item.status === 'preparing') && (
+        {item.status === 'preparing' && (
           <TouchableOpacity
             style={[styles.actionButton, styles.primaryButton]}
             onPress={() => updateOrderStatus(item.id, getNextStatus(item.status))}
