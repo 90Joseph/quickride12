@@ -429,6 +429,38 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#999',
   },
+  riderInfoCard: {
+    backgroundColor: '#E8F5E9',
+    borderRadius: 16,
+    padding: 20,
+    marginBottom: 16,
+    borderWidth: 2,
+    borderColor: '#4CAF50',
+  },
+  riderInfoHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  riderInfoTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#4CAF50',
+    marginLeft: 8,
+  },
+  riderInfoBody: {
+    paddingLeft: 32,
+  },
+  riderNameText: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#2E7D32',
+    marginBottom: 6,
+  },
+  riderPhoneText: {
+    fontSize: 16,
+    color: '#388E3C',
+  },
   section: {
     backgroundColor: '#FFF',
     borderRadius: 16,
