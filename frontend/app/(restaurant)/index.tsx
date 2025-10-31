@@ -33,8 +33,8 @@ export default function RestaurantOrdersScreen() {
 
   useEffect(() => {
     fetchOrders();
-    // Poll for new orders every 10 seconds
-    const interval = setInterval(fetchOrders, 10000);
+    // Auto-refresh every 5 seconds for real-time updates
+    const interval = setInterval(fetchOrders, 5000);
     return () => clearInterval(interval);
   }, []);
 
