@@ -676,9 +676,38 @@ async def update_order_status(order_id: str, status_update: Dict[str, str], requ
     
     new_status = status_update.get("status")
     
+    update_data = {
+        "status": new_status, 
+        "updated_at": datetime.now(timezone.utc)
+    }
+    
+    # Auto-assign rider when order is marked as ready_for_pickup
+    if new_status == OrderStatus.READY_FOR_PICKUP and not order.get("rider_id"):
+        # Find an available rider
+        available_rider = await db.riders.find_one({"status": RiderStatus.AVAILABLE})
+        if available_rider:
+            update_data["rider_id"] = available_rider["id"]
+            # Update status to rider_assigned
+            update_data["status"] = OrderStatus.RIDER_ASSIGNED
+            new_status = OrderStatus.RIDER_ASSIGNED
+            
+            # Update rider status to busy
+            await db.riders.update_one(
+                {"id": available_rider["id"]},
+                {"$set": {"status": RiderStatus.BUSY}}
+            )
+            
+            logger.info(f"Auto-assigned rider {available_rider['id']} to order {order_id}")
+            
+            # Emit event to rider
+            await sio.emit('new_delivery_assignment', {
+                "order_id": order_id,
+                "order": Order(**order).dict()
+            }, room=f"rider_{available_rider['user_id']}")
+    
     await db.orders.update_one(
         {"id": order_id},
-        {"$set": {"status": new_status, "updated_at": datetime.now(timezone.utc)}}
+        {"$set": update_data}
     )
     
     # Emit real-time status update
