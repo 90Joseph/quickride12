@@ -19,6 +19,7 @@ interface Order {
   restaurant_name: string;
   customer_name: string;
   total_amount: number;
+  status: string;
   delivery_address: {
     address: string;
     latitude: number;
@@ -41,7 +42,8 @@ export default function RiderAvailableScreen() {
 
   const fetchOrders = async () => {
     try {
-      const response = await api.get('/orders/available/riders');
+      // Get rider's assigned orders
+      const response = await api.get('/orders');
       setOrders(response.data);
     } catch (error) {
       console.error('Error fetching orders:', error);
@@ -56,7 +58,7 @@ export default function RiderAvailableScreen() {
     fetchOrders();
   };
 
-  const handleAcceptDelivery = async (orderId: string) => {
+  const handlePickup = async (orderId: string) => {
     console.log('Accept delivery clicked for order:', orderId);
     
     // Cross-platform confirmation
