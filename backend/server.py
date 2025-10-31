@@ -635,11 +635,15 @@ async def get_orders(request: Request):
     
     if user.role == UserRole.CUSTOMER:
         orders = await db.orders.find({"customer_id": user.id}).sort("created_at", -1).to_list(100)
+        logger.info(f"Customer {user.id} fetched {len(orders)} orders")
     elif user.role == UserRole.RESTAURANT:
         restaurant = await db.restaurants.find_one({"owner_id": user.id})
         if not restaurant:
+            logger.warning(f"Restaurant owner {user.id} has no restaurant")
             return []
+        logger.info(f"Restaurant owner {user.id} managing restaurant {restaurant['id']} - {restaurant.get('name')}")
         orders = await db.orders.find({"restaurant_id": restaurant["id"]}).sort("created_at", -1).to_list(100)
+        logger.info(f"Found {len(orders)} orders for restaurant {restaurant['id']}")
     elif user.role == UserRole.RIDER:
         rider = await db.riders.find_one({"user_id": user.id})
         if not rider:
