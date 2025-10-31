@@ -166,8 +166,19 @@ export default function RestaurantOrdersScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
+      <View style={styles.header}>
+        <Text style={styles.headerTitle}>Active Orders</Text>
+        <TouchableOpacity 
+          style={styles.historyButton}
+          onPress={() => router.push('/(restaurant)/history' as any)}
+        >
+          <Ionicons name="time-outline" size={20} color="#FF6B6B" />
+          <Text style={styles.historyButtonText}>History</Text>
+        </TouchableOpacity>
+      </View>
+
       <FlatList
-        data={orders}
+        data={orders.filter((o) => o.status !== 'delivered' && o.status !== 'cancelled')}
         renderItem={renderOrder}
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.listContent}
