@@ -496,7 +496,24 @@ async def get_my_restaurant(request: Request):
     
     restaurant = await db.restaurants.find_one({"owner_id": user.id})
     if not restaurant:
-        return None
+        # Auto-create a default restaurant for the user
+        default_restaurant = Restaurant(
+            owner_id=user.id,
+            name=f"{user.name}'s Restaurant",
+            description="Welcome to my restaurant! Update your profile to get started.",
+            phone=user.phone or "+63 912 345 6789",
+            location=Location(
+                latitude=14.5995,
+                longitude=120.9842,
+                address="Metro Manila, Philippines"
+            ),
+            menu=[],
+            operating_hours="9:00 AM - 10:00 PM",
+            is_open=True
+        )
+        await db.restaurants.insert_one(default_restaurant.dict())
+        logger.info(f"Auto-created restaurant for user {user.email}")
+        return default_restaurant
     
     return Restaurant(**restaurant)
 
