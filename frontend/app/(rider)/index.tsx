@@ -200,7 +200,7 @@ export default function RiderAvailableScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <FlatList
-        data={orders.filter((o) => o.status === 'rider_assigned' || o.status === 'picked_up')}
+        data={orders.filter((o) => o.status === 'rider_assigned' || o.status === 'out_for_delivery')}
         renderItem={renderOrder}
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.listContent}
