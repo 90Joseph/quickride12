@@ -96,14 +96,20 @@ export default function CheckoutScreen() {
 
       console.log('Sending order data:', JSON.stringify(orderData, null, 2));
 
-      const response = await api.post('/orders', orderData);
+      // Add timeout to prevent infinite loading
+      const response = await Promise.race([
+        api.post('/orders', orderData),
+        new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Request timeout - Please check your connection')), 30000)
+        )
+      ]);
 
       console.log('Order created successfully:', response.data);
 
       if (Platform.OS === 'web') {
-        window.alert('Order placed successfully! Check your Orders tab.');
+        window.alert('Order placed successfully! 🎉 Check your Orders tab.');
       } else {
-        Alert.alert('Success', 'Order placed successfully! Check your Orders tab.');
+        Alert.alert('Success', 'Order placed successfully! 🎉 Check your Orders tab.');
       }
 
       clearCart();
@@ -119,7 +125,9 @@ export default function CheckoutScreen() {
       
       let message = 'Failed to place order. ';
       
-      if (error.response?.data?.detail) {
+      if (error.message === 'Request timeout - Please check your connection') {
+        message = 'Request timeout. Please check your internet connection and try again.';
+      } else if (error.response?.data?.detail) {
         message += error.response.data.detail;
       } else if (error.response?.status === 401) {
         message += 'Please login again.';
@@ -135,6 +143,7 @@ export default function CheckoutScreen() {
         Alert.alert('Error', message);
       }
     } finally {
+      console.log('Order placement finished, setting loading to false');
       setLoading(false);
     }
   };
