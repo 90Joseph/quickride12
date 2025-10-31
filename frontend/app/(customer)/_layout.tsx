@@ -61,6 +61,12 @@ export default function CustomerLayout() {
           ),
         }}
       />
+      <Tabs.Screen
+        name="history"
+        options={{
+          href: null, // Hide from tab bar
+        }}
+      />
     </Tabs>
   );
 }
