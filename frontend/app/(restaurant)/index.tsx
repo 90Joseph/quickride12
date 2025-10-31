@@ -28,6 +28,7 @@ interface Order {
 }
 
 export default function RestaurantOrdersScreen() {
+  const router = useRouter();
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
