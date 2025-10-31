@@ -160,7 +160,7 @@ export default function RiderAvailableScreen() {
       <View style={styles.statusBadge}>
         <Text style={styles.statusText}>
           {item.status === 'rider_assigned' ? 'ASSIGNED - Ready for Pickup' :
-           item.status === 'picked_up' ? 'PICKED UP - On the Way' :
+           item.status === 'out_for_delivery' ? 'OUT FOR DELIVERY 🚴' :
            item.status}
         </Text>
       </View>
@@ -175,7 +175,7 @@ export default function RiderAvailableScreen() {
         </TouchableOpacity>
       )}
 
-      {item.status === 'picked_up' && (
+      {item.status === 'out_for_delivery' && (
         <TouchableOpacity
           style={styles.deliverButton}
           onPress={() => handleDeliver(item.id)}
