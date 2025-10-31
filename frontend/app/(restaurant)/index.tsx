@@ -257,6 +257,28 @@ const styles = StyleSheet.create({
     marginLeft: 8,
     flex: 1,
   },
+  riderInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 12,
+    backgroundColor: '#E8F5E9',
+    borderRadius: 12,
+    marginBottom: 16,
+  },
+  riderDetails: {
+    marginLeft: 8,
+    flex: 1,
+  },
+  riderName: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#4CAF50',
+  },
+  riderPhone: {
+    fontSize: 12,
+    color: '#66BB6A',
+    marginTop: 2,
+  },
   orderActions: {
     flexDirection: 'row',
     gap: 12,
