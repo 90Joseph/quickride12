@@ -78,13 +78,13 @@ export default function RiderAvailableScreen() {
 
     console.log('Processing pickup...');
     try {
-      await api.put(`/orders/${orderId}/status`, { status: 'picked_up' });
-      console.log('Order marked as picked up');
+      await api.put(`/orders/${orderId}/status`, { status: 'out_for_delivery' });
+      console.log('Order marked as out for delivery');
       
       if (Platform.OS === 'web') {
-        window.alert('Order picked up! Now delivering to customer.');
+        window.alert('Order picked up! Now out for delivery.');
       } else {
-        Alert.alert('Success', 'Order picked up! Now delivering to customer.');
+        Alert.alert('Success', 'Order picked up! Now out for delivery.');
       }
       
       fetchOrders();
