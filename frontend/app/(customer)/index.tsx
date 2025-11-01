@@ -258,7 +258,7 @@ export default function HomeScreen() {
             activeOpacity={0.7}
           >
             <Ionicons name="location" size={20} color="#FF6B6B" />
-            <Text style={styles.locationText}>Metro Manila, Philippines</Text>
+            <Text style={styles.locationText}>{selectedLocation}</Text>
             <Ionicons name="chevron-down" size={16} color="#666" />
           </TouchableOpacity>
           <TouchableOpacity 
