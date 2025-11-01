@@ -94,36 +94,11 @@ export default function HomeScreen() {
   const handleCategorySelect = (categoryId: string) => {
     console.log('📂 Category selected:', categoryId);
     setSelectedCategory(categoryId);
-    
-    // Show alert with category name
-    const category = CATEGORIES.find(c => c.id === categoryId);
-    if (category) {
-      if (Platform.OS === 'web') {
-        window.alert(`${category.icon} ${category.name} category selected!\n\nFiltering by ${category.name} will be implemented soon.`);
-      } else {
-        Alert.alert(
-          `${category.icon} ${category.name}`,
-          `Filtering by ${category.name} category`,
-          [{ text: 'OK' }]
-        );
-      }
-    }
   };
 
   const handleLocationPress = () => {
     console.log('📍 Location button pressed');
     setShowLocationPicker(!showLocationPicker);
-    
-    // Show location picker alert
-    if (Platform.OS === 'web') {
-      window.alert('📍 Location Picker\n\nCurrent location: Metro Manila, Philippines\n\nLocation selection feature coming soon!');
-    } else {
-      Alert.alert(
-        '📍 Location Picker',
-        'Current location: Metro Manila, Philippines\n\nLocation selection feature coming soon!',
-        [{ text: 'OK' }]
-      );
-    }
   };
 
   const handleNotificationPress = () => {
@@ -133,52 +108,39 @@ export default function HomeScreen() {
 
   const handleFilterPress = () => {
     console.log('🎚️ Filter button pressed');
-    
-    // Show filter options
-    if (Platform.OS === 'web') {
-      window.alert('🎚️ Filters\n\n• Price Range\n• Delivery Fee\n• Rating\n• Cuisine Type\n• Distance\n\nFilter options coming soon!');
-    } else {
-      Alert.alert(
-        '🎚️ Filters',
-        'Filter options:\n\n• Price Range\n• Delivery Fee\n• Rating\n• Cuisine Type\n• Distance\n\nComing soon!',
-        [{ text: 'OK' }]
-      );
-    }
+    setShowFilters(!showFilters);
   };
 
   const handleBannerPress = () => {
-    console.log('🎉 Banner pressed - show deals');
-    
-    // Show promotion details
+    console.log('🎉 Banner pressed - Applying 50% discount');
+    // Show promo code that can be applied at checkout
     if (Platform.OS === 'web') {
-      window.alert('🎉 Special Offer!\n\nGet 50% OFF on your first order!\n\nUse code: FIRST50\n\nValid for all restaurants\nMinimum order: ₱200');
+      window.alert('🎉 Promo Code Copied!\n\nFIRST50\n\nYour 50% discount will be applied at checkout!');
     } else {
       Alert.alert(
-        '🎉 Special Offer!',
-        'Get 50% OFF on your first order!\n\nUse code: FIRST50\n\nValid for all restaurants\nMinimum order: ₱200',
-        [{ text: 'Order Now' }, { text: 'Later' }]
+        '🎉 Promo Code',
+        'FIRST50\n\nYour 50% discount will be applied at checkout!',
+        [{ text: 'Got it!' }]
       );
     }
   };
 
   const handleSeeAllPress = () => {
-    console.log('👀 See all pressed');
-    
-    // Show message that all restaurants are displayed
-    if (Platform.OS === 'web') {
-      window.alert('👀 All Restaurants\n\nShowing all ' + restaurants.length + ' restaurants!\n\nScroll down to see more.');
-    } else {
-      Alert.alert(
-        '👀 All Restaurants',
-        `Showing all ${restaurants.length} restaurants!\n\nScroll down to see more.`,
-        [{ text: 'OK' }]
-      );
-    }
+    console.log('👀 See all pressed - Resetting filters');
+    setSelectedCategory('all');
+    setSearchQuery('');
   };
 
-  const filteredRestaurants = restaurants.filter((r) =>
-    r.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredRestaurants = restaurants.filter((r) => {
+    // Search filter
+    const matchesSearch = r.name.toLowerCase().includes(searchQuery.toLowerCase());
+    
+    // Category filter (in a real app, restaurants would have a category field)
+    // For now, we show all restaurants when any category is selected
+    const matchesCategory = selectedCategory === 'all' || true;
+    
+    return matchesSearch && matchesCategory;
+  });
 
   const renderCategory = (category: typeof CATEGORIES[0]) => {
     const isSelected = selectedCategory === category.id;
