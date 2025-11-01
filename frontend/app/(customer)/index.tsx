@@ -221,12 +221,20 @@ export default function HomeScreen() {
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         {/* Header */}
         <View style={styles.header}>
-          <View style={styles.locationContainer}>
+          <TouchableOpacity 
+            style={styles.locationContainer}
+            onPress={handleLocationPress}
+            activeOpacity={0.7}
+          >
             <Ionicons name="location" size={20} color="#FF6B6B" />
             <Text style={styles.locationText}>Metro Manila, Philippines</Text>
             <Ionicons name="chevron-down" size={16} color="#666" />
-          </View>
-          <TouchableOpacity style={styles.notificationButton}>
+          </TouchableOpacity>
+          <TouchableOpacity 
+            style={styles.notificationButton}
+            onPress={handleNotificationPress}
+            activeOpacity={0.7}
+          >
             <Ionicons name="notifications-outline" size={24} color="#333" />
             <View style={styles.notificationBadge} />
           </TouchableOpacity>
@@ -244,32 +252,41 @@ export default function HomeScreen() {
               placeholderTextColor="#999"
             />
           </View>
-          <TouchableOpacity style={styles.filterButton}>
+          <TouchableOpacity 
+            style={styles.filterButton}
+            onPress={handleFilterPress}
+            activeOpacity={0.7}
+          >
             <Ionicons name="options-outline" size={24} color="#FF6B6B" />
           </TouchableOpacity>
         </View>
 
         {/* Hero Banner */}
         <View style={styles.bannerContainer}>
-          <LinearGradient
-            colors={['#FF6B6B', '#FF8E53']}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            style={styles.heroBanner}
+          <TouchableOpacity 
+            activeOpacity={0.9}
+            onPress={handleBannerPress}
           >
-            <View style={styles.bannerContent}>
-              <View style={styles.bannerBadge}>
-                <Text style={styles.bannerBadgeText}>🎉 Special</Text>
+            <LinearGradient
+              colors={['#FF6B6B', '#FF8E53']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.heroBanner}
+            >
+              <View style={styles.bannerContent}>
+                <View style={styles.bannerBadge}>
+                  <Text style={styles.bannerBadgeText}>🎉 Special</Text>
+                </View>
+                <Text style={styles.bannerTitle}>Get 50% Off{'\n'}Your First Order!</Text>
+                <View style={styles.bannerButton}>
+                  <Text style={styles.bannerButtonText}>Order Now</Text>
+                </View>
               </View>
-              <Text style={styles.bannerTitle}>Get 50% Off{'\n'}Your First Order!</Text>
-              <TouchableOpacity style={styles.bannerButton}>
-                <Text style={styles.bannerButtonText}>Order Now</Text>
-              </TouchableOpacity>
-            </View>
-            <View style={styles.bannerImageContainer}>
-              <Text style={styles.bannerEmoji}>🍟</Text>
-            </View>
-          </LinearGradient>
+              <View style={styles.bannerImageContainer}>
+                <Text style={styles.bannerEmoji}>🍟</Text>
+              </View>
+            </LinearGradient>
+          </TouchableOpacity>
         </View>
 
         {/* Categories */}
