@@ -43,6 +43,15 @@ export default function AdminLayout() {
         }}
       />
       <Tabs.Screen
+        name="restaurants"
+        options={{
+          title: 'Restaurants',
+          tabBarIcon: ({ color, size}) => (
+            <Ionicons name="restaurant" size={size} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
         name="activities"
         options={{
           title: 'Activities',
