@@ -416,7 +416,7 @@ export default function HomeScreen() {
                     styles.bannerTrack,
                     {
                       transform: [{ translateX: slideAnim }],
-                      width: width * banners.length,
+                      width: bannerWidth * banners.length,
                     },
                   ]}
                 >
@@ -425,7 +425,7 @@ export default function HomeScreen() {
                       key={banner.id}
                       activeOpacity={0.9}
                       onPress={handleBannerPress}
-                      style={{ width: width - 40 }}
+                      style={{ width: bannerWidth }}
                     >
                       <LinearGradient
                         colors={banner.colors}
