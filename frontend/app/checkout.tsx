@@ -107,19 +107,32 @@ export default function CheckoutScreen() {
       ]);
 
       console.log('Order created successfully:', response.data);
+      const orderId = response.data.id;
 
-      if (Platform.OS === 'web') {
-        window.alert('Order placed successfully! 🎉 Check your Orders tab.');
+      if (paymentMethod === 'gcash') {
+        // Navigate to GCash payment screen
+        router.push({
+          pathname: '/gcash-payment',
+          params: {
+            orderId: orderId,
+            amount: total.toFixed(2),
+          }
+        });
       } else {
-        Alert.alert('Success', 'Order placed successfully! 🎉 Check your Orders tab.');
-      }
+        // Cash on delivery - show success message
+        if (Platform.OS === 'web') {
+          window.alert('Order placed successfully! 🎉 Check your Orders tab.');
+        } else {
+          Alert.alert('Success', 'Order placed successfully! 🎉 Check your Orders tab.');
+        }
 
-      clearCart();
-      
-      // Redirect to orders page
-      setTimeout(() => {
-        router.replace('/(customer)/orders');
-      }, 1000);
+        clearCart();
+        
+        // Redirect to orders page
+        setTimeout(() => {
+          router.replace('/(customer)/orders');
+        }, 1000);
+      }
     } catch (error: any) {
       console.error('Error placing order:', error);
       console.error('Error response:', error.response?.data);
