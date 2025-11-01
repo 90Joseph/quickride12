@@ -408,39 +408,55 @@ export default function HomeScreen() {
         {/* Main Content - Hidden when searching */}
         {!isSearchActive && (
           <View>
-            {/* Hero Banner */}
+            {/* Hero Banner Carousel */}
             <View style={styles.bannerContainer}>
-              <TouchableOpacity 
-                activeOpacity={0.9}
-                onPress={handleBannerPress}
-              >
-                <LinearGradient
-                  colors={banners[currentBannerIndex].colors}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 1 }}
-                  style={styles.heroBanner}
+              <View style={styles.bannerCarouselContainer} {...panResponder.panHandlers}>
+                <Animated.View
+                  style={[
+                    styles.bannerTrack,
+                    {
+                      transform: [{ translateX: slideAnim }],
+                      width: width * banners.length,
+                    },
+                  ]}
                 >
-                  <View style={styles.bannerContent}>
-                    <View style={styles.bannerBadge}>
-                      <Text style={styles.bannerBadgeText}>{banners[currentBannerIndex].badge}</Text>
-                    </View>
-                    <Text style={styles.bannerTitle}>{banners[currentBannerIndex].title}</Text>
-                    <View style={styles.bannerButton}>
-                      <Text style={styles.bannerButtonText}>{banners[currentBannerIndex].buttonText}</Text>
-                    </View>
-                  </View>
-                  <View style={styles.bannerImageContainer}>
-                    <Text style={styles.bannerEmoji}>{banners[currentBannerIndex].emoji}</Text>
-                  </View>
-                </LinearGradient>
-              </TouchableOpacity>
+                  {banners.map((banner, index) => (
+                    <TouchableOpacity
+                      key={banner.id}
+                      activeOpacity={0.9}
+                      onPress={handleBannerPress}
+                      style={{ width: width - 40 }}
+                    >
+                      <LinearGradient
+                        colors={banner.colors}
+                        start={{ x: 0, y: 0 }}
+                        end={{ x: 1, y: 1 }}
+                        style={styles.heroBanner}
+                      >
+                        <View style={styles.bannerContent}>
+                          <View style={styles.bannerBadge}>
+                            <Text style={styles.bannerBadgeText}>{banner.badge}</Text>
+                          </View>
+                          <Text style={styles.bannerTitle}>{banner.title}</Text>
+                          <View style={styles.bannerButton}>
+                            <Text style={styles.bannerButtonText}>{banner.buttonText}</Text>
+                          </View>
+                        </View>
+                        <View style={styles.bannerImageContainer}>
+                          <Text style={styles.bannerEmoji}>{banner.emoji}</Text>
+                        </View>
+                      </LinearGradient>
+                    </TouchableOpacity>
+                  ))}
+                </Animated.View>
+              </View>
 
               {/* Pagination Dots */}
               <View style={styles.paginationContainer}>
                 {banners.map((_, index) => (
                   <TouchableOpacity
                     key={index}
-                    onPress={() => setCurrentBannerIndex(index)}
+                    onPress={() => animateSlide(index)}
                     style={[
                       styles.paginationDot,
                       index === currentBannerIndex && styles.paginationDotActive
