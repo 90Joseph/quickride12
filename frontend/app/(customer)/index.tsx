@@ -693,6 +693,25 @@ const styles = StyleSheet.create({
     fontSize: 64,
   },
 
+  // Pagination Dots
+  paginationContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 12,
+    gap: 8,
+  },
+  paginationDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: '#DDD',
+  },
+  paginationDotActive: {
+    width: 24,
+    backgroundColor: '#FF6B6B',
+  },
+
   // Categories
   categoriesSection: {
     marginTop: 24,
