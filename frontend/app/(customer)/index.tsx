@@ -354,6 +354,88 @@ export default function HomeScreen() {
         {/* Bottom Padding */}
         <View style={{ height: 100 }} />
       </ScrollView>
+
+      {/* Location Picker Modal */}
+      {showLocationPicker && (
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>📍 Select Location</Text>
+              <TouchableOpacity onPress={() => setShowLocationPicker(false)}>
+                <Ionicons name="close" size={24} color="#333" />
+              </TouchableOpacity>
+            </View>
+            
+            {['Metro Manila, Philippines', 'Quezon City, Philippines', 'Makati City, Philippines', 'Taguig City, Philippines', 'Pasig City, Philippines'].map((loc) => (
+              <TouchableOpacity
+                key={loc}
+                style={[styles.locationItem, selectedLocation === loc && styles.locationItemSelected]}
+                onPress={() => {
+                  setSelectedLocation(loc);
+                  setShowLocationPicker(false);
+                }}
+              >
+                <Ionicons name="location" size={20} color={selectedLocation === loc ? "#FF6B6B" : "#666"} />
+                <Text style={[styles.locationItemText, selectedLocation === loc && styles.locationItemTextSelected]}>{loc}</Text>
+                {selectedLocation === loc && <Ionicons name="checkmark-circle" size={20} color="#FF6B6B" />}
+              </TouchableOpacity>
+            ))}
+          </View>
+        </View>
+      )}
+
+      {/* Filters Modal */}
+      {showFilters && (
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>🎚️ Filters</Text>
+              <TouchableOpacity onPress={() => setShowFilters(false)}>
+                <Ionicons name="close" size={24} color="#333" />
+              </TouchableOpacity>
+            </View>
+            
+            <ScrollView>
+              {/* Delivery Fee Filter */}
+              <Text style={styles.filterLabel}>Delivery Fee</Text>
+              {['all', 'free', 'under50', 'under100'].map((option) => (
+                <TouchableOpacity
+                  key={option}
+                  style={[styles.filterOption, filters.deliveryFee === option && styles.filterOptionSelected]}
+                  onPress={() => setFilters({ ...filters, deliveryFee: option })}
+                >
+                  <Text style={[styles.filterOptionText, filters.deliveryFee === option && styles.filterOptionTextSelected]}>
+                    {option === 'all' ? 'All' : option === 'free' ? 'Free Delivery' : option === 'under50' ? 'Under ₱50' : 'Under ₱100'}
+                  </Text>
+                  {filters.deliveryFee === option && <Ionicons name="checkmark-circle" size={20} color="#FF6B6B" />}
+                </TouchableOpacity>
+              ))}
+
+              {/* Rating Filter */}
+              <Text style={styles.filterLabel}>Minimum Rating</Text>
+              {['all', '4', '4.5', '5'].map((option) => (
+                <TouchableOpacity
+                  key={option}
+                  style={[styles.filterOption, filters.rating === option && styles.filterOptionSelected]}
+                  onPress={() => setFilters({ ...filters, rating: option })}
+                >
+                  <Text style={[styles.filterOptionText, filters.rating === option && styles.filterOptionTextSelected]}>
+                    {option === 'all' ? 'All Ratings' : `${option}+ ⭐`}
+                  </Text>
+                  {filters.rating === option && <Ionicons name="checkmark-circle" size={20} color="#FF6B6B" />}
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+
+            <TouchableOpacity
+              style={styles.applyButton}
+              onPress={() => setShowFilters(false)}
+            >
+              <Text style={styles.applyButtonText}>Apply Filters</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      )}
     </SafeAreaView>
   );
 }
