@@ -67,7 +67,7 @@ class GCashPaymentTester:
             "phone": "+63 917 987 6543"
         }
         
-        response = self.session.post(f"{BACKEND_URL}/auth/register", json=restaurant_data)
+        response = self.restaurant_session.post(f"{BACKEND_URL}/auth/register", json=restaurant_data)
         
         if response.status_code == 200:
             data = response.json()
