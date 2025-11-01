@@ -31,430 +31,411 @@ class GCashPaymentTester:
         print(f"[{timestamp}] {message}")
         
     def register_customer(self):
-        """Register a new restaurant owner for testing"""
-        try:
-            # Generate unique test data
-            test_id = str(uuid.uuid4())[:8]
-            email = f"restaurant_owner_{test_id}@test.com"
-            password = "testpass123"
-            name = f"Test Restaurant Owner {test_id}"
-            phone = f"09{test_id[:9]}"
-            
-            payload = {
-                "email": email,
-                "password": password,
-                "name": name,
-                "role": "restaurant",
-                "phone": phone
-            }
-            
-            response = self.session.post(f"{BACKEND_URL}/auth/register", json=payload)
-            
-            if response.status_code == 200:
-                data = response.json()
-                self.session_token = data.get("session_token")
-                self.user_id = data.get("user", {}).get("id")
-                
-                # Set authorization header
-                self.session.headers.update({
-                    "Authorization": f"Bearer {self.session_token}"
-                })
-                
-                self.log_result("Register Restaurant Owner", True, 
-                              f"Successfully registered user: {email}")
-                return True
-            else:
-                self.log_result("Register Restaurant Owner", False, 
-                              f"Registration failed: {response.status_code} - {response.text}")
-                return False
-                
-        except Exception as e:
-            self.log_result("Register Restaurant Owner", False, f"Exception: {str(e)}")
+        """Register a customer user for testing"""
+        self.log("🔐 Registering customer user...")
+        
+        customer_data = {
+            "email": f"customer_{uuid.uuid4().hex[:8]}@test.com",
+            "password": "testpass123",
+            "name": "Maria Santos",
+            "role": "customer",
+            "phone": "+63 917 123 4567"
+        }
+        
+        response = self.session.post(f"{BACKEND_URL}/auth/register", json=customer_data)
+        
+        if response.status_code == 200:
+            data = response.json()
+            self.customer_token = data["session_token"]
+            self.customer_user = data["user"]
+            self.log(f"✅ Customer registered: {self.customer_user['name']} ({self.customer_user['email']})")
+            return True
+        else:
+            self.log(f"❌ Customer registration failed: {response.status_code} - {response.text}")
             return False
-    
-    def create_test_restaurant(self):
-        """Create a test restaurant"""
-        try:
-            test_id = str(uuid.uuid4())[:8]
-            payload = {
-                "name": f"Test Restaurant {test_id}",
-                "description": "A test restaurant for API testing",
-                "phone": f"09{test_id[:9]}",
-                "location": {
-                    "latitude": 14.5995,
-                    "longitude": 120.9842,
-                    "address": "123 Test Street, Manila, Philippines"
-                },
-                "operating_hours": "9:00 AM - 10:00 PM",
-                "is_open": True
-            }
             
-            response = self.session.post(f"{BACKEND_URL}/restaurants", json=payload)
-            
-            if response.status_code == 200:
-                restaurant_data = response.json()
-                self.restaurant_id = restaurant_data.get("id")
-                self.log_result("Create Test Restaurant", True, 
-                              f"Restaurant created with ID: {self.restaurant_id}")
-                return True
-            else:
-                self.log_result("Create Test Restaurant", False, 
-                              f"Failed: {response.status_code} - {response.text}")
-                return False
-                
-        except Exception as e:
-            self.log_result("Create Test Restaurant", False, f"Exception: {str(e)}")
+    def register_restaurant(self):
+        """Register a restaurant user for testing"""
+        self.log("🔐 Registering restaurant user...")
+        
+        restaurant_data = {
+            "email": f"restaurant_{uuid.uuid4().hex[:8]}@test.com",
+            "password": "testpass123",
+            "name": "Juan's Lechon",
+            "role": "restaurant",
+            "phone": "+63 917 987 6543"
+        }
+        
+        response = self.session.post(f"{BACKEND_URL}/auth/register", json=restaurant_data)
+        
+        if response.status_code == 200:
+            data = response.json()
+            self.restaurant_token = data["session_token"]
+            self.restaurant_user = data["user"]
+            self.log(f"✅ Restaurant registered: {self.restaurant_user['name']} ({self.restaurant_user['email']})")
+            return True
+        else:
+            self.log(f"❌ Restaurant registration failed: {response.status_code} - {response.text}")
             return False
-    
-    def get_my_restaurant(self):
-        """Get restaurant owned by current user"""
-        try:
-            response = self.session.get(f"{BACKEND_URL}/restaurants/owner/my")
             
-            if response.status_code == 200:
-                restaurant_data = response.json()
-                if restaurant_data:
-                    self.restaurant_id = restaurant_data.get("id")
-                    self.log_result("Get My Restaurant", True, 
-                                  f"Found restaurant ID: {self.restaurant_id}")
-                    return True
-                else:
-                    # No restaurant found, need to create one
-                    return self.create_test_restaurant()
-            else:
-                self.log_result("Get My Restaurant", False, 
-                              f"Failed: {response.status_code} - {response.text}")
-                return False
-                
-        except Exception as e:
-            self.log_result("Get My Restaurant", False, f"Exception: {str(e)}")
+    def get_restaurant_profile(self):
+        """Get restaurant profile to get restaurant_id"""
+        self.log("🏪 Getting restaurant profile...")
+        
+        headers = {"Authorization": f"Bearer {self.restaurant_token}"}
+        response = self.session.get(f"{BACKEND_URL}/restaurants/owner/my", headers=headers)
+        
+        if response.status_code == 200:
+            restaurant = response.json()
+            self.restaurant_id = restaurant["id"]
+            self.log(f"✅ Restaurant profile retrieved: {restaurant['name']} (ID: {self.restaurant_id})")
+            return True
+        else:
+            self.log(f"❌ Failed to get restaurant profile: {response.status_code} - {response.text}")
             return False
-    
-    def test_add_menu_item(self):
-        """Test POST /api/restaurants/{restaurant_id}/menu-items"""
-        try:
-            # Test data for menu item
-            menu_items = [
+            
+    def create_order(self):
+        """Create an order for testing payment"""
+        self.log("📝 Creating test order...")
+        
+        order_data = {
+            "restaurant_id": self.restaurant_id,
+            "items": [
                 {
-                    "name": "Chicken Adobo",
-                    "description": "Traditional Filipino chicken dish with soy sauce and vinegar",
-                    "price": 250.00,
-                    "category": "Main Course",
-                    "available": True
+                    "menu_item_id": str(uuid.uuid4()),
+                    "name": "Lechon Kawali",
+                    "price": 350.00,
+                    "quantity": 2
                 },
                 {
-                    "name": "Halo-Halo",
-                    "description": "Filipino shaved ice dessert with mixed ingredients",
-                    "price": 120.00,
-                    "category": "Desserts",
-                    "available": True
-                },
-                {
-                    "name": "Lumpia Shanghai",
-                    "description": "Crispy spring rolls with ground pork filling",
-                    "price": 180.00,
-                    "category": "Appetizers",
-                    "available": False  # Test with unavailable item
+                    "menu_item_id": str(uuid.uuid4()),
+                    "name": "Garlic Rice",
+                    "price": 50.00,
+                    "quantity": 2
                 }
-            ]
-            
-            added_items = []
-            
-            for item_data in menu_items:
-                response = self.session.post(
-                    f"{BACKEND_URL}/restaurants/{self.restaurant_id}/menu-items",
-                    json=item_data
-                )
-                
-                if response.status_code == 200:
-                    item = response.json()
-                    added_items.append(item)
-                    self.log_result("Add Menu Item", True, 
-                                  f"Added '{item_data['name']}' - ID: {item.get('id')}")
-                else:
-                    self.log_result("Add Menu Item", False, 
-                                  f"Failed to add '{item_data['name']}': {response.status_code} - {response.text}")
-            
-            # Store added items for later tests
-            self.added_menu_items = added_items
-            return len(added_items) > 0
-            
-        except Exception as e:
-            self.log_result("Add Menu Item", False, f"Exception: {str(e)}")
+            ],
+            "total_amount": 800.00,
+            "subtotal": 700.00,
+            "delivery_fee": 50.00,
+            "app_fee": 50.00,
+            "delivery_address": {
+                "latitude": 14.5995,
+                "longitude": 120.9842,
+                "address": "123 Rizal Street, Makati City, Metro Manila"
+            },
+            "customer_phone": "+63 917 123 4567",
+            "special_instructions": "Extra rice please"
+        }
+        
+        headers = {"Authorization": f"Bearer {self.customer_token}"}
+        response = self.session.post(f"{BACKEND_URL}/orders", json=order_data, headers=headers)
+        
+        if response.status_code == 200:
+            order = response.json()
+            self.order_id = order["id"]
+            self.log(f"✅ Order created: {order['id']} - Total: ₱{order['total_amount']}")
+            return True
+        else:
+            self.log(f"❌ Order creation failed: {response.status_code} - {response.text}")
             return False
-    
-    def test_update_menu_item(self):
-        """Test PUT /api/restaurants/{restaurant_id}/menu-items/{item_id}"""
-        try:
-            if not hasattr(self, 'added_menu_items') or not self.added_menu_items:
-                self.log_result("Update Menu Item", False, "No menu items available to update")
-                return False
             
-            # Test updating the first menu item
-            item_to_update = self.added_menu_items[0]
-            item_id = item_to_update.get('id')
+    def test_initiate_gcash_payment(self):
+        """Test POST /api/payments/gcash/initiate"""
+        self.log("💳 Testing GCash payment initiation...")
+        
+        payment_data = {
+            "order_id": self.order_id,
+            "customer_gcash_number": "+63 917 123 4567"
+        }
+        
+        headers = {"Authorization": f"Bearer {self.customer_token}"}
+        response = self.session.post(f"{BACKEND_URL}/payments/gcash/initiate", json=payment_data, headers=headers)
+        
+        if response.status_code == 200:
+            data = response.json()
+            self.payment_id = data["payment_id"]
             
-            # Test different update scenarios
-            update_tests = [
-                {
-                    "name": "Update Price",
-                    "data": {"price": 275.00},
-                    "description": "Update menu item price"
-                },
-                {
-                    "name": "Update Availability",
-                    "data": {"available": False},
-                    "description": "Toggle menu item availability"
-                },
-                {
-                    "name": "Update Description",
-                    "data": {"description": "Updated: Premium Filipino chicken adobo with special sauce"},
-                    "description": "Update menu item description"
-                },
-                {
-                    "name": "Update Multiple Fields",
-                    "data": {
-                        "name": "Premium Chicken Adobo",
-                        "price": 300.00,
-                        "available": True
-                    },
-                    "description": "Update multiple fields at once"
-                }
-            ]
+            # Verify response structure
+            required_fields = ["payment_id", "order_id", "amount", "reference_number", "merchant_gcash_number", "payment_instructions", "status"]
+            missing_fields = [field for field in required_fields if field not in data]
             
-            success_count = 0
-            
-            for test in update_tests:
-                response = self.session.put(
-                    f"{BACKEND_URL}/restaurants/{self.restaurant_id}/menu-items/{item_id}",
-                    json=test["data"]
-                )
-                
-                if response.status_code == 200:
-                    self.log_result("Update Menu Item", True, 
-                                  f"{test['name']}: {test['description']}")
-                    success_count += 1
-                else:
-                    self.log_result("Update Menu Item", False, 
-                                  f"{test['name']} failed: {response.status_code} - {response.text}")
-            
-            return success_count > 0
-            
-        except Exception as e:
-            self.log_result("Update Menu Item", False, f"Exception: {str(e)}")
-            return False
-    
-    def test_delete_menu_item(self):
-        """Test DELETE /api/restaurants/{restaurant_id}/menu-items/{item_id}"""
-        try:
-            if not hasattr(self, 'added_menu_items') or len(self.added_menu_items) < 2:
-                self.log_result("Delete Menu Item", False, "Not enough menu items to test deletion")
-                return False
-            
-            # Delete the last menu item (keep some for other tests)
-            item_to_delete = self.added_menu_items[-1]
-            item_id = item_to_delete.get('id')
-            item_name = item_to_delete.get('name')
-            
-            response = self.session.delete(
-                f"{BACKEND_URL}/restaurants/{self.restaurant_id}/menu-items/{item_id}"
-            )
-            
-            if response.status_code == 200:
-                self.log_result("Delete Menu Item", True, 
-                              f"Successfully deleted '{item_name}' (ID: {item_id})")
-                return True
-            else:
-                self.log_result("Delete Menu Item", False, 
-                              f"Failed to delete '{item_name}': {response.status_code} - {response.text}")
+            if missing_fields:
+                self.log(f"❌ Missing fields in response: {missing_fields}")
                 return False
                 
-        except Exception as e:
-            self.log_result("Delete Menu Item", False, f"Exception: {str(e)}")
-            return False
-    
-    def test_update_restaurant_profile(self):
-        """Test PUT /api/restaurants/{restaurant_id}"""
-        try:
-            # Test different restaurant profile updates
-            update_tests = [
-                {
-                    "name": "Update Restaurant Name",
-                    "data": {"name": "Updated Test Restaurant"},
-                    "description": "Update restaurant name"
-                },
-                {
-                    "name": "Update Description",
-                    "data": {"description": "Updated description for our amazing test restaurant"},
-                    "description": "Update restaurant description"
-                },
-                {
-                    "name": "Update Phone",
-                    "data": {"phone": "09123456789"},
-                    "description": "Update restaurant phone number"
-                },
-                {
-                    "name": "Update Operating Hours",
-                    "data": {"operating_hours": "8:00 AM - 11:00 PM"},
-                    "description": "Update restaurant operating hours"
-                },
-                {
-                    "name": "Toggle Open Status",
-                    "data": {"is_open": False},
-                    "description": "Close restaurant temporarily"
-                },
-                {
-                    "name": "Multiple Updates",
-                    "data": {
-                        "name": "Premium Test Restaurant",
-                        "description": "The best test restaurant in town",
-                        "is_open": True,
-                        "operating_hours": "7:00 AM - 12:00 AM"
-                    },
-                    "description": "Update multiple restaurant fields"
-                }
-            ]
-            
-            success_count = 0
-            
-            for test in update_tests:
-                response = self.session.put(
-                    f"{BACKEND_URL}/restaurants/{self.restaurant_id}",
-                    json=test["data"]
-                )
-                
-                if response.status_code == 200:
-                    self.log_result("Update Restaurant Profile", True, 
-                                  f"{test['name']}: {test['description']}")
-                    success_count += 1
-                else:
-                    self.log_result("Update Restaurant Profile", False, 
-                                  f"{test['name']} failed: {response.status_code} - {response.text}")
-            
-            return success_count > 0
-            
-        except Exception as e:
-            self.log_result("Update Restaurant Profile", False, f"Exception: {str(e)}")
-            return False
-    
-    def test_authorization_security(self):
-        """Test that only restaurant owners can manage their own restaurants"""
-        try:
-            # Create a second restaurant owner to test authorization
-            test_id = str(uuid.uuid4())[:8]
-            payload = {
-                "email": f"other_owner_{test_id}@test.com",
-                "password": "testpass123",
-                "name": f"Other Owner {test_id}",
-                "role": "restaurant",
-                "phone": f"09{test_id[:9]}"
-            }
-            
-            # Register second user
-            response = requests.post(f"{BACKEND_URL}/auth/register", json=payload)
-            
-            if response.status_code != 200:
-                self.log_result("Authorization Test", False, "Failed to create second user for auth test")
-                return False
-            
-            other_session_token = response.json().get("session_token")
-            
-            # Try to add menu item to our restaurant using other user's token
-            headers = {"Authorization": f"Bearer {other_session_token}"}
-            menu_item_data = {
-                "name": "Unauthorized Item",
-                "description": "This should fail",
-                "price": 100.00,
-                "category": "Test",
-                "available": True
-            }
-            
-            response = requests.post(
-                f"{BACKEND_URL}/restaurants/{self.restaurant_id}/menu-items",
-                json=menu_item_data,
-                headers=headers
-            )
-            
-            if response.status_code == 403:
-                self.log_result("Authorization Test", True, 
-                              "Correctly blocked unauthorized menu item addition")
-                return True
-            else:
-                self.log_result("Authorization Test", False, 
-                              f"Authorization bypass detected: {response.status_code}")
+            # Verify merchant GCash number
+            if data["merchant_gcash_number"] != "09609317687":
+                self.log(f"❌ Incorrect merchant GCash number: {data['merchant_gcash_number']}")
                 return False
                 
-        except Exception as e:
-            self.log_result("Authorization Test", False, f"Exception: {str(e)}")
+            # Verify payment instructions structure
+            instructions = data["payment_instructions"]
+            required_steps = ["step_1", "step_2", "step_3", "step_4", "step_5"]
+            missing_steps = [step for step in required_steps if step not in instructions]
+            
+            if missing_steps:
+                self.log(f"❌ Missing payment instruction steps: {missing_steps}")
+                return False
+                
+            self.log(f"✅ GCash payment initiated successfully")
+            self.log(f"   Payment ID: {data['payment_id']}")
+            self.log(f"   Reference: {data['reference_number']}")
+            self.log(f"   Merchant GCash: {data['merchant_gcash_number']}")
+            self.log(f"   Amount: ₱{data['amount']}")
+            self.log(f"   Status: {data['status']}")
+            return True
+        else:
+            self.log(f"❌ GCash payment initiation failed: {response.status_code} - {response.text}")
             return False
-    
-    def run_all_tests(self):
-        """Run all backend API tests"""
-        print("=" * 60)
-        print("RESTAURANT MANAGEMENT BACKEND API TESTS")
-        print("=" * 60)
-        print(f"Backend URL: {BACKEND_URL}")
-        print()
+            
+    def test_verify_gcash_payment(self):
+        """Test POST /api/payments/gcash/verify"""
+        self.log("✅ Testing GCash payment verification...")
+        
+        # Create mock payment proof (base64 encoded dummy image)
+        mock_screenshot = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=="
+        
+        verification_data = {
+            "payment_id": self.payment_id,
+            "payment_proof_base64": mock_screenshot
+        }
+        
+        headers = {"Authorization": f"Bearer {self.customer_token}"}
+        response = self.session.post(f"{BACKEND_URL}/payments/gcash/verify", json=verification_data, headers=headers)
+        
+        if response.status_code == 200:
+            data = response.json()
+            
+            # Verify response structure
+            required_fields = ["message", "order_id", "payment_status", "order_status"]
+            missing_fields = [field for field in required_fields if field not in data]
+            
+            if missing_fields:
+                self.log(f"❌ Missing fields in verification response: {missing_fields}")
+                return False
+                
+            # Verify payment status is completed
+            if data["payment_status"] != "completed":
+                self.log(f"❌ Payment status not completed: {data['payment_status']}")
+                return False
+                
+            # Verify order status is preparing
+            if data["order_status"] != "preparing":
+                self.log(f"❌ Order status not preparing: {data['order_status']}")
+                return False
+                
+            self.log(f"✅ GCash payment verified successfully")
+            self.log(f"   Order ID: {data['order_id']}")
+            self.log(f"   Payment Status: {data['payment_status']}")
+            self.log(f"   Order Status: {data['order_status']}")
+            return True
+        else:
+            self.log(f"❌ GCash payment verification failed: {response.status_code} - {response.text}")
+            return False
+            
+    def test_get_order_payment(self):
+        """Test GET /api/payments/order/{order_id}"""
+        self.log("📋 Testing payment details retrieval...")
+        
+        headers = {"Authorization": f"Bearer {self.customer_token}"}
+        response = self.session.get(f"{BACKEND_URL}/payments/order/{self.order_id}", headers=headers)
+        
+        if response.status_code == 200:
+            payment = response.json()
+            
+            # Verify payment details
+            required_fields = ["id", "order_id", "amount", "payment_method", "payment_status", "reference_number", "created_at"]
+            missing_fields = [field for field in required_fields if field not in payment]
+            
+            if missing_fields:
+                self.log(f"❌ Missing fields in payment details: {missing_fields}")
+                return False
+                
+            # Verify payment method is gcash
+            if payment["payment_method"] != "gcash":
+                self.log(f"❌ Incorrect payment method: {payment['payment_method']}")
+                return False
+                
+            # Verify payment status is completed
+            if payment["payment_status"] != "completed":
+                self.log(f"❌ Payment status not completed: {payment['payment_status']}")
+                return False
+                
+            # Verify verified_at timestamp is set
+            if not payment.get("verified_at"):
+                self.log(f"❌ Payment verified_at timestamp not set")
+                return False
+                
+            self.log(f"✅ Payment details retrieved successfully")
+            self.log(f"   Payment ID: {payment['id']}")
+            self.log(f"   Order ID: {payment['order_id']}")
+            self.log(f"   Amount: ₱{payment['amount']}")
+            self.log(f"   Method: {payment['payment_method']}")
+            self.log(f"   Status: {payment['payment_status']}")
+            self.log(f"   Reference: {payment['reference_number']}")
+            return True
+        else:
+            self.log(f"❌ Payment details retrieval failed: {response.status_code} - {response.text}")
+            return False
+            
+    def test_error_scenarios(self):
+        """Test error handling scenarios"""
+        self.log("🚫 Testing error scenarios...")
+        
+        headers = {"Authorization": f"Bearer {self.customer_token}"}
+        
+        # Test 1: Invalid order_id for payment initiation
+        self.log("   Testing invalid order_id for payment initiation...")
+        invalid_payment_data = {
+            "order_id": "invalid-order-id",
+            "customer_gcash_number": "+63 917 123 4567"
+        }
+        response = self.session.post(f"{BACKEND_URL}/payments/gcash/initiate", json=invalid_payment_data, headers=headers)
+        if response.status_code == 404:
+            self.log("   ✅ Correctly rejected invalid order_id")
+        else:
+            self.log(f"   ❌ Should have returned 404 for invalid order_id, got {response.status_code}")
+            return False
+            
+        # Test 2: Missing payment_id for verification
+        self.log("   Testing missing payment_id for verification...")
+        invalid_verification = {
+            "payment_proof_base64": "mock_screenshot"
+        }
+        response = self.session.post(f"{BACKEND_URL}/payments/gcash/verify", json=invalid_verification, headers=headers)
+        if response.status_code == 400:
+            self.log("   ✅ Correctly rejected missing payment_id")
+        else:
+            self.log(f"   ❌ Should have returned 400 for missing payment_id, got {response.status_code}")
+            return False
+            
+        # Test 3: Invalid payment_id for verification
+        self.log("   Testing invalid payment_id for verification...")
+        invalid_verification = {
+            "payment_id": "invalid-payment-id",
+            "payment_proof_base64": "mock_screenshot"
+        }
+        response = self.session.post(f"{BACKEND_URL}/payments/gcash/verify", json=invalid_verification, headers=headers)
+        if response.status_code == 404:
+            self.log("   ✅ Correctly rejected invalid payment_id")
+        else:
+            self.log(f"   ❌ Should have returned 404 for invalid payment_id, got {response.status_code}")
+            return False
+            
+        # Test 4: Invalid order_id for payment details
+        self.log("   Testing invalid order_id for payment details...")
+        response = self.session.get(f"{BACKEND_URL}/payments/order/invalid-order-id", headers=headers)
+        if response.status_code == 404:
+            self.log("   ✅ Correctly rejected invalid order_id for payment details")
+        else:
+            self.log(f"   ❌ Should have returned 404 for invalid order_id, got {response.status_code}")
+            return False
+            
+        # Test 5: Unauthorized access (no token)
+        self.log("   Testing unauthorized access...")
+        response = self.session.post(f"{BACKEND_URL}/payments/gcash/initiate", json={"order_id": self.order_id})
+        if response.status_code == 401:
+            self.log("   ✅ Correctly rejected unauthorized access")
+        else:
+            self.log(f"   ❌ Should have returned 401 for unauthorized access, got {response.status_code}")
+            return False
+            
+        self.log("✅ All error scenarios handled correctly")
+        return True
+        
+    def verify_database_state(self):
+        """Verify the database state after payment completion"""
+        self.log("🗄️ Verifying database state...")
+        
+        # Check order status
+        headers = {"Authorization": f"Bearer {self.customer_token}"}
+        response = self.session.get(f"{BACKEND_URL}/orders/{self.order_id}", headers=headers)
+        
+        if response.status_code == 200:
+            order = response.json()
+            
+            # Verify order status is preparing
+            if order["status"] != "preparing":
+                self.log(f"❌ Order status not updated to preparing: {order['status']}")
+                return False
+                
+            # Verify payment method is set
+            if order.get("payment_method") != "gcash":
+                self.log(f"❌ Order payment method not set to gcash: {order.get('payment_method')}")
+                return False
+                
+            # Verify payment status is completed
+            if order.get("payment_status") != "completed":
+                self.log(f"❌ Order payment status not completed: {order.get('payment_status')}")
+                return False
+                
+            self.log("✅ Database state verified - Order properly updated")
+            return True
+        else:
+            self.log(f"❌ Failed to verify order state: {response.status_code} - {response.text}")
+            return False
+            
+    def run_complete_test_suite(self):
+        """Run the complete GCash payment test suite"""
+        self.log("🚀 Starting GCash Payment Integration Test Suite")
+        self.log("=" * 60)
+        
+        test_results = []
         
         # Setup phase
-        if not self.register_restaurant_owner():
-            print("❌ Failed to register restaurant owner. Stopping tests.")
-            return False
+        test_results.append(("Customer Registration", self.register_customer()))
+        test_results.append(("Restaurant Registration", self.register_restaurant()))
+        test_results.append(("Get Restaurant Profile", self.get_restaurant_profile()))
+        test_results.append(("Create Order", self.create_order()))
         
-        if not self.get_my_restaurant():
-            print("❌ Failed to get/create restaurant. Stopping tests.")
-            return False
+        # Payment flow tests
+        test_results.append(("Initiate GCash Payment", self.test_initiate_gcash_payment()))
+        test_results.append(("Verify GCash Payment", self.test_verify_gcash_payment()))
+        test_results.append(("Get Payment Details", self.test_get_order_payment()))
         
-        print()
-        print("Running API Tests...")
-        print("-" * 40)
+        # Error handling tests
+        test_results.append(("Error Scenarios", self.test_error_scenarios()))
         
-        # Run tests
-        tests = [
-            ("Menu Item CRUD - Add", self.test_add_menu_item),
-            ("Menu Item CRUD - Update", self.test_update_menu_item),
-            ("Menu Item CRUD - Delete", self.test_delete_menu_item),
-            ("Restaurant Profile Update", self.test_update_restaurant_profile),
-            ("Authorization Security", self.test_authorization_security)
-        ]
-        
-        passed = 0
-        total = len(tests)
-        
-        for test_name, test_func in tests:
-            print(f"\n--- {test_name} ---")
-            if test_func():
-                passed += 1
+        # Database verification
+        test_results.append(("Database State Verification", self.verify_database_state()))
         
         # Summary
-        print("\n" + "=" * 60)
-        print("TEST SUMMARY")
-        print("=" * 60)
-        print(f"Total Tests: {total}")
-        print(f"Passed: {passed}")
-        print(f"Failed: {total - passed}")
-        print(f"Success Rate: {(passed/total)*100:.1f}%")
+        self.log("=" * 60)
+        self.log("📊 TEST RESULTS SUMMARY")
+        self.log("=" * 60)
         
-        # Detailed results
-        print("\nDetailed Results:")
-        print("-" * 40)
-        for result in self.test_results:
-            status = "✅" if result["success"] else "❌"
-            print(f"{status} {result['test']}: {result['message']}")
+        passed = 0
+        failed = 0
         
-        return passed == total
+        for test_name, result in test_results:
+            status = "✅ PASS" if result else "❌ FAIL"
+            self.log(f"{status} - {test_name}")
+            if result:
+                passed += 1
+            else:
+                failed += 1
+                
+        self.log("=" * 60)
+        self.log(f"📈 TOTAL: {len(test_results)} tests | ✅ PASSED: {passed} | ❌ FAILED: {failed}")
+        
+        if failed == 0:
+            self.log("🎉 ALL TESTS PASSED - GCash Payment Integration Working Perfectly!")
+            return True
+        else:
+            self.log(f"⚠️  {failed} TEST(S) FAILED - Issues need to be addressed")
+            return False
 
 def main():
     """Main test execution"""
-    tester = RestaurantAPITester()
-    success = tester.run_all_tests()
+    tester = GCashPaymentTester()
+    success = tester.run_complete_test_suite()
     
     if success:
-        print("\n🎉 All tests passed!")
-        sys.exit(0)
+        print("\n🎯 GCash Payment Integration: FULLY FUNCTIONAL")
+        exit(0)
     else:
-        print("\n⚠️  Some tests failed. Check the results above.")
-        sys.exit(1)
+        print("\n🚨 GCash Payment Integration: ISSUES DETECTED")
+        exit(1)
 
 if __name__ == "__main__":
     main()
