@@ -111,18 +111,28 @@ export default function HomeScreen() {
     r.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const renderCategory = (category: typeof CATEGORIES[0]) => (
-    <TouchableOpacity
-      key={category.id}
-      style={styles.categoryItem}
-      onPress={() => setSelectedCategory(category.id)}
-    >
-      <View style={[styles.categoryIcon, { backgroundColor: category.color }]}>
-        <Text style={styles.categoryEmoji}>{category.icon}</Text>
-      </View>
-      <Text style={styles.categoryName}>{category.name}</Text>
-    </TouchableOpacity>
-  );
+  const renderCategory = (category: typeof CATEGORIES[0]) => {
+    const isSelected = selectedCategory === category.id;
+    return (
+      <TouchableOpacity
+        key={category.id}
+        style={styles.categoryItem}
+        onPress={() => handleCategorySelect(category.id)}
+        activeOpacity={0.7}
+      >
+        <View style={[
+          styles.categoryIcon, 
+          { backgroundColor: category.color },
+          isSelected && styles.categoryIconSelected
+        ]}>
+          <Text style={styles.categoryEmoji}>{category.icon}</Text>
+        </View>
+        <Text style={[styles.categoryName, isSelected && styles.categoryNameSelected]}>
+          {category.name}
+        </Text>
+      </TouchableOpacity>
+    );
+  };
 
   const renderRestaurantCard = (item: Restaurant) => (
     <TouchableOpacity
