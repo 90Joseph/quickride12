@@ -29,6 +29,8 @@ export default function CheckoutScreen() {
   const [phoneNumber, setPhoneNumber] = useState(user?.phone || '');
   const [specialInstructions, setSpecialInstructions] = useState('');
   const [loading, setLoading] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState<'cash' | 'gcash'>('gcash');
+  const [gcashNumber, setGcashNumber] = useState('09609317687'); // Merchant number for display
 
   // Calculate fees
   const subtotal = getTotalAmount();
