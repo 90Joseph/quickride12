@@ -108,13 +108,53 @@ export default function HomeScreen() {
     fetchRestaurants();
   }, []);
 
-  // Auto-slide banner every 4 seconds
+  // Auto-slide banner every 4 seconds with animation
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentBannerIndex((prev) => (prev + 1) % banners.length);
+      goToNextSlide();
     }, 4000);
     return () => clearInterval(interval);
-  }, []);
+  }, [currentBannerIndex]);
+
+  const goToNextSlide = () => {
+    const nextIndex = (currentBannerIndex + 1) % banners.length;
+    animateSlide(nextIndex);
+  };
+
+  const animateSlide = (toIndex: number) => {
+    Animated.timing(slideAnim, {
+      toValue: -toIndex * width,
+      duration: 300,
+      useNativeDriver: true,
+    }).start(() => {
+      setCurrentBannerIndex(toIndex);
+    });
+  };
+
+  const panResponder = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => true,
+      onPanResponderMove: (_, gesture) => {
+        slideAnim.setValue(-currentBannerIndex * width + gesture.dx);
+      },
+      onPanResponderRelease: (_, gesture) => {
+        const threshold = width * 0.3;
+        if (gesture.dx > threshold && currentBannerIndex > 0) {
+          // Swipe right - go to previous
+          animateSlide(currentBannerIndex - 1);
+        } else if (gesture.dx < -threshold && currentBannerIndex < banners.length - 1) {
+          // Swipe left - go to next
+          animateSlide(currentBannerIndex + 1);
+        } else {
+          // Snap back
+          Animated.spring(slideAnim, {
+            toValue: -currentBannerIndex * width,
+            useNativeDriver: true,
+          }).start();
+        }
+      },
+    })
+  ).current;
 
   const fetchRestaurants = async () => {
     try {
