@@ -112,17 +112,8 @@ export default function HomeScreen() {
   };
 
   const handleBannerPress = () => {
-    console.log('🎉 Banner pressed - Applying 50% discount');
-    // Show promo code that can be applied at checkout
-    if (Platform.OS === 'web') {
-      window.alert('🎉 Promo Code Copied!\n\nFIRST50\n\nYour 50% discount will be applied at checkout!');
-    } else {
-      Alert.alert(
-        '🎉 Promo Code',
-        'FIRST50\n\nYour 50% discount will be applied at checkout!',
-        [{ text: 'Got it!' }]
-      );
-    }
+    console.log('🎉 Banner pressed - Navigating to deals page');
+    router.push('/deals');
   };
 
   const handleSeeAllPress = () => {
