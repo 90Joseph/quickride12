@@ -102,6 +102,14 @@ export default function HomeScreen() {
     fetchRestaurants();
   }, []);
 
+  // Auto-slide banner every 4 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentBannerIndex((prev) => (prev + 1) % banners.length);
+    }, 4000);
+    return () => clearInterval(interval);
+  }, []);
+
   const fetchRestaurants = async () => {
     try {
       const response = await api.get('/restaurants');
