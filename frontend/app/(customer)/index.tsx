@@ -480,6 +480,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  categoryIconSelected: {
+    borderWidth: 3,
+    borderColor: '#FF6B6B',
+  },
   categoryEmoji: {
     fontSize: 32,
   },
@@ -487,6 +491,9 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '600',
     color: '#333',
+  },
+  categoryNameSelected: {
+    color: '#FF6B6B',
   },
 
   // Section Header
