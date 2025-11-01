@@ -94,6 +94,13 @@ export default function HomeScreen() {
   const handleCategorySelect = (categoryId: string) => {
     console.log('📂 Category selected:', categoryId);
     setSelectedCategory(categoryId);
+    
+    // Show feedback that category filtering is active
+    const category = CATEGORIES.find(c => c.id === categoryId);
+    if (category && categoryId !== 'all') {
+      // In future, this will filter restaurants by actual category
+      console.log(`Filtering by ${category.name} category`);
+    }
   };
 
   const handleLocationPress = () => {
