@@ -123,7 +123,7 @@ export default function HomeScreen() {
 
   const animateSlide = (toIndex: number) => {
     Animated.timing(slideAnim, {
-      toValue: -toIndex * width,
+      toValue: -toIndex * bannerWidth,
       duration: 300,
       useNativeDriver: true,
     }).start(() => {
@@ -135,10 +135,10 @@ export default function HomeScreen() {
     PanResponder.create({
       onStartShouldSetPanResponder: () => true,
       onPanResponderMove: (_, gesture) => {
-        slideAnim.setValue(-currentBannerIndex * width + gesture.dx);
+        slideAnim.setValue(-currentBannerIndex * bannerWidth + gesture.dx);
       },
       onPanResponderRelease: (_, gesture) => {
-        const threshold = width * 0.3;
+        const threshold = bannerWidth * 0.3;
         if (gesture.dx > threshold && currentBannerIndex > 0) {
           // Swipe right - go to previous
           animateSlide(currentBannerIndex - 1);
@@ -148,7 +148,7 @@ export default function HomeScreen() {
         } else {
           // Snap back
           Animated.spring(slideAnim, {
-            toValue: -currentBannerIndex * width,
+            toValue: -currentBannerIndex * bannerWidth,
             useNativeDriver: true,
           }).start();
         }
