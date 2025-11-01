@@ -308,7 +308,7 @@ class GCashPaymentTester:
             "order_id": "invalid-order-id",
             "customer_gcash_number": "+63 917 123 4567"
         }
-        response = self.session.post(f"{BACKEND_URL}/payments/gcash/initiate", json=invalid_payment_data, headers=headers)
+        response = self.customer_session.post(f"{BACKEND_URL}/payments/gcash/initiate", json=invalid_payment_data, headers=headers)
         if response.status_code == 404:
             self.log("   ✅ Correctly rejected invalid order_id")
         else:
@@ -320,7 +320,7 @@ class GCashPaymentTester:
         invalid_verification = {
             "payment_proof_base64": "mock_screenshot"
         }
-        response = self.session.post(f"{BACKEND_URL}/payments/gcash/verify", json=invalid_verification, headers=headers)
+        response = self.customer_session.post(f"{BACKEND_URL}/payments/gcash/verify", json=invalid_verification, headers=headers)
         if response.status_code == 400:
             self.log("   ✅ Correctly rejected missing payment_id")
         else:
@@ -333,7 +333,7 @@ class GCashPaymentTester:
             "payment_id": "invalid-payment-id",
             "payment_proof_base64": "mock_screenshot"
         }
-        response = self.session.post(f"{BACKEND_URL}/payments/gcash/verify", json=invalid_verification, headers=headers)
+        response = self.customer_session.post(f"{BACKEND_URL}/payments/gcash/verify", json=invalid_verification, headers=headers)
         if response.status_code == 404:
             self.log("   ✅ Correctly rejected invalid payment_id")
         else:
@@ -342,7 +342,7 @@ class GCashPaymentTester:
             
         # Test 4: Invalid order_id for payment details
         self.log("   Testing invalid order_id for payment details...")
-        response = self.session.get(f"{BACKEND_URL}/payments/order/invalid-order-id", headers=headers)
+        response = self.customer_session.get(f"{BACKEND_URL}/payments/order/invalid-order-id", headers=headers)
         if response.status_code == 404:
             self.log("   ✅ Correctly rejected invalid order_id for payment details")
         else:
@@ -351,7 +351,7 @@ class GCashPaymentTester:
             
         # Test 5: Unauthorized access (no token)
         self.log("   Testing unauthorized access...")
-        response = self.session.post(f"{BACKEND_URL}/payments/gcash/initiate", json={"order_id": self.order_id})
+        response = requests.post(f"{BACKEND_URL}/payments/gcash/initiate", json={"order_id": self.order_id})
         if response.status_code == 401:
             self.log("   ✅ Correctly rejected unauthorized access")
         else:
