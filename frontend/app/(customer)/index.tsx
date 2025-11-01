@@ -60,6 +60,7 @@ export default function HomeScreen() {
     deliveryFee: 'all',
     distance: 'all',
   });
+  const [isSearchActive, setIsSearchActive] = useState(false);
 
   useEffect(() => {
     fetchRestaurants();
