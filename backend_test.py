@@ -84,7 +84,7 @@ class GCashPaymentTester:
         self.log("🏪 Getting restaurant profile...")
         
         headers = {"Authorization": f"Bearer {self.restaurant_token}"}
-        response = self.session.get(f"{BACKEND_URL}/restaurants/owner/my", headers=headers)
+        response = self.restaurant_session.get(f"{BACKEND_URL}/restaurants/owner/my", headers=headers)
         
         if response.status_code == 200:
             restaurant = response.json()
