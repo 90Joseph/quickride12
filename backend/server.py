@@ -70,6 +70,16 @@ class RiderStatus(str, Enum):
     AVAILABLE = "available"
     BUSY = "busy"
 
+class PaymentStatus(str, Enum):
+    PENDING = "pending"
+    PROCESSING = "processing"
+    COMPLETED = "completed"
+    FAILED = "failed"
+
+class PaymentMethod(str, Enum):
+    GCASH = "gcash"
+    CASH = "cash"
+
 # ============= MODELS =============
 class User(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
