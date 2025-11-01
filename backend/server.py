@@ -782,6 +782,156 @@ async def get_available_orders_for_riders(request: Request):
     
     return [Order(**o) for o in orders]
 
+# ============= PAYMENT ENDPOINTS =============
+@api_router.post("/payments/gcash/initiate")
+async def initiate_gcash_payment(payment_data: Dict[str, Any], request: Request):
+    """Initiate GCash payment for an order - Automated payment to merchant"""
+    user = await require_auth(request)
+    
+    order_id = payment_data.get("order_id")
+    customer_gcash_number = payment_data.get("customer_gcash_number")  # For reference
+    
+    if not order_id:
+        raise HTTPException(status_code=400, detail="order_id is required")
+    
+    # Get the order
+    order = await db.orders.find_one({"id": order_id})
+    if not order:
+        raise HTTPException(status_code=404, detail="Order not found")
+    
+    # Verify customer owns this order
+    if order["customer_id"] != user.id:
+        raise HTTPException(status_code=403, detail="Not authorized to pay for this order")
+    
+    # Get merchant GCash number from environment
+    merchant_gcash_number = os.environ.get("MERCHANT_GCASH_NUMBER", "09609317687")
+    
+    # Generate unique payment reference
+    payment_reference = f"GCASH-{order_id[:8]}-{str(uuid.uuid4())[:8]}".upper()
+    
+    # Create payment record
+    payment = Payment(
+        order_id=order_id,
+        amount=order["total_amount"],
+        payment_method=PaymentMethod.GCASH,
+        payment_status=PaymentStatus.PENDING,
+        gcash_number=customer_gcash_number,
+        reference_number=payment_reference
+    )
+    
+    await db.payments.insert_one(payment.dict())
+    
+    # Update order with payment info
+    await db.orders.update_one(
+        {"id": order_id},
+        {
+            "$set": {
+                "payment_method": "gcash",
+                "payment_status": "pending",
+                "payment_reference": payment_reference,
+                "gcash_number": customer_gcash_number,
+                "updated_at": datetime.now(timezone.utc)
+            }
+        }
+    )
+    
+    logger.info(f"GCash payment initiated for order {order_id} - Reference: {payment_reference}")
+    
+    # Return payment instructions
+    return {
+        "payment_id": payment.id,
+        "order_id": order_id,
+        "amount": order["total_amount"],
+        "reference_number": payment_reference,
+        "merchant_gcash_number": merchant_gcash_number,
+        "payment_instructions": {
+            "step_1": f"Open your GCash app and send ₱{order['total_amount']:.2f}",
+            "step_2": f"Send to GCash number: {merchant_gcash_number}",
+            "step_3": f"Use reference: {payment_reference}",
+            "step_4": "Take a screenshot of the successful transaction",
+            "step_5": "Upload the screenshot in the next step"
+        },
+        "status": "pending"
+    }
+
+@api_router.post("/payments/gcash/verify")
+async def verify_gcash_payment(verification_data: Dict[str, Any], request: Request):
+    """Submit GCash payment proof for verification"""
+    user = await require_auth(request)
+    
+    payment_id = verification_data.get("payment_id")
+    payment_proof_base64 = verification_data.get("payment_proof_base64")
+    
+    if not payment_id:
+        raise HTTPException(status_code=400, detail="payment_id is required")
+    
+    # Get payment record
+    payment = await db.payments.find_one({"id": payment_id})
+    if not payment:
+        raise HTTPException(status_code=404, detail="Payment not found")
+    
+    # Get order to verify ownership
+    order = await db.orders.find_one({"id": payment["order_id"]})
+    if not order or order["customer_id"] != user.id:
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    # Update payment with proof (in real scenario, this would trigger admin verification)
+    # For automated flow, we'll auto-approve the payment
+    await db.payments.update_one(
+        {"id": payment_id},
+        {
+            "$set": {
+                "payment_proof_base64": payment_proof_base64,
+                "payment_status": "completed",  # Auto-approve for MVP
+                "verified_at": datetime.now(timezone.utc)
+            }
+        }
+    )
+    
+    # Update order status to PAID and then to PREPARING
+    await db.orders.update_one(
+        {"id": payment["order_id"]},
+        {
+            "$set": {
+                "payment_status": "completed",
+                "status": "preparing",  # Auto-accept and start preparing
+                "updated_at": datetime.now(timezone.utc)
+            }
+        }
+    )
+    
+    logger.info(f"GCash payment verified for order {payment['order_id']}")
+    
+    # Emit real-time event to restaurant
+    await sio.emit('new_order', order, room=f"restaurant_{order['restaurant_id']}")
+    
+    return {
+        "message": "Payment verified successfully",
+        "order_id": payment["order_id"],
+        "payment_status": "completed",
+        "order_status": "preparing"
+    }
+
+@api_router.get("/payments/order/{order_id}")
+async def get_order_payment(order_id: str, request: Request):
+    """Get payment details for an order"""
+    user = await require_auth(request)
+    
+    payment = await db.payments.find_one({"order_id": order_id})
+    if not payment:
+        raise HTTPException(status_code=404, detail="Payment not found")
+    
+    # Verify access
+    order = await db.orders.find_one({"id": order_id})
+    if not order:
+        raise HTTPException(status_code=404, detail="Order not found")
+    
+    # Allow customer, restaurant owner, or admin to view
+    if user.role == UserRole.CUSTOMER and order["customer_id"] != user.id:
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    return Payment(**payment)
+
 # ============= RIDER PROFILE ENDPOINTS =============
 @api_router.get("/riders/me")
 async def get_my_rider_profile(request: Request):
