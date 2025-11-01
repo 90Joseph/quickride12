@@ -1,20 +1,20 @@
 #!/usr/bin/env python3
 """
-Backend API Testing for Restaurant Management System
-Tests menu item CRUD operations and restaurant profile updates
+Backend API Testing for GCash Payment Integration
+Tests the complete GCash payment flow for QuickBite Food Delivery App
 """
 
 import requests
 import json
+import base64
 import uuid
 from datetime import datetime
-import sys
 import os
 
 # Get backend URL from environment
 BACKEND_URL = "https://foodrush-app-1.preview.emergentagent.com/api"
 
-class RestaurantAPITester:
+class GCashPaymentTester:
     def __init__(self):
         self.session = requests.Session()
         self.session_token = None
