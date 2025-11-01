@@ -294,17 +294,25 @@ export default function HomeScreen() {
               style={styles.searchInput}
               placeholder="Search delivery..."
               value={searchQuery}
-              onChangeText={setSearchQuery}
+              onChangeText={handleSearchChange}
+              onFocus={handleSearchFocus}
               placeholderTextColor="#999"
             />
+            {isSearchActive && (
+              <TouchableOpacity onPress={handleSearchClose}>
+                <Ionicons name="close-circle" size={20} color="#999" />
+              </TouchableOpacity>
+            )}
           </View>
-          <TouchableOpacity 
-            style={styles.filterButton}
-            onPress={handleFilterPress}
-            activeOpacity={0.7}
-          >
-            <Ionicons name="options-outline" size={24} color="#FF6B6B" />
-          </TouchableOpacity>
+          {!isSearchActive && (
+            <TouchableOpacity 
+              style={styles.filterButton}
+              onPress={handleFilterPress}
+              activeOpacity={0.7}
+            >
+              <Ionicons name="options-outline" size={24} color="#FF6B6B" />
+            </TouchableOpacity>
+          )}
         </View>
 
         {/* Hero Banner */}
