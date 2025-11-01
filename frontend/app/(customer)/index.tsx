@@ -64,6 +64,10 @@ export default function HomeScreen() {
   });
   const [isSearchActive, setIsSearchActive] = useState(false);
   const [currentBannerIndex, setCurrentBannerIndex] = useState(0);
+  const [showNotifications, setShowNotifications] = useState(false);
+  
+  const slideAnim = useRef(new Animated.Value(0)).current;
+  const { width } = Dimensions.get('window');
 
   const banners = [
     {
