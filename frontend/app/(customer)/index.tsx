@@ -77,6 +77,22 @@ export default function HomeScreen() {
     }
   };
 
+  const handleSearchFocus = () => {
+    setIsSearchActive(true);
+  };
+
+  const handleSearchClose = () => {
+    setIsSearchActive(false);
+    setSearchQuery('');
+  };
+
+  const handleSearchChange = (text: string) => {
+    setSearchQuery(text);
+    if (text.length > 0) {
+      setIsSearchActive(true);
+    }
+  };
+
   const toggleFavorite = (restaurantId: string) => {
     console.log('❤️ Toggling favorite for restaurant:', restaurantId);
     setFavorites((prev) => {
