@@ -217,7 +217,7 @@ export default function HomeScreen() {
 
   const handleNotificationPress = () => {
     console.log('🔔 Notification button pressed');
-    router.push('/(customer)/orders');
+    setShowNotifications(!showNotifications);
   };
 
   const handleFilterPress = () => {
