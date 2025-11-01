@@ -61,6 +61,42 @@ export default function HomeScreen() {
     distance: 'all',
   });
   const [isSearchActive, setIsSearchActive] = useState(false);
+  const [currentBannerIndex, setCurrentBannerIndex] = useState(0);
+
+  const banners = [
+    {
+      id: 1,
+      badge: '🎉 Special',
+      title: 'Get 50% Off\nYour First Order!',
+      buttonText: 'Order Now',
+      emoji: '🍟',
+      colors: ['#FF6B6B', '#FF8E53'],
+    },
+    {
+      id: 2,
+      badge: '🚴 Free Delivery',
+      title: 'Free Delivery\nOn Orders ₱500+',
+      buttonText: 'Start Ordering',
+      emoji: '🚲',
+      colors: ['#4CAF50', '#66BB6A'],
+    },
+    {
+      id: 3,
+      badge: '💰 Cashback',
+      title: '20% Cashback\nWith GCash',
+      buttonText: 'Pay with GCash',
+      emoji: '💳',
+      colors: ['#2196F3', '#42A5F5'],
+    },
+    {
+      id: 4,
+      badge: '🎊 Weekend Deal',
+      title: '30% Off\nSat & Sunday',
+      buttonText: 'View Menu',
+      emoji: '🎈',
+      colors: ['#9C27B0', '#BA68C8'],
+    },
+  ];
 
   useEffect(() => {
     fetchRestaurants();
