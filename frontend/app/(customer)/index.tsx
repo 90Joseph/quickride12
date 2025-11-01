@@ -67,44 +67,50 @@ export default function HomeScreen() {
   };
 
   const toggleFavorite = (restaurantId: string) => {
+    console.log('❤️ Toggling favorite for restaurant:', restaurantId);
     setFavorites((prev) => {
       const newFavorites = new Set(prev);
       if (newFavorites.has(restaurantId)) {
         newFavorites.delete(restaurantId);
+        console.log('💔 Removed from favorites');
       } else {
         newFavorites.add(restaurantId);
+        console.log('❤️ Added to favorites');
       }
       return newFavorites;
     });
   };
 
   const handleCategorySelect = (categoryId: string) => {
+    console.log('📂 Category selected:', categoryId);
     setSelectedCategory(categoryId);
     // In future, you can filter by actual category
   };
 
   const handleLocationPress = () => {
+    console.log('📍 Location button pressed');
     setShowLocationPicker(!showLocationPicker);
     // In future, open location picker modal
   };
 
   const handleNotificationPress = () => {
+    console.log('🔔 Notification button pressed');
     router.push('/(customer)/orders');
   };
 
   const handleFilterPress = () => {
+    console.log('🎚️ Filter button pressed');
     // In future, open filter modal
-    console.log('Filter pressed');
   };
 
   const handleBannerPress = () => {
+    console.log('🎉 Banner pressed - show deals');
     // Navigate to featured/deals section
-    console.log('Banner pressed - show deals');
   };
 
   const handleSeeAllPress = () => {
+    console.log('👀 See all pressed');
     // Show all restaurants or navigate to full list
-    console.log('See all pressed');
   };
 
   const filteredRestaurants = restaurants.filter((r) =>
