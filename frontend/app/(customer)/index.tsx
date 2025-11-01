@@ -265,11 +265,59 @@ export default function HomeScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+        {/* Header - Always Visible */}
+        <View style={styles.header}>
+          <TouchableOpacity 
+            style={styles.locationContainer}
+            onPress={handleLocationPress}
+            activeOpacity={0.7}
+          >
+            <Ionicons name="location" size={20} color="#FF6B6B" />
+            <Text style={styles.locationText}>{selectedLocation}</Text>
+            <Ionicons name="chevron-down" size={16} color="#666" />
+          </TouchableOpacity>
+          <TouchableOpacity 
+            style={styles.notificationButton}
+            onPress={handleNotificationPress}
+            activeOpacity={0.7}
+          >
+            <Ionicons name="notifications-outline" size={24} color="#333" />
+            <View style={styles.notificationBadge} />
+          </TouchableOpacity>
+        </View>
+
+        {/* Search Bar - Always Visible */}
+        <View style={styles.searchSection}>
+          <View style={styles.searchContainer}>
+            <Ionicons name="search" size={20} color="#999" />
+            <TextInput
+              style={styles.searchInput}
+              placeholder="Search delivery..."
+              value={searchQuery}
+              onChangeText={handleSearchChange}
+              onFocus={handleSearchFocus}
+              placeholderTextColor="#999"
+            />
+            {isSearchActive && (
+              <TouchableOpacity onPress={handleSearchClose}>
+                <Ionicons name="close-circle" size={20} color="#999" />
+              </TouchableOpacity>
+            )}
+          </View>
+          {!isSearchActive && (
+            <TouchableOpacity 
+              style={styles.filterButton}
+              onPress={handleFilterPress}
+              activeOpacity={0.7}
+            >
+              <Ionicons name="options-outline" size={24} color="#FF6B6B" />
+            </TouchableOpacity>
+          )}
+        </View>
+
         {/* Main Content - Hidden when searching */}
         {!isSearchActive && (
           <View>
-            {/* Header */}
-            <View style={styles.header}>
           <TouchableOpacity 
             style={styles.locationContainer}
             onPress={handleLocationPress}
