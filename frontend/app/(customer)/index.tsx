@@ -67,7 +67,7 @@ export default function HomeScreen() {
   const [showNotifications, setShowNotifications] = useState(false);
   
   const slideAnim = useRef(new Animated.Value(0)).current;
-  const { width } = Dimensions.get('window');
+  const [bannerWidth, setBannerWidth] = useState(width - 40); // width minus padding
 
   const banners = [
     {
