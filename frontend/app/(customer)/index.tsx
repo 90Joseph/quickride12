@@ -386,6 +386,34 @@ export default function HomeScreen() {
 
         {/* Bottom Padding */}
         <View style={{ height: 100 }} />
+          </View>
+        )}
+
+        {/* Full-Screen Search Results Overlay */}
+        {isSearchActive && (
+          <View style={styles.searchOverlay}>
+            <View style={styles.searchResultsContainer}>
+              <Text style={styles.searchResultsTitle}>
+                {searchQuery ? `Results for "${searchQuery}"` : 'Start typing to search...'}
+              </Text>
+              <Text style={styles.searchResultsCount}>
+                {filteredRestaurants.length} restaurant{filteredRestaurants.length !== 1 ? 's' : ''} found
+              </Text>
+
+              {filteredRestaurants.length > 0 ? (
+                <View style={styles.searchResults}>
+                  {filteredRestaurants.map(renderRestaurantCard)}
+                </View>
+              ) : searchQuery.length > 0 ? (
+                <View style={styles.noResults}>
+                  <Ionicons name="search-outline" size={64} color="#CCC" />
+                  <Text style={styles.noResultsText}>No restaurants found</Text>
+                  <Text style={styles.noResultsSubtext}>Try searching for something else</Text>
+                </View>
+              ) : null}
+            </View>
+          </View>
+        )}
       </ScrollView>
 
       {/* Location Picker Modal */}
