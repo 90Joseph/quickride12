@@ -11,9 +11,9 @@ import {
   Modal,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import api from '../../../../utils/api';
+import api from '../../utils/api';
 import { Ionicons } from '@expo/vector-icons';
-import LiveOrdersMap from '../../../../components/LiveOrdersMap';
+import LiveOrdersMap from '../../components/LiveOrdersMap';
 
 const { width } = Dimensions.get('window');
 const IS_DESKTOP = width >= 1024;
