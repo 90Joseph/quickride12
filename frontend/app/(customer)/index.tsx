@@ -356,28 +356,29 @@ export default function HomeScreen() {
     <SafeAreaView style={styles.container}>
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         {/* Header - Always Visible */}
-        <View style={styles.header}>
-          <View style={styles.headerLeft}>
-            <Text style={styles.homeTitle}>Home</Text>
-            <TouchableOpacity 
-              style={styles.locationBadge}
-              onPress={handleLocationPress}
-              activeOpacity={0.7}
-            >
-              
-              <Ionicons name="location" size={14} color="#FF6B6B" />
-              <Text style={styles.locationBadgeText}>{selectedLocation.split(',')[0]}</Text>
-              <Ionicons name="chevron-down" size={12} color="#666" />
-            </TouchableOpacity>
-          </View>
+        <View style={styles.pinkHeader}>
+          <TouchableOpacity 
+            style={styles.locationContainer}
+            onPress={handleLocationPress}
+            activeOpacity={0.7}
+          >
+            <Ionicons name="location" size={18} color="#FFF" />
+            <Text style={styles.locationText}>{selectedLocation}</Text>
+            <Ionicons name="chevron-down" size={16} color="#FFF" />
+          </TouchableOpacity>
           <TouchableOpacity 
             style={styles.notificationButton}
             onPress={handleNotificationPress}
             activeOpacity={0.7}
           >
-            <Ionicons name="notifications-outline" size={24} color="#333" />
+            <Ionicons name="notifications-outline" size={24} color="#FFF" />
             <View style={styles.notificationBadge} />
           </TouchableOpacity>
+        </View>
+        
+        {/* Home Title */}
+        <View style={styles.titleContainer}>
+          <Text style={styles.homeTitle}>Home</Text>
         </View>
 
         {/* Search Bar - Always Visible */}
