@@ -740,20 +740,6 @@ const styles = StyleSheet.create({
   locationBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FFE8E8',
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 20,
-    gap: 4,
-  },
-  locationBadgeText: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: '#FF6B6B',
-  },
-  locationContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
     gap: 6,
   },
   locationText: {
