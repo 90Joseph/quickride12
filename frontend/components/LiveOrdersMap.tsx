@@ -36,8 +36,7 @@ export default function LiveOrdersMap({ orders }: LiveOrdersMapProps) {
   useEffect(() => {
     if (Platform.OS !== 'web') return;
 
-    const apiKey = Constants.expoConfig?.extra?.googleMapsApiKey || 
-                   process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY;
+    const apiKey = process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY || 'AIzaSyDJqsXxZXuu808lFZXARvy4rd0xktuqwJQ';
 
     if (!apiKey) {
       setError('Google Maps API key not found');
@@ -52,7 +51,7 @@ export default function LiveOrdersMap({ orders }: LiveOrdersMapProps) {
       }
 
       const script = document.createElement('script');
-      script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}`;
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places`;
       script.async = true;
       script.defer = true;
       script.onload = () => initializeMap();
