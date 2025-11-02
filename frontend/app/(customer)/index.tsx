@@ -356,32 +356,27 @@ export default function HomeScreen() {
     <SafeAreaView style={styles.container}>
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         {/* Header - Always Visible */}
-        <View style={styles.headerContainer}>
-          {/* Top Row: Location & Notification */}
-          <View style={styles.topBar}>
+        <View style={styles.header}>
+          <View style={styles.headerLeft}>
+            <Text style={styles.homeTitle}>Home</Text>
             <TouchableOpacity 
-              style={styles.locationContainer}
+              style={styles.locationBadge}
               onPress={handleLocationPress}
               activeOpacity={0.7}
             >
-              <Ionicons name="location" size={16} color="#FF6B6B" />
-              <Text style={styles.locationText}>{selectedLocation}</Text>
-              <Ionicons name="chevron-down" size={14} color="#666" />
-            </TouchableOpacity>
-            <TouchableOpacity 
-              style={styles.notificationButton}
-              onPress={handleNotificationPress}
-              activeOpacity={0.7}
-            >
-              <Ionicons name="notifications-outline" size={24} color="#333" />
-              <View style={styles.notificationBadge} />
+              <Ionicons name="location" size={14} color="#FF6B6B" />
+              <Text style={styles.locationBadgeText}>{selectedLocation.split(',')[0]}</Text>
+              <Ionicons name="chevron-down" size={12} color="#666" />
             </TouchableOpacity>
           </View>
-          
-          {/* Bottom Row: Home Title */}
-          <View style={styles.titleRow}>
-            <Text style={styles.homeTitle}>Home</Text>
-          </View>
+          <TouchableOpacity 
+            style={styles.notificationButton}
+            onPress={handleNotificationPress}
+            activeOpacity={0.7}
+          >
+            <Ionicons name="notifications-outline" size={24} color="#333" />
+            <View style={styles.notificationBadge} />
+          </TouchableOpacity>
         </View>
 
         {/* Search Bar - Always Visible */}
