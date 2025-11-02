@@ -64,6 +64,15 @@ export default function AdminLayout() {
           ),
         }}
       />
+      <Tabs.Screen
+        name="live-orders"
+        options={{
+          title: 'Live Tracking',
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="map" size={size} color={color} />
+          ),
+        }}
+      />
     </Tabs>
   );
 }
