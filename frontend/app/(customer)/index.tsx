@@ -357,15 +357,18 @@ export default function HomeScreen() {
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         {/* Header - Always Visible */}
         <View style={styles.header}>
-          <TouchableOpacity 
-            style={styles.locationContainer}
-            onPress={handleLocationPress}
-            activeOpacity={0.7}
-          >
-            <Ionicons name="location" size={20} color="#FF6B6B" />
-            <Text style={styles.locationText}>{selectedLocation}</Text>
-            <Ionicons name="chevron-down" size={16} color="#666" />
-          </TouchableOpacity>
+          <View style={styles.headerLeft}>
+            <Text style={styles.homeTitle}>Home</Text>
+            <TouchableOpacity 
+              style={styles.locationBadge}
+              onPress={handleLocationPress}
+              activeOpacity={0.7}
+            >
+              <Ionicons name="location" size={14} color="#FF6B6B" />
+              <Text style={styles.locationBadgeText}>{selectedLocation.split(',')[0]}</Text>
+              <Ionicons name="chevron-down" size={12} color="#666" />
+            </TouchableOpacity>
+          </View>
           <TouchableOpacity 
             style={styles.notificationButton}
             onPress={handleNotificationPress}
