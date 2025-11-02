@@ -1318,6 +1318,247 @@ async def admin_update_restaurant_status(restaurant_id: str, status_update: Dict
     
     return {"message": "Restaurant status updated"}
 
+# ============= ENHANCED ADMIN USER MANAGEMENT =============
+@api_router.put("/admin/users/{user_id}/ban")
+async def ban_user(user_id: str, request: Request):
+    """Ban a user (admin only)"""
+    await require_admin(request)
+    
+    user = await db.users.find_one({"id": user_id})
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    await db.users.update_one(
+        {"id": user_id},
+        {"$set": {"is_banned": True, "banned_at": datetime.now(timezone.utc)}}
+    )
+    
+    logger.info(f"Admin banned user {user.get('name')} (ID: {user_id})")
+    return {"message": "User banned successfully"}
+
+@api_router.put("/admin/users/{user_id}/unban")
+async def unban_user(user_id: str, request: Request):
+    """Unban a user (admin only)"""
+    await require_admin(request)
+    
+    user = await db.users.find_one({"id": user_id})
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    await db.users.update_one(
+        {"id": user_id},
+        {"$set": {"is_banned": False}, "$unset": {"banned_at": ""}}
+    )
+    
+    logger.info(f"Admin unbanned user {user.get('name')} (ID: {user_id})")
+    return {"message": "User unbanned successfully"}
+
+@api_router.put("/admin/users/{user_id}/suspend")
+async def suspend_user(user_id: str, suspend_data: Dict[str, Any], request: Request):
+    """Suspend a user temporarily (admin only)"""
+    await require_admin(request)
+    
+    user = await db.users.find_one({"id": user_id})
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    days = suspend_data.get("days", 7)
+    reason = suspend_data.get("reason", "Violation of terms")
+    suspend_until = datetime.now(timezone.utc) + timedelta(days=days)
+    
+    await db.users.update_one(
+        {"id": user_id},
+        {"$set": {
+            "is_suspended": True,
+            "suspended_until": suspend_until,
+            "suspension_reason": reason
+        }}
+    )
+    
+    logger.info(f"Admin suspended user {user.get('name')} until {suspend_until}")
+    return {"message": f"User suspended for {days} days"}
+
+@api_router.put("/admin/restaurants/{restaurant_id}/approve")
+async def approve_restaurant(restaurant_id: str, request: Request):
+    """Approve a restaurant (admin only)"""
+    await require_admin(request)
+    
+    restaurant = await db.restaurants.find_one({"id": restaurant_id})
+    if not restaurant:
+        raise HTTPException(status_code=404, detail="Restaurant not found")
+    
+    await db.restaurants.update_one(
+        {"id": restaurant_id},
+        {"$set": {"is_approved": True, "approved_at": datetime.now(timezone.utc)}}
+    )
+    
+    logger.info(f"Admin approved restaurant {restaurant.get('name')}")
+    return {"message": "Restaurant approved"}
+
+@api_router.put("/admin/restaurants/{restaurant_id}/reject")
+async def reject_restaurant(restaurant_id: str, reject_data: Dict[str, Any], request: Request):
+    """Reject a restaurant (admin only)"""
+    await require_admin(request)
+    
+    restaurant = await db.restaurants.find_one({"id": restaurant_id})
+    if not restaurant:
+        raise HTTPException(status_code=404, detail="Restaurant not found")
+    
+    reason = reject_data.get("reason", "Does not meet requirements")
+    
+    await db.restaurants.update_one(
+        {"id": restaurant_id},
+        {"$set": {"is_approved": False, "rejection_reason": reason}}
+    )
+    
+    logger.info(f"Admin rejected restaurant {restaurant.get('name')}")
+    return {"message": "Restaurant rejected"}
+
+# ============= ENHANCED ADMIN LIVE TRACKING =============
+@api_router.get("/admin/orders/live")
+async def get_live_orders(request: Request):
+    """Get all active orders with location data for live tracking (admin only)"""
+    await require_admin(request)
+    
+    # Get all active orders (not delivered or cancelled)
+    active_statuses = [
+        OrderStatus.PENDING.value,
+        OrderStatus.PAYMENT_PENDING.value,
+        OrderStatus.PAID.value,
+        OrderStatus.ACCEPTED.value,
+        OrderStatus.PREPARING.value,
+        OrderStatus.READY_FOR_PICKUP.value,
+        OrderStatus.RIDER_ASSIGNED.value,
+        OrderStatus.PICKED_UP.value,
+        OrderStatus.OUT_FOR_DELIVERY.value
+    ]
+    
+    orders = await db.orders.find({"status": {"$in": active_statuses}}).sort("created_at", -1).to_list(100)
+    
+    # Enhance orders with restaurant and rider location data
+    enhanced_orders = []
+    for order in orders:
+        order_dict = Order(**order).model_dump()
+        
+        # Get restaurant location
+        restaurant = await db.restaurants.find_one({"id": order_dict["restaurant_id"]})
+        if restaurant:
+            order_dict["restaurant_location"] = restaurant.get("location")
+        
+        # Get rider location if assigned
+        if order_dict.get("rider_id"):
+            rider = await db.riders.find_one({"user_id": order_dict["rider_id"]})
+            if rider and rider.get("current_location"):
+                order_dict["rider_location"] = rider.get("current_location")
+        
+        # Convert datetime fields to strings
+        if "created_at" in order_dict and isinstance(order_dict["created_at"], datetime):
+            order_dict["created_at"] = order_dict["created_at"].isoformat()
+        if "updated_at" in order_dict and isinstance(order_dict["updated_at"], datetime):
+            order_dict["updated_at"] = order_dict["updated_at"].isoformat()
+        
+        enhanced_orders.append(order_dict)
+    
+    return enhanced_orders
+
+@api_router.get("/admin/riders/live")
+async def get_live_riders(request: Request):
+    """Get all riders with their current status and location (admin only)"""
+    await require_admin(request)
+    
+    riders = await db.riders.find().to_list(100)
+    
+    enhanced_riders = []
+    for rider in riders:
+        rider_dict = Rider(**rider).model_dump()
+        
+        # Get user info
+        user = await db.users.find_one({"id": rider_dict["user_id"]})
+        if user:
+            rider_dict["email"] = user.get("email")
+        
+        # Get current order details if busy
+        if rider_dict.get("current_order_id"):
+            order = await db.orders.find_one({"id": rider_dict["current_order_id"]})
+            if order:
+                rider_dict["current_order"] = {
+                    "id": order.get("id"),
+                    "customer_name": order.get("customer_name"),
+                    "restaurant_name": order.get("restaurant_name"),
+                    "status": order.get("status"),
+                    "delivery_address": order.get("delivery_address")
+                }
+        
+        # Convert datetime fields
+        if "created_at" in rider_dict and isinstance(rider_dict["created_at"], datetime):
+            rider_dict["created_at"] = rider_dict["created_at"].isoformat()
+        
+        enhanced_riders.append(rider_dict)
+    
+    return enhanced_riders
+
+@api_router.get("/admin/restaurants/live")
+async def get_live_restaurants(request: Request):
+    """Get all restaurants with their current status (admin only)"""
+    await require_admin(request)
+    
+    restaurants = await db.restaurants.find().to_list(100)
+    
+    enhanced_restaurants = []
+    for restaurant in restaurants:
+        restaurant_dict = Restaurant(**restaurant).model_dump()
+        
+        # Count active orders for this restaurant
+        active_orders = await db.orders.count_documents({
+            "restaurant_id": restaurant_dict["id"],
+            "status": {"$in": ["pending", "accepted", "preparing", "ready_for_pickup"]}
+        })
+        restaurant_dict["active_orders_count"] = active_orders
+        
+        # Convert datetime fields
+        if "created_at" in restaurant_dict and isinstance(restaurant_dict["created_at"], datetime):
+            restaurant_dict["created_at"] = restaurant_dict["created_at"].isoformat()
+        
+        enhanced_restaurants.append(restaurant_dict)
+    
+    return enhanced_restaurants
+
+@api_router.get("/admin/stats/realtime")
+async def get_realtime_stats(request: Request):
+    """Get real-time statistics for dashboard (admin only)"""
+    await require_admin(request)
+    
+    # Count online/active entities
+    active_orders = await db.orders.count_documents({
+        "status": {"$in": ["accepted", "preparing", "ready_for_pickup", "rider_assigned", "picked_up", "out_for_delivery"]}
+    })
+    
+    available_riders = await db.riders.count_documents({"status": "available"})
+    busy_riders = await db.riders.count_documents({"status": "busy"})
+    
+    open_restaurants = await db.restaurants.count_documents({"is_open": True})
+    
+    # Today's stats
+    today_start = datetime.now(timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0)
+    today_orders = await db.orders.count_documents({"created_at": {"$gte": today_start}})
+    today_revenue = 0
+    
+    delivered_today = await db.orders.find({
+        "created_at": {"$gte": today_start},
+        "status": "delivered"
+    }).to_list(1000)
+    today_revenue = sum(order.get("total_amount", 0) for order in delivered_today)
+    
+    return {
+        "active_orders": active_orders,
+        "available_riders": available_riders,
+        "busy_riders": busy_riders,
+        "open_restaurants": open_restaurants,
+        "today_orders": today_orders,
+        "today_revenue": today_revenue
+    }
+
+
 # ============= USER PROFILE ENDPOINTS =============
 @api_router.put("/users/{user_id}")
 async def update_user_profile(user_id: str, updates: Dict[str, Any], request: Request):
