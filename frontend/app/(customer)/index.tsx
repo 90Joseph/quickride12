@@ -769,6 +769,16 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     backgroundColor: '#FF6B6B',
   },
+  headerLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  homeTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#FFF',
+  },
   titleContainer: {
     paddingHorizontal: 20,
     paddingVertical: 12,
