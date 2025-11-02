@@ -759,9 +759,24 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   locationText: {
-    fontSize: 13,
+    fontSize: 14,
     fontWeight: '500',
-    color: '#666',
+    color: '#FFF',
+  },
+  pinkHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    backgroundColor: '#FF6B6B',
+  },
+  titleContainer: {
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    backgroundColor: '#FFF',
+    borderBottomWidth: 2,
+    borderBottomColor: '#FFE8E8',
   },
   notificationButton: {
     position: 'relative',
