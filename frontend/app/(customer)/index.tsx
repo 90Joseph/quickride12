@@ -765,13 +765,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#FFF',
   },
-  titleContainer: {
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-    backgroundColor: '#FFF',
-    borderBottomWidth: 2,
-    borderBottomColor: '#FFE8E8',
-  },
   notificationButton: {
     position: 'relative',
   },
