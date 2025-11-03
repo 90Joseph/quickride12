@@ -83,6 +83,7 @@ export default function ServiceSelectionScreen() {
           </Text>
         </View>
       </View>
+      </LinearGradient>
     </SafeAreaView>
   );
 }
