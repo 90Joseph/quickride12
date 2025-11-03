@@ -67,6 +67,15 @@ export default function HomeScreen() {
   const [currentBannerIndex, setCurrentBannerIndex] = useState(0);
   const [showNotifications, setShowNotifications] = useState(false);
   
+  // Quick location dropdown
+  const [showQuickLocations, setShowQuickLocations] = useState(false);
+  const [savedLocations, setSavedLocations] = useState({
+    home: { address: '', coordinates: { lat: 0, lng: 0 } },
+    work: { address: '', coordinates: { lat: 0, lng: 0 } },
+    school: { address: '', coordinates: { lat: 0, lng: 0 } },
+  });
+  const [editingLocation, setEditingLocation] = useState<'home' | 'work' | 'school' | null>(null);
+  
   // Map picker states
   const [mapLoaded, setMapLoaded] = useState(false);
   const [tempLocation, setTempLocation] = useState({ lat: 14.5547, lng: 121.0244 });
