@@ -80,38 +80,63 @@ export default function CheckoutScreen() {
 
   // Load Google Maps and initialize map
   const loadMapPicker = () => {
-    if (typeof window === 'undefined') return;
+    console.log('🗺️ loadMapPicker called');
+    if (typeof window === 'undefined') {
+      console.log('❌ Window is undefined');
+      return;
+    }
 
+    console.log('✅ Window is defined');
     const apiKey = 'AIzaSyA0m1oRlXLQWjxacqjEJ6zJW3WvmOWvQkQ';
 
     if ((window as any).google && (window as any).google.maps) {
-      initializeMapPicker();
+      console.log('✅ Google Maps already loaded, initializing...');
+      setTimeout(() => initializeMapPicker(), 100);
       return;
     }
 
+    console.log('🔄 Google Maps not loaded, checking for existing script...');
     const existingScript = document.querySelector('script[src*="maps.googleapis.com"]');
     if (existingScript) {
+      console.log('✅ Script tag exists, waiting for Google Maps to load...');
       const checkInterval = setInterval(() => {
         if ((window as any).google && (window as any).google.maps) {
           clearInterval(checkInterval);
+          console.log('✅ Google Maps loaded from existing script');
           initializeMapPicker();
         }
       }, 100);
+      
+      setTimeout(() => {
+        clearInterval(checkInterval);
+        if (!mapLoaded) {
+          console.error('⏱️ Timeout waiting for Google Maps');
+        }
+      }, 10000);
       return;
     }
 
+    console.log('📝 Creating new Google Maps script tag...');
     const script = document.createElement('script');
     script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places`;
     script.async = true;
     script.defer = true;
     script.onload = () => {
+      console.log('✅ Script loaded, waiting for google.maps...');
       setTimeout(() => {
         if ((window as any).google && (window as any).google.maps) {
+          console.log('✅ Google Maps API ready!');
           initializeMapPicker();
+        } else {
+          console.error('❌ Google Maps API not available after script load');
         }
       }, 100);
     };
+    script.onerror = (error) => {
+      console.error('❌ Failed to load Google Maps script:', error);
+    };
     document.head.appendChild(script);
+    console.log('✅ Script tag appended to document');
   };
 
   // Initialize interactive map
