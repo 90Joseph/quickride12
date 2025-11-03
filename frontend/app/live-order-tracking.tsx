@@ -376,13 +376,30 @@ export default function LiveOrderTrackingScreen() {
       {/* Map */}
       {Platform.OS === 'web' ? (
         <View style={styles.mapContainer}>
-          <div ref={mapRef} style={{ width: '100%', height: '100%' }} />
-          {!mapLoaded && (
+          {!mapLoaded && !mapError && (
             <View style={styles.mapLoadingOverlay}>
               <ActivityIndicator size="large" color="#FF6B6B" />
               <Text style={styles.mapLoadingText}>Loading map...</Text>
             </View>
           )}
+          {mapError && (
+            <View style={styles.mapLoadingOverlay}>
+              <Ionicons name="alert-circle" size={48} color="#FF6B6B" />
+              <Text style={styles.errorText}>{mapError}</Text>
+              <TouchableOpacity 
+                style={styles.retryButton}
+                onPress={() => {
+                  setMapError('');
+                  setScriptLoaded(false);
+                  setMapLoaded(false);
+                  loadMap();
+                }}
+              >
+                <Text style={styles.retryButtonText}>Retry</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+          <div ref={mapRef} style={{ width: '100%', height: '100%', display: mapLoaded ? 'block' : 'none' }} />
         </View>
       ) : (
         <View style={[styles.mapContainer, styles.mapPlaceholder]}>
