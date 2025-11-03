@@ -259,36 +259,59 @@ export default function CheckoutScreen() {
 
   // Load Google Maps for verification modal
   const loadVerificationMap = () => {
-    if (typeof window === 'undefined') return;
+    console.log('🗺️ loadVerificationMap called');
+    if (typeof window === 'undefined') {
+      console.log('❌ Window is undefined');
+      return;
+    }
 
-    const apiKey = 'AIzaSyA0m1oRlXLQWjxacqjEJ6zJW3WvmOWvQkQ';
+    const apiKey = process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY || 'AIzaSyDJqsXxZXuu808lFZXARvy4rd0xktuqwJQ';
+    console.log('📍 Using API key:', apiKey.substring(0, 20) + '...');
 
     if ((window as any).google && (window as any).google.maps) {
-      initializeVerificationMap();
+      console.log('✅ Google Maps already loaded, initializing...');
+      setTimeout(() => initializeVerificationMap(), 100);
       return;
     }
 
     const existingScript = document.querySelector('script[src*="maps.googleapis.com"]');
     if (existingScript) {
+      console.log('📜 Google Maps script exists, waiting for load...');
+      let attempts = 0;
       const checkInterval = setInterval(() => {
+        attempts++;
         if ((window as any).google && (window as any).google.maps) {
+          console.log(`✅ Google Maps loaded after ${attempts} attempts`);
           clearInterval(checkInterval);
           initializeVerificationMap();
+        } else if (attempts > 50) {
+          console.log('❌ Timeout waiting for Google Maps');
+          clearInterval(checkInterval);
+          setVerificationMapLoaded(true); // Show the div even if map fails
         }
       }, 100);
       return;
     }
 
+    console.log('📥 Loading Google Maps script...');
     const script = document.createElement('script');
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}`;
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places`;
     script.async = true;
     script.defer = true;
     script.onload = () => {
+      console.log('✅ Google Maps script loaded');
       setTimeout(() => {
         if ((window as any).google && (window as any).google.maps) {
           initializeVerificationMap();
+        } else {
+          console.log('❌ Google object not available after script load');
+          setVerificationMapLoaded(true);
         }
-      }, 100);
+      }, 200);
+    };
+    script.onerror = () => {
+      console.error('❌ Failed to load Google Maps script');
+      setVerificationMapLoaded(true);
     };
     document.head.appendChild(script);
   };
