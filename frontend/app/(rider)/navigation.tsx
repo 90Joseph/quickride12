@@ -57,22 +57,38 @@ export default function RiderNavigationScreen() {
 
   const getUserLocation = () => {
     if (typeof navigator !== 'undefined' && navigator.geolocation) {
+      console.log('🔍 Requesting user location from browser...');
       navigator.geolocation.getCurrentPosition(
         (position) => {
-          setUserLocation({
+          const location = {
             latitude: position.coords.latitude,
             longitude: position.coords.longitude,
-          });
+          };
+          console.log('✅ Got real user location:', location);
+          setUserLocation(location);
         },
         (error) => {
-          console.error('Error getting location:', error);
-          // Fallback to Manila if location not available
-          setUserLocation({
-            latitude: 14.5995,
-            longitude: 120.9842,
-          });
+          console.error('❌ Error getting location:', error);
+          // Fallback to real location in Manila (Makati CBD)
+          const fallbackLocation = {
+            latitude: 14.5547,
+            longitude: 121.0244,
+          };
+          console.log('⚠️ Using fallback location (Makati, Manila):', fallbackLocation);
+          setUserLocation(fallbackLocation);
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 10000,
+          maximumAge: 0
         }
       );
+    } else {
+      console.warn('⚠️ Geolocation not available, using fallback');
+      setUserLocation({
+        latitude: 14.5547,
+        longitude: 121.0244,
+      });
     }
   };
 
