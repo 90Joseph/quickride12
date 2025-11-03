@@ -194,9 +194,54 @@ class Rider(BaseModel):
     status: RiderStatus = RiderStatus.AVAILABLE
     current_location: Optional[Location] = None
     current_order_id: Optional[str] = None
+    current_ride_id: Optional[str] = None
+    active_service: ServiceType = ServiceType.FOOD_DELIVERY
     total_deliveries: int = 0
+    total_rides: int = 0
     rating: float = 0.0
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class RideStop(BaseModel):
+    location: Location
+    order: int  # Stop number (1, 2, 3, etc.)
+    completed: bool = False
+
+class Ride(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    customer_id: str
+    customer_name: str
+    customer_phone: str
+    pickup_location: Location
+    dropoff_location: Location
+    stops: List[RideStop] = []  # Additional stops
+    rider_id: Optional[str] = None
+    rider_name: Optional[str] = None
+    rider_phone: Optional[str] = None
+    rider_vehicle: Optional[str] = None
+    distance_km: float = 0.0
+    estimated_fare: float = 0.0
+    actual_fare: float = 0.0
+    base_fare: float = 30.0
+    per_km_rate: float = 10.0
+    cancellation_fee: float = 0.0
+    status: RideStatus = RideStatus.PENDING
+    payment_method: PaymentMethod = PaymentMethod.CASH
+    payment_status: PaymentStatus = PaymentStatus.PENDING
+    scheduled_time: Optional[datetime] = None  # For scheduled rides
+    pickup_time: Optional[datetime] = None
+    dropoff_time: Optional[datetime] = None
+    special_instructions: Optional[str] = None
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class CustomerCancellationRecord(BaseModel):
+    customer_id: str
+    total_cancellations: int = 0
+    last_cancellation: Optional[datetime] = None
+    penalty_amount: float = 0.0
+    suspension_until: Optional[datetime] = None
+    suspension_reason: Optional[str] = None
+
 
 # ============= AUTH HELPERS =============
 async def get_current_user(request: Request) -> Optional[User]:
