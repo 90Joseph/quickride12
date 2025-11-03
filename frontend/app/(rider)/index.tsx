@@ -57,6 +57,10 @@ export default function RiderAvailableScreen() {
   const [currentLocation, setCurrentLocation] = useState<any>(null);
   const [showLocationPicker, setShowLocationPicker] = useState(false);
   const [locationAddress, setLocationAddress] = useState('Fetching location...');
+  const [showSearchModal, setShowSearchModal] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [searching, setSearching] = useState(false);
 
   useEffect(() => {
     fetchData();
