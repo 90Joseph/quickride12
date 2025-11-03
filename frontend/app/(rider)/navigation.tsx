@@ -296,28 +296,35 @@ export default function RiderNavigationScreen() {
           },
           title: 'Pickup: ' + currentJob.data.restaurant_name,
         });
+        } else {
+          console.warn('Invalid restaurant coordinates:', restaurantLocation);
+        }
       }
 
       if (deliveryLocation) {
-        dropoffLocation = {
-          lat: deliveryLocation.latitude,
-          lng: deliveryLocation.longitude,
-        };
+        const lat = parseCoordinate(deliveryLocation.latitude);
+        const lng = parseCoordinate(deliveryLocation.longitude);
         
-        // Customer marker (dropoff)
-        new google.maps.Marker({
-          position: dropoffLocation,
-          map,
-          icon: {
-            path: google.maps.SymbolPath.CIRCLE,
-            scale: 10,
-            fillColor: '#FF6B6B',
-            fillOpacity: 1,
-            strokeColor: '#FFF',
-            strokeWeight: 2,
-          },
-          title: 'Dropoff: ' + currentJob.data.customer_name,
-        });
+        if (lat !== null && lng !== null) {
+          dropoffLocation = { lat, lng };
+          
+          // Customer marker (dropoff)
+          new google.maps.Marker({
+            position: dropoffLocation,
+            map,
+            icon: {
+              path: google.maps.SymbolPath.CIRCLE,
+              scale: 10,
+              fillColor: '#FF6B6B',
+              fillOpacity: 1,
+              strokeColor: '#FFF',
+              strokeWeight: 2,
+            },
+            title: 'Dropoff: ' + currentJob.data.customer_name,
+          });
+        } else {
+          console.warn('Invalid delivery coordinates:', deliveryLocation);
+        }
       }
     } else {
       // Moto-taxi: Customer pickup, Destination dropoff
@@ -325,29 +332,34 @@ export default function RiderNavigationScreen() {
       const dropoff = currentJob.data.dropoff_location;
       
       if (pickup) {
-        pickupLocation = {
-          lat: pickup.latitude,
-          lng: pickup.longitude,
-        };
+        const lat = parseCoordinate(pickup.latitude);
+        const lng = parseCoordinate(pickup.longitude);
         
-        new google.maps.Marker({
-          position: pickupLocation,
-          map,
-          icon: {
-            path: google.maps.SymbolPath.CIRCLE,
-            scale: 10,
-            fillColor: '#4CAF50',
-            fillOpacity: 1,
-            strokeColor: '#FFF',
-            strokeWeight: 2,
-          },
-          title: 'Pickup: ' + currentJob.data.customer_name,
-        });
+        if (lat !== null && lng !== null) {
+          pickupLocation = { lat, lng };
+          
+          new google.maps.Marker({
+            position: pickupLocation,
+            map,
+            icon: {
+              path: google.maps.SymbolPath.CIRCLE,
+              scale: 10,
+              fillColor: '#4CAF50',
+              fillOpacity: 1,
+              strokeColor: '#FFF',
+              strokeWeight: 2,
+            },
+            title: 'Pickup: ' + currentJob.data.customer_name,
+          });
+        }
       }
 
       if (dropoff) {
-        dropoffLocation = {
-          lat: dropoff.latitude,
+        const lat = parseCoordinate(dropoff.latitude);
+        const lng = parseCoordinate(dropoff.longitude);
+        
+        if (lat !== null && lng !== null) {
+          dropoffLocation = { lat, lng };
           lng: dropoff.longitude,
         };
         
