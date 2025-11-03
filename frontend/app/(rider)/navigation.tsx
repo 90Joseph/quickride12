@@ -613,6 +613,25 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#666',
   },
+  errorText: {
+    marginTop: 12,
+    fontSize: 16,
+    color: '#FF6B6B',
+    textAlign: 'center',
+    paddingHorizontal: 20,
+  },
+  retryButton: {
+    backgroundColor: '#FF6B6B',
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 8,
+    marginTop: 16,
+  },
+  retryButtonText: {
+    color: '#FFF',
+    fontSize: 16,
+    fontWeight: '600',
+  },
   infoCard: {
     backgroundColor: '#FFF',
     padding: 20,
