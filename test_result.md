@@ -111,27 +111,33 @@ user_problem_statement: |
 backend:
   - task: "Add /rider/current-order endpoint"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Added GET /api/rider/current-order endpoint to fetch rider's current active food delivery order with enriched restaurant and customer information."
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: GET /api/rider/current-order endpoint working correctly. Returns null when no active order, proper authentication (403 for non-riders), and enriched order data when rider has active assignment. Endpoint requires rider role and auto-creates rider profile via /riders/me if needed."
 
   - task: "Add /orders/{order_id}/rider-location endpoint"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Added GET /api/orders/{order_id}/rider-location endpoint for customers to fetch real-time rider location for their orders. Includes authentication check to ensure only order owner or admin can access."
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: GET /api/orders/{order_id}/rider-location endpoint working correctly. Returns proper JSON with rider_assigned, location, rider_name, and rider_phone fields. Correctly handles authorization (403 for unauthorized customers), 404 for non-existent orders, and shows real-time location updates."
 
   - task: "Rider location update API"
     implemented: true
@@ -144,6 +150,9 @@ backend:
       - working: true
         agent: "main"
         comment: "Existing PUT /api/riders/location endpoint already working. Updates rider's current location in database and emits WebSocket events for real-time tracking."
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: PUT /api/riders/location endpoint working correctly. Successfully updates rider location with latitude, longitude, and address. Requires rider authentication (403 for non-riders), creates rider profile automatically via /riders/me, and emits WebSocket events for real-time tracking. Location updates are reflected in customer tracking endpoint."
 
 frontend:
   - task: "Rider Navigation Screen with Live Directions"
