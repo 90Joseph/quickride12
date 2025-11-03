@@ -206,6 +206,38 @@ export default function RiderAvailableScreen() {
     }
   };
 
+
+  const loadGoogleMapsScript = () => {
+    return new Promise((resolve, reject) => {
+      if (typeof window === 'undefined') {
+        reject('Not in browser environment');
+        return;
+      }
+
+      if ((window as any).google && (window as any).google.maps) {
+        resolve((window as any).google);
+        return;
+      }
+
+      const script = document.createElement('script');
+      const apiKey = process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY || 'AIzaSyDJqsXxZXuu808lFZXARvy4rd0xktuqwJQ';
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places`;
+      script.async = true;
+      script.defer = true;
+      
+      script.onload = () => {
+        if ((window as any).google) {
+          resolve((window as any).google);
+        } else {
+          reject('Google Maps API failed to load');
+        }
+      };
+      
+      script.onerror = () => reject('Failed to load Google Maps script');
+      document.head.appendChild(script);
+    });
+  };
+
   const searchLocation = async (query: string) => {
     if (!query.trim() || query.length < 3) {
       setSearchResults([]);
@@ -214,8 +246,10 @@ export default function RiderAvailableScreen() {
 
     setSearching(true);
     try {
-      if (Platform.OS === 'web' && (window as any).google) {
-        const google = (window as any).google;
+      if (Platform.OS === 'web') {
+        // Ensure Google Maps is loaded
+        const google = await loadGoogleMapsScript();
+        
         const service = new google.maps.places.PlacesService(document.createElement('div'));
         
         const request = {
@@ -224,17 +258,35 @@ export default function RiderAvailableScreen() {
         };
 
         service.textSearch(request, (results: any, status: any) => {
+          console.log('Search status:', status);
+          console.log('Search results:', results);
+          
           if (status === google.maps.places.PlacesServiceStatus.OK && results) {
             setSearchResults(results.slice(0, 5)); // Top 5 results
-          } else {
+            setSearching(false);
+          } else if (status === google.maps.places.PlacesServiceStatus.ZERO_RESULTS) {
             setSearchResults([]);
+            setSearching(false);
+          } else {
+            console.error('Places API error:', status);
+            setSearchResults([]);
+            setSearching(false);
+            
+            if (Platform.OS === 'web') {
+              window.alert(`Search error: ${status}. Please ensure Google Places API is enabled.`);
+            }
           }
-          setSearching(false);
         });
+      } else {
+        setSearching(false);
       }
     } catch (error) {
       console.error('Error searching location:', error);
       setSearching(false);
+      
+      if (Platform.OS === 'web') {
+        window.alert('Failed to load Google Maps. Please check your internet connection.');
+      }
     }
   };
 
