@@ -1866,7 +1866,7 @@ async def calculate_ride_fare(ride_request: Dict[str, Any], request: Request):
         stops = [RideStop(**stop) for stop in ride_request.get('stops', [])]
         
         # Calculate distance
-        distance_km = await calculate_distance(pickup, dropoff, stops)
+        distance_km = await calculate_route_distance(pickup, dropoff, stops)
         
         # Calculate fare: ₱30 base + ₱10 per km
         base_fare = 30.0
@@ -1909,7 +1909,7 @@ async def create_ride(ride_data: Dict[str, Any], request: Request):
         stops = [RideStop(**stop) for stop in ride_data.get('stops', [])]
         
         # Calculate distance and fare
-        distance_km = await calculate_distance(pickup, dropoff, stops)
+        distance_km = await calculate_route_distance(pickup, dropoff, stops)
         base_fare = 30.0
         per_km_rate = 10.0
         estimated_fare = base_fare + (distance_km * per_km_rate)
