@@ -697,7 +697,7 @@ export default function CheckoutScreen() {
               <View style={styles.gcashInfo}>
                 <Ionicons name="information-circle-outline" size={20} color="#0066CC" />
                 <Text style={styles.gcashInfoText}>
-                  You'll be directed to complete payment via GCash after placing your order
+                  You&apos;ll be directed to complete payment via GCash after placing your order
                 </Text>
               </View>
             )}
