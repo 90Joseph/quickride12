@@ -318,63 +318,86 @@ export default function CheckoutScreen() {
 
   // Initialize verification map
   const initializeVerificationMap = () => {
+    console.log('🗺️ initializeVerificationMap called');
     const google = (window as any).google;
-    if (!google || !verificationMapRef.current) return;
+    
+    if (!google || !google.maps) {
+      console.log('❌ Google Maps not available');
+      setVerificationMapLoaded(true);
+      return;
+    }
+    
+    if (!verificationMapRef.current) {
+      console.log('❌ Map ref not available, retrying...');
+      setTimeout(() => initializeVerificationMap(), 200);
+      return;
+    }
 
-    const location = {
-      lat: parseFloat(latitude),
-      lng: parseFloat(longitude)
-    };
+    console.log('✅ Both Google Maps and ref available, creating map...');
+    console.log('📍 Location:', latitude, longitude);
 
-    const map = new google.maps.Map(verificationMapRef.current, {
-      center: location,
-      zoom: 17,
-      disableDefaultUI: false,
-      zoomControl: true,
-    });
+    try {
+      const location = {
+        lat: parseFloat(latitude) || 14.5547,
+        lng: parseFloat(longitude) || 121.0244
+      };
 
-    // Add marker
-    new google.maps.Marker({
-      position: location,
-      map,
-      icon: {
-        path: google.maps.SymbolPath.CIRCLE,
-        scale: 18,
+      const map = new google.maps.Map(verificationMapRef.current, {
+        center: location,
+        zoom: 17,
+        disableDefaultUI: false,
+        zoomControl: true,
+        mapTypeControl: false,
+        streetViewControl: false,
+      });
+
+      // Add marker
+      const marker = new google.maps.Marker({
+        position: location,
+        map,
+        icon: {
+          path: google.maps.SymbolPath.CIRCLE,
+          scale: 18,
+          fillColor: '#FF6B6B',
+          fillOpacity: 1,
+          strokeColor: '#FFF',
+          strokeWeight: 4,
+        },
+        title: 'Your Delivery Location',
+      });
+
+      // Add pulsing circle
+      const pulsingCircle = new google.maps.Circle({
+        map: map,
+        center: location,
+        radius: 30,
         fillColor: '#FF6B6B',
-        fillOpacity: 1,
-        strokeColor: '#FFF',
-        strokeWeight: 4,
-      },
-      title: 'Your Delivery Location',
-    });
+        fillOpacity: 0.2,
+        strokeColor: '#FF6B6B',
+        strokeOpacity: 0.6,
+        strokeWeight: 2,
+      });
 
-    // Add pulsing circle
-    const pulsingCircle = new google.maps.Circle({
-      map: map,
-      center: location,
-      radius: 30,
-      fillColor: '#FF6B6B',
-      fillOpacity: 0.2,
-      strokeColor: '#FF6B6B',
-      strokeOpacity: 0.6,
-      strokeWeight: 2,
-    });
+      // Animate pulsing
+      let growing = true;
+      let radius = 30;
+      const pulseInterval = setInterval(() => {
+        if (growing) {
+          radius += 2;
+          if (radius >= 60) growing = false;
+        } else {
+          radius -= 2;
+          if (radius <= 30) growing = true;
+        }
+        pulsingCircle.setRadius(radius);
+      }, 100);
 
-    // Animate pulsing
-    let growing = true;
-    let radius = 30;
-    setInterval(() => {
-      if (growing) {
-        radius += 2;
-        if (radius >= 60) growing = false;
-      } else {
-        radius -= 2;
-        if (radius <= 30) growing = true;
-      }
-      pulsingCircle.setRadius(radius);
-    }, 100);
-
-    setVerificationMapLoaded(true);
+      console.log('✅ Verification map initialized successfully');
+      setVerificationMapLoaded(true);
+    } catch (error) {
+      console.error('❌ Error initializing map:', error);
+      setVerificationMapLoaded(true);
+    }
   };
 
   // Modified handlePlaceOrder - shows verification modal first
