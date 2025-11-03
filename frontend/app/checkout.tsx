@@ -391,7 +391,15 @@ export default function CheckoutScreen() {
       return;
     }
 
-    console.log('Starting order placement...');
+    // Show location verification modal before placing order
+    console.log('📍 Opening location verification modal');
+    setShowLocationVerification(true);
+    setVerificationMapLoaded(false);
+    loadVerificationMap();
+  };
+
+  // Confirm and place order after location verification
+  const confirmAndPlaceOrder = async () => {
     setLoading(true);
 
     try {
