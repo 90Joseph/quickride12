@@ -399,7 +399,20 @@ export default function LiveOrderTrackingScreen() {
               </TouchableOpacity>
             </View>
           )}
-          <div ref={mapRef} style={{ width: '100%', height: '100%', display: mapLoaded ? 'block' : 'none' }} />
+          {/* @ts-ignore - Web-only div for Google Maps */}
+          {Platform.OS === 'web' && (
+            <div 
+              ref={mapRef} 
+              style={{ 
+                width: '100%', 
+                height: '100%', 
+                display: mapLoaded ? 'block' : 'none',
+                position: 'absolute',
+                top: 0,
+                left: 0,
+              }} 
+            />
+          )}
         </View>
       ) : (
         <View style={[styles.mapContainer, styles.mapPlaceholder]}>
