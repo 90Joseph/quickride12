@@ -1789,7 +1789,8 @@ const styles = StyleSheet.create({
   // Quick Locations Dropdown Styles
   quickLocationsOverlay: {
     position: 'absolute',
-    top: 100,
+    top: 60, // Position right below the location button
+    left: 16,
     right: 16,
     zIndex: 1000,
   },
@@ -1801,8 +1802,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.15,
     shadowRadius: 12,
     elevation: 8,
-    minWidth: 320,
-    maxWidth: 380,
   },
   quickLocationItem: {
     flexDirection: 'row',
