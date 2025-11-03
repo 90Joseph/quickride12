@@ -669,7 +669,19 @@ export default function HomeScreen() {
     
     setSelectedLocation(address);
     setShowLocationPicker(false);
-    console.log('✅ Location confirmed:', { lat: tempLocation.lat, lng: tempLocation.lng, address });
+    
+    // Save to localStorage for checkout page to access
+    try {
+      localStorage.setItem('deliveryLocation', JSON.stringify({
+        address: address,
+        latitude: tempLocation.lat,
+        longitude: tempLocation.lng,
+        timestamp: new Date().toISOString()
+      }));
+      console.log('✅ Location saved to localStorage for checkout:', { address, coordinates: tempLocation });
+    } catch (error) {
+      console.error('Error saving to localStorage:', error);
+    }
   };
 
   const handleNotificationPress = () => {
