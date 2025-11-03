@@ -118,7 +118,11 @@ export default function RiderNavigationScreen() {
   const loadMap = () => {
     if (typeof window === 'undefined' || !currentJob || !userLocation) return;
 
-    const apiKey = process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY || 'AIzaSyA0m1oRlXLQWjxacqjEJ6zJW3WvmOWvQkQ';
+    const apiKey = Constants.expoConfig?.extra?.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY || 
+                   process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY || 
+                   'AIzaSyA0m1oRlXLQWjxacqjEJ6zJW3WvmOWvQkQ';
+
+    console.log('Loading Google Maps with API key:', apiKey ? 'Key present' : 'No key');
 
     if ((window as any).google) {
       initializeMap();
@@ -129,7 +133,13 @@ export default function RiderNavigationScreen() {
     script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places`;
     script.async = true;
     script.defer = true;
-    script.onload = () => initializeMap();
+    script.onload = () => {
+      console.log('Google Maps script loaded successfully');
+      initializeMap();
+    };
+    script.onerror = () => {
+      console.error('Failed to load Google Maps script');
+    };
     document.head.appendChild(script);
   };
 
