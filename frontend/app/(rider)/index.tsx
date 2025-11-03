@@ -174,6 +174,47 @@ export default function RiderAvailableScreen() {
     }
   };
 
+  const renderRide = ({ item }: { item: Ride }) => (
+    <View style={styles.orderCard}>
+      <View style={styles.orderHeader}>
+        <View style={styles.restaurantInfo}>
+          <Ionicons name="bicycle" size={24} color="#2196F3" />
+          <View style={styles.restaurantDetails}>
+            <Text style={styles.restaurantName}>Ride Request</Text>
+            <Text style={styles.customerName}>{item.customer_name}</Text>
+          </View>
+        </View>
+        <Text style={styles.amount}>₱{item.estimated_fare.toFixed(2)}</Text>
+      </View>
+
+      <View style={styles.addressContainer}>
+        <Ionicons name="location" size={20} color="#4CAF50" />
+        <Text style={styles.address} numberOfLines={1}>
+          From: {item.pickup_location.address}
+        </Text>
+      </View>
+      
+      <View style={styles.addressContainer}>
+        <Ionicons name="location" size={20} color="#F44336" />
+        <Text style={styles.address} numberOfLines={1}>
+          To: {item.dropoff_location.address}
+        </Text>
+      </View>
+
+      <View style={styles.rideInfo}>
+        <Text style={styles.rideDistance}>{item.distance_km} km</Text>
+      </View>
+
+      <TouchableOpacity
+        style={styles.acceptRideButton}
+        onPress={() => acceptRide(item.id)}
+      >
+        <Ionicons name="checkmark-circle" size={24} color="#FFF" />
+        <Text style={styles.acceptRideButtonText}>Accept Ride</Text>
+      </TouchableOpacity>
+    </View>
+  );
+
   const renderOrder = ({ item }: { item: Order }) => (
     <View style={styles.orderCard}>
       <View style={styles.orderHeader}>
@@ -236,18 +277,61 @@ export default function RiderAvailableScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <FlatList
-        data={orders.filter((o) => o.status === 'rider_assigned' || o.status === 'out_for_delivery')}
-        renderItem={renderOrder}
-        keyExtractor={(item) => item.id}
-        contentContainerStyle={styles.listContent}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#FF6B6B']} />
-        }
-        ListEmptyComponent={
-          <View style={styles.emptyContainer}>
-            <Ionicons name="bicycle-outline" size={64} color="#CCC" />
-            <Text style={styles.emptyText}>No available deliveries</Text>
+      {/* Service Toggle Header */}
+      <View style={styles.toggleHeader}>
+        <View style={styles.toggleContainer}>
+          <View style={styles.toggleOption}>
+            <Ionicons 
+              name="fast-food" 
+              size={24} 
+              color={serviceType === 'food_delivery' ? '#FF6B6B' : '#999'} 
+            />
+            <Text style={[
+              styles.toggleText,
+              serviceType === 'food_delivery' && styles.toggleTextActive
+            ]}>
+              Food Delivery
+            </Text>
+          </View>
+          
+          <Switch
+            value={serviceType === 'ride_service'}
+            onValueChange={toggleService}
+            disabled={toggling}
+            trackColor={{ false: '#FFE8E8', true: '#E3F2FD' }}
+            thumbColor={serviceType === 'ride_service' ? '#2196F3' : '#FF6B6B'}
+          />
+          
+          <View style={styles.toggleOption}>
+            <Ionicons 
+              name="bicycle" 
+              size={24} 
+              color={serviceType === 'ride_service' ? '#2196F3' : '#999'} 
+            />
+            <Text style={[
+              styles.toggleText,
+              serviceType === 'ride_service' && styles.toggleTextActive
+            ]}>
+              Ride Service
+            </Text>
+          </View>
+        </View>
+      </View>
+
+      {/* List */}
+      {serviceType === 'food_delivery' ? (
+        <FlatList
+          data={orders.filter((o) => o.status === 'rider_assigned' || o.status === 'out_for_delivery')}
+          renderItem={renderOrder}
+          keyExtractor={(item) => item.id}
+          contentContainerStyle={styles.listContent}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#FF6B6B']} />
+          }
+          ListEmptyComponent={
+            <View style={styles.emptyContainer}>
+              <Ionicons name="fast-food-outline" size={64} color="#CCC" />
+              <Text style={styles.emptyText}>No available food deliveries</Text>
           </View>
         }
       />
