@@ -542,6 +542,30 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#666',
   },
+  etaCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-around',
+    backgroundColor: '#E3F2FD',
+    padding: 12,
+    borderRadius: 12,
+    marginTop: 12,
+  },
+  etaItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  etaLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#2196F3',
+  },
+  etaDivider: {
+    width: 1,
+    height: 24,
+    backgroundColor: '#90CAF9',
+  },
   actionButton: {
     flexDirection: 'row',
     alignItems: 'center',
