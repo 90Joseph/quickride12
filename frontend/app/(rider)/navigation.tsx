@@ -71,6 +71,21 @@ export default function RiderNavigationScreen() {
     }
   };
 
+  const updateRiderLocation = async () => {
+    if (!userLocation) return;
+    
+    try {
+      await api.put('/riders/location', {
+        latitude: userLocation.latitude,
+        longitude: userLocation.longitude,
+        address: 'Current location',
+      });
+      console.log('Location updated:', userLocation);
+    } catch (error) {
+      console.error('Error updating location:', error);
+    }
+  };
+
   const fetchCurrentJob = async () => {
     try {
       // Try to get current order (food delivery)
