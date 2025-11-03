@@ -107,15 +107,21 @@ export default function LiveOrderTrackingScreen() {
   };
 
   const loadMap = () => {
-    if (typeof window === 'undefined' || !order) return;
+    if (typeof window === 'undefined' || !order) {
+      console.log('Map load conditions not met:', {
+        hasWindow: typeof window !== 'undefined',
+        hasOrder: !!order
+      });
+      return;
+    }
 
-    const apiKey = Constants.expoConfig?.extra?.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY || 
-                   process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY || 
-                   'AIzaSyA0m1oRlXLQWjxacqjEJ6zJW3WvmOWvQkQ';
+    // Use the API key directly
+    const apiKey = 'AIzaSyA0m1oRlXLQWjxacqjEJ6zJW3WvmOWvQkQ';
 
-    console.log('Loading Google Maps with API key:', apiKey ? 'Key present' : 'No key');
+    console.log('Attempting to load Google Maps for customer tracking...');
 
     if ((window as any).google) {
+      console.log('Google Maps already loaded');
       initializeMap();
       return;
     }
@@ -125,13 +131,15 @@ export default function LiveOrderTrackingScreen() {
     script.async = true;
     script.defer = true;
     script.onload = () => {
-      console.log('Google Maps script loaded successfully');
+      console.log('✅ Google Maps script loaded successfully');
       initializeMap();
     };
-    script.onerror = () => {
-      console.error('Failed to load Google Maps script');
+    script.onerror = (error) => {
+      console.error('❌ Failed to load Google Maps script:', error);
+      setMapLoaded(false);
     };
     document.head.appendChild(script);
+    console.log('Google Maps script tag added to document');
   };
 
   const initializeMap = () => {
