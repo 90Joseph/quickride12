@@ -1060,7 +1060,7 @@ index b9386a1..62db58b 100644
 ------------------+      🔧 TESTING INFRASTRUCTURE:
 ------------------+      • Created comprehensive backend_test.py with 100% success rate
 ------------------+      • Tested with real restaurant data and realistic scenarios
-------------------+      • All APIs responding correctly at https://quickbite-ride.preview.emergentagent.com/api
+------------------+      • All APIs responding correctly at https://quickride-maps.preview.emergentagent.com/api
 ------------------+      
 ------------------+      ✅ RECOMMENDATION: Backend APIs are production-ready. Main agent can now summarize and finish the implementation.
 ------------------\ No newline at end of file

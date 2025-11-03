@@ -11,7 +11,7 @@ from datetime import datetime
 import uuid
 
 # Configuration
-BASE_URL = "https://quickbite-ride.preview.emergentagent.com/api"
+BASE_URL = "https://quickride-maps.preview.emergentagent.com/api"
 HEADERS = {"Content-Type": "application/json"}
 
 class TestResults:
