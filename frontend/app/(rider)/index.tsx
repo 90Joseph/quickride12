@@ -569,19 +569,14 @@ export default function RiderAvailableScreen() {
             <TouchableOpacity
               style={styles.locationOption}
               onPress={() => {
-                // Navigate to a full location picker screen if needed
                 setShowLocationPicker(false);
-                if (Platform.OS === 'web') {
-                  window.alert('💡 Tip: Click "Current GPS Location" to update your location automatically');
-                } else {
-                  Alert.alert('Info', '💡 Tip: Click "Current GPS Location" to update your location automatically');
-                }
+                setShowSearchModal(true);
               }}
             >
               <Ionicons name="search" size={22} color="#2196F3" />
               <View style={styles.locationOptionText}>
                 <Text style={styles.locationOptionTitle}>🔍 Search Location</Text>
-                <Text style={styles.locationOptionSubtext}>Coming soon...</Text>
+                <Text style={styles.locationOptionSubtext}>Search any place</Text>
               </View>
             </TouchableOpacity>
           </View>
