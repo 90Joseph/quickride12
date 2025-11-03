@@ -473,9 +473,24 @@ export default function HomeScreen() {
 
   // Confirm selected location
   const confirmLocation = () => {
-    setSelectedLocation(userAddress || selectedLocation);
+    const address = userAddress || selectedLocation;
+    
+    // If editing a saved location (home, work, school), save it
+    if (editingLocation) {
+      setSavedLocations({
+        ...savedLocations,
+        [editingLocation]: {
+          address: address,
+          coordinates: tempLocation
+        }
+      });
+      console.log(`✅ ${editingLocation} location saved:`, { address, coordinates: tempLocation });
+      setEditingLocation(null);
+    }
+    
+    setSelectedLocation(address);
     setShowLocationPicker(false);
-    console.log('✅ Location confirmed:', { lat: tempLocation.lat, lng: tempLocation.lng, address: userAddress });
+    console.log('✅ Location confirmed:', { lat: tempLocation.lat, lng: tempLocation.lng, address });
   };
 
   const handleNotificationPress = () => {
