@@ -202,12 +202,17 @@ frontend:
 
 metadata:
   created_by: "main_agent"
-  version: "1.0"
-  test_sequence: 1
+  version: "2.0"
+  test_sequence: 2
   run_ui: false
 
 test_plan:
-  current_focus: []
+  current_focus:
+    - "Add /rider/current-order endpoint"
+    - "Add /orders/{order_id}/rider-location endpoint"
+    - "Rider Navigation Screen with Live Directions"
+    - "Customer Live Order Tracking"
+    - "Periodic Location Updates from Rider"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
@@ -215,67 +220,49 @@ test_plan:
 agent_communication:
   - agent: "main"
     message: |
-      I have implemented full restaurant management features:
+      I have implemented comprehensive live navigation and tracking features for both riders and customers:
       
-      Backend Changes:
-      1. Added three new API endpoints for menu item management (POST, PUT, DELETE)
-      2. All endpoints include owner authorization checks
-      3. Backend service was restarted successfully
+      BACKEND CHANGES:
+      1. Added GET /api/rider/current-order endpoint - Riders can fetch their current active food delivery order
+      2. Added GET /api/orders/{order_id}/rider-location endpoint - Customers can get real-time rider location
+      3. Leveraged existing PUT /api/riders/location endpoint for location updates
       
-      Frontend Changes:
-      1. Rebuilt menu.tsx from scratch with full CRUD functionality
-      2. Rebuilt profile.tsx from scratch with complete profile management
-      3. Both screens now have real UI with forms, actions, and state management
+      FRONTEND CHANGES:
+      1. Enhanced Rider Navigation Screen (/app/frontend/app/(rider)/navigation.tsx):
+         - Auto-fetches current job (food delivery or ride)
+         - Shows Google Maps with real-time directions
+         - Sends location updates to backend every 5 seconds
+         - Displays distance and ETA using Google Directions API
+         - Color-coded markers for pickup (green) and dropoff (red)
+         - Status update buttons for order progression
       
-      Testing Priority:
-      - HIGH: Please test all menu item CRUD operations (add, edit, delete, toggle availability)
-      - HIGH: Test restaurant profile updates (name, description, hours, address, image)
-      - MEDIUM: Test authorization (only restaurant owners can manage their own restaurant)
-      - MEDIUM: Test image upload functionality for both menu items and restaurant profile
+      2. Enhanced Customer Order Tracking (/app/frontend/app/live-order-tracking.tsx):
+         - Fetches real-time rider location every 3 seconds
+         - Shows both customer and rider on Google Maps
+         - Displays live route from rider to customer
+         - Shows distance and ETA (e.g., "250m away • ETA: 3 min")
+         - Animated rider marker with directional arrow
+         - Auto-zoom to fit both locations on map
       
-      Authentication Required:
-      - Use restaurant role user account for testing
-      - Menu and Profile tabs should be accessible from restaurant dashboard
+      KEY FEATURES:
+      - Real-time location updates (rider → backend → customer)
+      - Distance and ETA calculations using Google Maps Directions API
+      - Visual route display with turn-by-turn directions
+      - Works for both food delivery orders and moto-taxi rides
+      - Geolocation API for rider's current position
+      - Auto-refresh every 3-5 seconds for live tracking
       
-      Please test the backend APIs first to ensure they're working correctly before frontend testing.
-  - agent: "testing"
-    message: |
-      🎉 BACKEND TESTING COMPLETED SUCCESSFULLY - ALL APIS WORKING PERFECTLY!
+      TESTING PRIORITY:
+      - HIGH: Test /api/rider/current-order endpoint with authenticated rider
+      - HIGH: Test /api/orders/{order_id}/rider-location with customer auth
+      - HIGH: Test rider navigation screen with active order
+      - HIGH: Test customer live tracking with rider location updates
+      - MEDIUM: Verify distance and ETA accuracy
+      - MEDIUM: Test with both food delivery and moto-taxi services
       
-      ✅ COMPREHENSIVE BACKEND API TESTING RESULTS:
+      AUTHENTICATION REQUIRED:
+      - Rider role account for navigation testing
+      - Customer role account for order tracking testing
+      - Active orders with assigned riders for best testing
       
-      1. Menu Item CRUD APIs - ALL WORKING:
-         • POST /api/restaurants/{restaurant_id}/menu-items ✅
-           - Successfully added 3 menu items with different categories
-           - Proper UUID generation and MongoDB storage
-           - Authorization working correctly
-         
-         • PUT /api/restaurants/{restaurant_id}/menu-items/{item_id} ✅
-           - Price updates working (250.00 → 275.00 → 300.00)
-           - Availability toggling working (true ↔ false)
-           - Description and name updates working
-           - Multiple field updates working simultaneously
-           - MongoDB array_filters working properly
-         
-         • DELETE /api/restaurants/{restaurant_id}/menu-items/{item_id} ✅
-           - Successfully deleted menu items from restaurant
-           - MongoDB $pull operator working correctly
-      
-      2. Restaurant Profile Update API - WORKING:
-         • PUT /api/restaurants/{restaurant_id} ✅
-           - Name, description, phone updates working
-           - Operating hours modifications working
-           - is_open status toggling working
-           - Multiple field updates working
-      
-      3. Security & Authorization - WORKING:
-         • Owner-only access properly enforced ✅
-         • 403 Forbidden correctly returned for unauthorized access
-         • Session-based authentication working
-      
-      🔧 TESTING INFRASTRUCTURE:
-      • Created comprehensive backend_test.py with 100% success rate
-      • Tested with real restaurant data and realistic scenarios
-      • All APIs responding correctly at https://quickbite-ride.preview.emergentagent.com/api
-      
-      ✅ RECOMMENDATION: Backend APIs are production-ready. Main agent can now summarize and finish the implementation.
+      Please test backend APIs first, then frontend UI features.
