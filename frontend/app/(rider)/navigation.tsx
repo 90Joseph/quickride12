@@ -304,9 +304,18 @@ export default function RiderNavigationScreen() {
       const restaurantLocation = currentJob.data.restaurant_location;
       const deliveryLocation = currentJob.data.delivery_address;
       
+      console.log('📦 Order data:', {
+        restaurant_location: restaurantLocation,
+        delivery_address: deliveryLocation,
+        restaurant_name: currentJob.data.restaurant_name,
+        customer_name: currentJob.data.customer_name
+      });
+      
       if (restaurantLocation) {
         const lat = parseCoordinate(restaurantLocation.latitude);
         const lng = parseCoordinate(restaurantLocation.longitude);
+        
+        console.log('🏪 Restaurant coords:', { lat, lng, raw: restaurantLocation });
         
         if (lat !== null && lng !== null) {
           pickupLocation = { lat, lng };
