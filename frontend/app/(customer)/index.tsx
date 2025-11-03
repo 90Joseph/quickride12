@@ -1786,4 +1786,54 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
   },
+  // Quick Locations Dropdown Styles
+  quickLocationsOverlay: {
+    position: 'absolute',
+    top: 100,
+    right: 16,
+    zIndex: 1000,
+  },
+  quickLocationsDropdown: {
+    backgroundColor: '#FFF',
+    borderRadius: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 12,
+    elevation: 8,
+    minWidth: 320,
+    maxWidth: 380,
+  },
+  quickLocationItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 16,
+    gap: 12,
+  },
+  quickLocationIcon: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: '#F5F5F5',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  quickLocationTextContainer: {
+    flex: 1,
+  },
+  quickLocationTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#333',
+    marginBottom: 2,
+  },
+  quickLocationSubtitle: {
+    fontSize: 12,
+    color: '#666',
+  },
+  quickLocationDivider: {
+    height: 1,
+    backgroundColor: '#EEE',
+    marginHorizontal: 16,
+  },
 });
