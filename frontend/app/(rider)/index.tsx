@@ -42,6 +42,7 @@ interface Ride {
 }
 
 export default function RiderAvailableScreen() {
+  const router = useRouter();
   const [serviceType, setServiceType] = useState<'food_delivery' | 'ride_service'>('food_delivery');
   const [orders, setOrders] = useState<Order[]>([]);
   const [rides, setRides] = useState<Ride[]>([]);
