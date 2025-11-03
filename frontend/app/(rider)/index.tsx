@@ -49,13 +49,58 @@ export default function RiderAvailableScreen() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [toggling, setToggling] = useState(false);
+  const [isAvailable, setIsAvailable] = useState(true);
+  const [nearbyOrders, setNearbyOrders] = useState<any[]>([]);
 
   useEffect(() => {
     fetchData();
-    // Poll for new orders/rides
-    const interval = setInterval(fetchData, 10000);
+    fetchRiderAvailability();
+    fetchNearbyOrders();
+    // Poll for new orders/rides and nearby orders
+    const interval = setInterval(() => {
+      fetchData();
+      fetchNearbyOrders();
+    }, 10000);
     return () => clearInterval(interval);
   }, [serviceType]);
+
+  const fetchRiderAvailability = async () => {
+    try {
+      const response = await api.get('/riders/me');
+      setIsAvailable(response.data.is_available !== false);
+    } catch (error) {
+      console.error('Error fetching rider availability:', error);
+    }
+  };
+
+  const fetchNearbyOrders = async () => {
+    try {
+      const response = await api.get('/riders/nearby-orders?radius=10');
+      setNearbyOrders(response.data.orders || []);
+    } catch (error) {
+      console.error('Error fetching nearby orders:', error);
+    }
+  };
+
+  const toggleAvailability = async (value: boolean) => {
+    try {
+      await api.put('/riders/availability', { is_available: value });
+      setIsAvailable(value);
+      if (Platform.OS === 'web') {
+        window.alert(value ? '✅ You are now available for deliveries' : '⚠️ You will not receive new orders');
+      } else {
+        Alert.alert('Status Updated', value ? '✅ You are now available for deliveries' : '⚠️ You will not receive new orders');
+      }
+    } catch (error: any) {
+      console.error('Error toggling availability:', error);
+      const message = error.response?.data?.detail || 'Failed to update availability';
+      if (Platform.OS === 'web') {
+        window.alert(`Error: ${message}`);
+      } else {
+        Alert.alert('Error', message);
+      }
+    }
+  };
 
   const fetchData = async () => {
     try {
