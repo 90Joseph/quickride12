@@ -824,6 +824,100 @@ export default function HomeScreen() {
       </ScrollView>
 
       {/* Location Picker Modal */}
+      {/* Quick Locations Dropdown */}
+      {showQuickLocations && (
+        <TouchableOpacity 
+          style={styles.quickLocationsOverlay}
+          activeOpacity={1}
+          onPress={() => setShowQuickLocations(false)}
+        >
+          <View style={styles.quickLocationsDropdown}>
+            {/* Current Location */}
+            <TouchableOpacity
+              style={styles.quickLocationItem}
+              onPress={() => handleQuickLocation('current')}
+            >
+              <View style={styles.quickLocationIcon}>
+                <Ionicons name="navigate-circle" size={24} color="#2196F3" />
+              </View>
+              <View style={styles.quickLocationTextContainer}>
+                <Text style={styles.quickLocationTitle}>Current Location</Text>
+                <Text style={styles.quickLocationSubtitle}>Use GPS to get your location</Text>
+              </View>
+              <Ionicons name="chevron-forward" size={20} color="#999" />
+            </TouchableOpacity>
+
+            {/* Home */}
+            <TouchableOpacity
+              style={styles.quickLocationItem}
+              onPress={() => handleQuickLocation('home')}
+            >
+              <View style={styles.quickLocationIcon}>
+                <Ionicons name="home" size={24} color="#FF6B6B" />
+              </View>
+              <View style={styles.quickLocationTextContainer}>
+                <Text style={styles.quickLocationTitle}>🏠 Home</Text>
+                <Text style={styles.quickLocationSubtitle}>
+                  {savedLocations.home.address || 'Tap to set home address'}
+                </Text>
+              </View>
+              <Ionicons name="chevron-forward" size={20} color="#999" />
+            </TouchableOpacity>
+
+            {/* Work */}
+            <TouchableOpacity
+              style={styles.quickLocationItem}
+              onPress={() => handleQuickLocation('work')}
+            >
+              <View style={styles.quickLocationIcon}>
+                <Ionicons name="briefcase" size={24} color="#4CAF50" />
+              </View>
+              <View style={styles.quickLocationTextContainer}>
+                <Text style={styles.quickLocationTitle}>💼 Work</Text>
+                <Text style={styles.quickLocationSubtitle}>
+                  {savedLocations.work.address || 'Tap to set work address'}
+                </Text>
+              </View>
+              <Ionicons name="chevron-forward" size={20} color="#999" />
+            </TouchableOpacity>
+
+            {/* School */}
+            <TouchableOpacity
+              style={styles.quickLocationItem}
+              onPress={() => handleQuickLocation('school')}
+            >
+              <View style={styles.quickLocationIcon}>
+                <Ionicons name="school" size={24} color="#FF9800" />
+              </View>
+              <View style={styles.quickLocationTextContainer}>
+                <Text style={styles.quickLocationTitle}>🎓 School</Text>
+                <Text style={styles.quickLocationSubtitle}>
+                  {savedLocations.school.address || 'Tap to set school address'}
+                </Text>
+              </View>
+              <Ionicons name="chevron-forward" size={20} color="#999" />
+            </TouchableOpacity>
+
+            <View style={styles.quickLocationDivider} />
+
+            {/* Set on Map */}
+            <TouchableOpacity
+              style={styles.quickLocationItem}
+              onPress={() => handleQuickLocation('custom')}
+            >
+              <View style={styles.quickLocationIcon}>
+                <Ionicons name="map" size={24} color="#9C27B0" />
+              </View>
+              <View style={styles.quickLocationTextContainer}>
+                <Text style={styles.quickLocationTitle}>📍 Select on Map</Text>
+                <Text style={styles.quickLocationSubtitle}>Choose exact location</Text>
+              </View>
+              <Ionicons name="chevron-forward" size={20} color="#999" />
+            </TouchableOpacity>
+          </View>
+        </TouchableOpacity>
+      )}
+
       {/* Google Maps Location Picker Modal */}
       {showLocationPicker && (
         <Modal
