@@ -85,7 +85,7 @@ export default function ServiceSelectionScreen() {
               style={styles.gradientCard}
             >
               <View style={styles.iconContainer}>
-                <Ionicons name="bicycle" size={64} color="#FFF" />
+                <Ionicons name="bicycle" size={40} color="#FFF" />
               </View>
               <Text style={styles.serviceTitle}>Moto-Taxi Ride</Text>
               <Text style={styles.serviceDescription}>
@@ -93,20 +93,20 @@ export default function ServiceSelectionScreen() {
               </Text>
               <View style={styles.serviceFeatures}>
                 <View style={styles.featureItem}>
-                  <Ionicons name="checkmark-circle" size={16} color="#FFF" />
+                  <Ionicons name="checkmark-circle" size={14} color="#FFF" />
                   <Text style={styles.featureText}>₱30 base fare</Text>
                 </View>
                 <View style={styles.featureItem}>
-                  <Ionicons name="checkmark-circle" size={16} color="#FFF" />
+                  <Ionicons name="checkmark-circle" size={14} color="#FFF" />
                   <Text style={styles.featureText}>Live tracking</Text>
                 </View>
                 <View style={styles.featureItem}>
-                  <Ionicons name="checkmark-circle" size={16} color="#FFF" />
+                  <Ionicons name="checkmark-circle" size={14} color="#FFF" />
                   <Text style={styles.featureText}>Schedule rides</Text>
                 </View>
               </View>
               <View style={styles.arrowButton}>
-                <Ionicons name="arrow-forward" size={24} color="#FFF" />
+                <Ionicons name="arrow-forward" size={20} color="#FFF" />
               </View>
             </LinearGradient>
           </TouchableOpacity>
