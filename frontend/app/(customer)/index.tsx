@@ -236,27 +236,85 @@ export default function HomeScreen() {
   };
 
   const handleLocationPress = () => {
-    console.log('📍 Location button pressed - Opening map picker');
-    setMapLoaded(false);
-    setShowLocationPicker(true);
-    
-    // Get user's current location
-    if (typeof navigator !== 'undefined' && navigator.geolocation) {
-      console.log('🔍 Requesting geolocation...');
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const newLocation = {
-            lat: position.coords.latitude,
-            lng: position.coords.longitude
-          };
-          setTempLocation(newLocation);
-          console.log('✅ Got current location:', newLocation);
-        },
-        (error) => {
-          console.error('❌ Error getting location:', error);
-        },
-        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
-      );
+    console.log('📍 Location button pressed - Opening quick locations');
+    setShowQuickLocations(!showQuickLocations);
+  };
+
+  // Handle quick location selection
+  const handleQuickLocation = async (type: 'current' | 'home' | 'work' | 'school' | 'custom') => {
+    if (type === 'current') {
+      // Get current GPS location
+      if (typeof navigator !== 'undefined' && navigator.geolocation) {
+        console.log('🔍 Getting current location...');
+        navigator.geolocation.getCurrentPosition(
+          async (position) => {
+            const newLocation = {
+              lat: position.coords.latitude,
+              lng: position.coords.longitude
+            };
+            setTempLocation(newLocation);
+            // Get address from coordinates
+            await getAddressFromCoordinates(newLocation.lat, newLocation.lng);
+            setSelectedLocation(userAddress || 'Current Location');
+            setShowQuickLocations(false);
+            console.log('✅ Current location set:', newLocation);
+          },
+          (error) => {
+            console.error('❌ Error getting location:', error);
+            Alert.alert('Location Error', 'Unable to get your current location. Please check permissions.');
+          },
+          { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+        );
+      }
+    } else if (type === 'custom') {
+      // Open map picker for custom location
+      setShowQuickLocations(false);
+      setMapLoaded(false);
+      setShowLocationPicker(true);
+      
+      // Get user's current location for map center
+      if (typeof navigator !== 'undefined' && navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            const newLocation = {
+              lat: position.coords.latitude,
+              lng: position.coords.longitude
+            };
+            setTempLocation(newLocation);
+          },
+          (error) => console.error('Error getting location:', error),
+          { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+        );
+      }
+    } else {
+      // Use saved location (home, work, school)
+      const saved = savedLocations[type];
+      if (saved.address) {
+        setSelectedLocation(saved.address);
+        setTempLocation(saved.coordinates);
+        setShowQuickLocations(false);
+        console.log(`✅ ${type} location selected:`, saved);
+      } else {
+        // No saved location - open map to set it
+        setEditingLocation(type);
+        setShowQuickLocations(false);
+        setMapLoaded(false);
+        setShowLocationPicker(true);
+        
+        // Get current location for map center
+        if (typeof navigator !== 'undefined' && navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(
+            (position) => {
+              setTempLocation({
+                lat: position.coords.latitude,
+                lng: position.coords.longitude
+              });
+            },
+            (error) => console.error('Error:', error),
+            { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+          );
+        }
+      }
     }
   };
 
