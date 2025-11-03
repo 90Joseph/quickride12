@@ -33,6 +33,27 @@ export default function CheckoutScreen() {
   const [paymentMethod, setPaymentMethod] = useState<'cash' | 'gcash'>('gcash');
   const [gcashNumber, setGcashNumber] = useState('09609317687'); // Merchant number for display
   
+  // Location verification modal
+  const [showLocationVerification, setShowLocationVerification] = useState(false);
+  const [verificationMapLoaded, setVerificationMapLoaded] = useState(false);
+  const verificationMapRef = useRef<any>(null);
+
+  // Load location from home screen on mount
+  useEffect(() => {
+    try {
+      const savedLocation = localStorage.getItem('deliveryLocation');
+      if (savedLocation) {
+        const location = JSON.parse(savedLocation);
+        setDeliveryAddress(location.address || '');
+        setLatitude(location.latitude?.toString() || '14.5547');
+        setLongitude(location.longitude?.toString() || '121.0244');
+        console.log('✅ Loaded delivery location from home screen:', location);
+      }
+    } catch (error) {
+      console.error('Error loading saved location:', error);
+    }
+  }, []);
+  
   // Map location picker states
   const [showMapPicker, setShowMapPicker] = useState(false);
   const [mapLoaded, setMapLoaded] = useState(false);
