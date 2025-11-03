@@ -258,13 +258,30 @@ const styles = StyleSheet.create({
   orderCard: {
     backgroundColor: '#FFF',
     borderRadius: 16,
-    padding: 16,
     marginBottom: 16,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 8,
     elevation: 4,
+  },
+  orderMainContent: {
+    padding: 16,
+  },
+  trackButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#FF6B6B',
+    padding: 14,
+    borderBottomLeftRadius: 16,
+    borderBottomRightRadius: 16,
+    gap: 8,
+  },
+  trackButtonText: {
+    color: '#FFF',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
   orderHeader: {
     flexDirection: 'row',
