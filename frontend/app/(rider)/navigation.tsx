@@ -30,24 +30,36 @@ export default function RiderNavigationScreen() {
   useEffect(() => {
     fetchCurrentJob();
     getUserLocation();
-    // Refresh every 10 seconds
-    const interval = setInterval(() => {
+    
+    // Refresh job every 10 seconds
+    const jobInterval = setInterval(() => {
       fetchCurrentJob();
-      getUserLocation();
     }, 10000);
     
-    // Send location updates every 5 seconds when rider has active job
+    // Update location every 5 seconds
     const locationInterval = setInterval(() => {
-      if (userLocation && currentJob) {
-        updateRiderLocation();
-      }
+      getUserLocation();
     }, 5000);
     
     return () => {
-      clearInterval(interval);
+      clearInterval(jobInterval);
       clearInterval(locationInterval);
     };
-  }, [currentJob, userLocation]);
+  }, []); // Empty dependency array - only run once on mount
+
+  // Separate effect for sending location updates to backend
+  useEffect(() => {
+    if (!userLocation || !currentJob) return;
+    
+    updateRiderLocation();
+    
+    // Send location updates every 5 seconds
+    const updateInterval = setInterval(() => {
+      updateRiderLocation();
+    }, 5000);
+    
+    return () => clearInterval(updateInterval);
+  }, [currentJob?.id]); // Only re-run when job changes
 
   useEffect(() => {
     if (currentJob && Platform.OS === 'web') {
