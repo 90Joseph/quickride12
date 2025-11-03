@@ -63,11 +63,13 @@ export default function LoginScreen() {
 
       // Navigate based on role
       if (user.role === 'customer') {
-        router.replace('/(customer)');
+        router.replace('/service-selection');
       } else if (user.role === 'restaurant') {
         router.replace('/(restaurant)');
       } else if (user.role === 'rider') {
         router.replace('/(rider)');
+      } else if (user.role === 'admin') {
+        router.replace('/(admin)');
       }
     } catch (error) {
       console.error('Session processing error:', error);
