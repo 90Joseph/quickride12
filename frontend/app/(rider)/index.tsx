@@ -471,6 +471,72 @@ export default function RiderAvailableScreen() {
         </View>
       )}
 
+      {/* Current Location Display */}
+      <View style={styles.locationCard}>
+        <View style={styles.locationHeader}>
+          <View style={styles.locationIconContainer}>
+            <Ionicons name="navigate-circle" size={24} color="#FF6B6B" />
+            <Text style={styles.locationTitle}>Your Location</Text>
+          </View>
+          <TouchableOpacity
+            style={styles.locationDropdownButton}
+            onPress={() => setShowLocationPicker(!showLocationPicker)}
+          >
+            <Ionicons name="chevron-down" size={20} color="#666" />
+          </TouchableOpacity>
+        </View>
+        
+        <Text style={styles.locationAddress} numberOfLines={2}>
+          {locationAddress}
+        </Text>
+        
+        {currentLocation && (
+          <Text style={styles.locationCoords}>
+            📍 {currentLocation.latitude?.toFixed(6)}, {currentLocation.longitude?.toFixed(6)}
+          </Text>
+        )}
+
+        {/* Location Dropdown */}
+        {showLocationPicker && (
+          <View style={styles.locationDropdown}>
+            <TouchableOpacity
+              style={styles.locationOption}
+              onPress={() => {
+                getCurrentGPSLocation();
+                setShowLocationPicker(false);
+              }}
+            >
+              <Ionicons name="locate" size={22} color="#4CAF50" />
+              <View style={styles.locationOptionText}>
+                <Text style={styles.locationOptionTitle}>📍 Current GPS Location</Text>
+                <Text style={styles.locationOptionSubtext}>Use your real-time GPS</Text>
+              </View>
+            </TouchableOpacity>
+
+            <View style={styles.locationDivider} />
+
+            <TouchableOpacity
+              style={styles.locationOption}
+              onPress={() => {
+                // Navigate to a full location picker screen if needed
+                setShowLocationPicker(false);
+                if (Platform.OS === 'web') {
+                  window.alert('💡 Tip: Click "Current GPS Location" to update your location automatically');
+                } else {
+                  Alert.alert('Info', '💡 Tip: Click "Current GPS Location" to update your location automatically');
+                }
+              }}
+            >
+              <Ionicons name="search" size={22} color="#2196F3" />
+              <View style={styles.locationOptionText}>
+                <Text style={styles.locationOptionTitle}>🔍 Search Location</Text>
+                <Text style={styles.locationOptionSubtext}>Coming soon...</Text>
+              </View>
+            </TouchableOpacity>
+          </View>
+        )}
+      </View>
+
       {/* Service Toggle Header */}
       <View style={styles.toggleHeader}>
         <View style={styles.toggleContainer}>
