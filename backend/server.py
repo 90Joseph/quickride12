@@ -24,7 +24,7 @@ client = AsyncIOMotorClient(mongo_url)
 db = client[os.environ['DB_NAME']]
 
 # Create the main app
-app = FastAPI(title="QuickBite Food Delivery API")
+app = FastAPI(title="QuickRide Food & Ride Services API")
 
 # Socket.IO setup for real-time features
 sio = socketio.AsyncServer(
