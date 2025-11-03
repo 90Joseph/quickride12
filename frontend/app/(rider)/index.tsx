@@ -9,6 +9,7 @@ import {
   RefreshControl,
   Alert,
   Platform,
+  Switch,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import api from '../../utils/api';
@@ -28,40 +29,81 @@ interface Order {
   created_at: string;
 }
 
+interface Ride {
+  id: string;
+  customer_name: string;
+  pickup_location: any;
+  dropoff_location: any;
+  distance_km: number;
+  estimated_fare: number;
+  status: string;
+  created_at: string;
+}
+
 export default function RiderAvailableScreen() {
+  const [serviceType, setServiceType] = useState<'food_delivery' | 'ride_service'>('food_delivery');
   const [orders, setOrders] = useState<Order[]>([]);
+  const [rides, setRides] = useState<Ride[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [toggling, setToggling] = useState(false);
 
   useEffect(() => {
-    fetchOrders();
-    // Poll for new orders
-    const interval = setInterval(fetchOrders, 10000);
+    fetchData();
+    // Poll for new orders/rides
+    const interval = setInterval(fetchData, 10000);
     return () => clearInterval(interval);
-  }, []);
+  }, [serviceType]);
 
-  const fetchOrders = async () => {
+  const fetchData = async () => {
     try {
-      // Get rider's assigned orders
-      const response = await api.get('/orders');
-      setOrders(response.data);
+      if (serviceType === 'food_delivery') {
+        const response = await api.get('/orders');
+        setOrders(response.data);
+      } else {
+        const response = await api.get('/rider/rides/available');
+        setRides(response.data);
+      }
     } catch (error) {
-      console.error('Error fetching orders:', error);
+      console.error('Error fetching data:', error);
     } finally {
       setLoading(false);
       setRefreshing(false);
     }
   };
 
+  const toggleService = async () => {
+    const newService = serviceType === 'food_delivery' ? 'ride_service' : 'food_delivery';
+    
+    setToggling(true);
+    try {
+      await api.put('/rider/toggle-service', { service_type: newService });
+      setServiceType(newService);
+      setLoading(true);
+      fetchData();
+    } catch (error: any) {
+      Alert.alert('Error', error.response?.data?.detail || 'Failed to switch service');
+    } finally {
+      setToggling(false);
+    }
+  };
+
   const onRefresh = () => {
     setRefreshing(true);
-    fetchOrders();
+    fetchData();
+  };
+
+  const acceptRide = async (rideId: string) => {
+    try {
+      await api.put(`/rider/rides/${rideId}/accept`, {});
+      Alert.alert('Success', 'Ride accepted! Navigate to pickup location.');
+      fetchData();
+    } catch (error: any) {
+      Alert.alert('Error', error.response?.data?.detail || 'Failed to accept ride');
+    }
   };
 
   const handlePickup = async (orderId: string) => {
-    console.log('Mark pickup clicked for order:', orderId);
-    
-    // Cross-platform confirmation
     const confirmed = Platform.OS === 'web' 
       ? window.confirm('Mark this order as picked up?')
       : await new Promise((resolve) => {
@@ -71,12 +113,7 @@ export default function RiderAvailableScreen() {
           ]);
         });
 
-    if (!confirmed) {
-      console.log('Pickup cancelled');
-      return;
-    }
-
-    console.log('Processing pickup...');
+    if (!confirmed) return;
     try {
       await api.put(`/orders/${orderId}/status`, { status: 'out_for_delivery' });
       console.log('Order marked as out for delivery');
