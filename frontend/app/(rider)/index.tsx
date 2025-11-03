@@ -474,6 +474,21 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#FF6B6B',
   },
+  navigationButton: {
+    flexDirection: 'row',
+    backgroundColor: '#9C27B0',
+    padding: 14,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 8,
+  },
+  navigationButtonText: {
+    color: '#FFF',
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginLeft: 8,
+  },
   pickupButton: {
     flexDirection: 'row',
     backgroundColor: '#2196F3',
