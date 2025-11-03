@@ -475,7 +475,7 @@ export default function HomeScreen() {
     });
   };
 
-  // Search location using Google Places Autocomplete (New API)
+  // Search location using Google Places Autocomplete (Simplified approach)
   const handleSearchLocation = async (query: string) => {
     setLocationSearchQuery(query);
     console.log('🔍 Search query:', query);
@@ -493,53 +493,56 @@ export default function HomeScreen() {
     }
 
     // Debounce search
-    searchTimeoutRef.current = setTimeout(async () => {
+    searchTimeoutRef.current = setTimeout(() => {
       const google = (window as any).google;
       if (!google || !google.maps || !google.maps.places) {
         console.error('❌ Google Maps Places API not available');
-        Alert.alert('Search Error', 'Location search is not available. Please drag the marker on the map.');
         return;
       }
 
-      console.log('✅ Google Maps Places API available, searching with new API...');
+      console.log('✅ Google Maps Places API available, using PlacesService...');
 
       try {
-        // Use the new AutocompleteSuggestion API (replaces deprecated AutocompleteService)
-        const { AutocompleteSuggestion } = await google.maps.importLibrary("places");
+        // Create a dummy div for PlacesService
+        const dummyDiv = document.createElement('div');
+        const service = new google.maps.places.PlacesService(dummyDiv);
         
+        // Use textSearch instead of autocomplete
         const request = {
-          input: query,
-          includedRegionCodes: ["ph"], // Restrict to Philippines
+          query: query,
+          fields: ['place_id', 'name', 'formatted_address', 'geometry'],
         };
 
-        const { suggestions } = await AutocompleteSuggestion.fetchAutocompleteSuggestions(request);
-        
-        console.log('📍 Suggestions:', suggestions);
-        
-        if (suggestions && suggestions.length > 0) {
-          // Convert new format to old format for compatibility
-          const formattedResults = suggestions.map((suggestion: any) => ({
-            place_id: suggestion.placePrediction.placeId,
-            structured_formatting: {
-              main_text: suggestion.placePrediction.text.text,
-              secondary_text: suggestion.placePrediction.text.matches?.[0]?.endOffset 
-                ? suggestion.placePrediction.text.text.substring(suggestion.placePrediction.text.matches[0].endOffset)
-                : '',
-            },
-            description: suggestion.placePrediction.text.text,
-          }));
+        service.textSearch(request, (results: any, status: any) => {
+          console.log('📍 Search status:', status);
+          console.log('📍 Results:', results);
           
-          setSearchResults(formattedResults);
-          setShowSearchResults(true);
-          console.log('✅ Found', formattedResults.length, 'results');
-        } else {
-          console.log('⚠️ No results found for:', query);
-          setSearchResults([]);
-          setShowSearchResults(false);
-        }
+          if (status === google.maps.places.PlacesServiceStatus.OK && results && results.length > 0) {
+            // Format results to match our UI
+            const formattedResults = results.map((place: any) => ({
+              place_id: place.place_id,
+              structured_formatting: {
+                main_text: place.name,
+                secondary_text: place.formatted_address,
+              },
+              description: `${place.name}, ${place.formatted_address}`,
+            }));
+            
+            setSearchResults(formattedResults);
+            setShowSearchResults(true);
+            console.log('✅ Found', formattedResults.length, 'results');
+          } else if (status === google.maps.places.PlacesServiceStatus.ZERO_RESULTS) {
+            console.log('⚠️ No results found for:', query);
+            setSearchResults([]);
+            setShowSearchResults(false);
+          } else {
+            console.error('❌ Search failed with status:', status);
+            setSearchResults([]);
+            setShowSearchResults(false);
+          }
+        });
       } catch (error) {
         console.error('❌ Error in search:', error);
-        // Fallback: show message to user
         setSearchResults([]);
         setShowSearchResults(false);
       }
