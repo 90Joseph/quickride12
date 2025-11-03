@@ -1648,6 +1648,458 @@ async def update_user_profile(user_id: str, updates: Dict[str, Any], request: Re
     
     return updated_user
 
+
+# ============= RIDE SERVICE ENDPOINTS =============
+
+# Helper function to calculate distance using Google Maps API
+async def calculate_distance(origin: Location, destination: Location, stops: List[RideStop] = []) -> float:
+    """Calculate actual road distance using Google Maps Distance Matrix API"""
+    try:
+        api_key = os.getenv('GOOGLE_MAPS_API_KEY', 'AIzaSyDJqsXxZXuu808lFZXARvy4rd0xktuqwJQ')
+        
+        # Build waypoints string if there are stops
+        waypoints = ""
+        if stops:
+            waypoint_coords = [f"{stop.location.latitude},{stop.location.longitude}" for stop in sorted(stops, key=lambda x: x.order)]
+            waypoints = f"&waypoints={"|".join(waypoint_coords)}"
+        
+        url = f"https://maps.googleapis.com/maps/api/distancematrix/json?origins={origin.latitude},{origin.longitude}&destinations={destination.latitude},{destination.longitude}{waypoints}&mode=driving&key={api_key}"
+        
+        response = requests.get(url, timeout=10)
+        data = response.json()
+        
+        if data.get('status') == 'OK' and data.get('rows'):
+            distance_meters = data['rows'][0]['elements'][0]['distance']['value']
+            distance_km = distance_meters / 1000
+            return round(distance_km, 2)
+        else:
+            # Fallback to straight-line distance
+            logger.warning(f"Google Maps API error: {data.get('status')}, using straight-line distance")
+            return calculate_straight_line_distance(origin, destination)
+    except Exception as e:
+        logger.error(f"Error calculating distance: {str(e)}")
+        # Fallback to straight-line distance
+        return calculate_straight_line_distance(origin, destination)
+
+def calculate_straight_line_distance(origin: Location, destination: Location) -> float:
+    """Fallback: Calculate straight-line distance using Haversine formula"""
+    from math import radians, sin, cos, sqrt, atan2
+    
+    R = 6371  # Earth's radius in km
+    
+    lat1, lon1 = radians(origin.latitude), radians(origin.longitude)
+    lat2, lon2 = radians(destination.latitude), radians(destination.longitude)
+    
+    dlat = lat2 - lat1
+    dlon = lon2 - lon1
+    
+    a = sin(dlat/2)**2 + cos(lat1) * cos(lat2) * sin(dlon/2)**2
+    c = 2 * atan2(sqrt(a), sqrt(1-a))
+    
+    distance = R * c
+    return round(distance, 2)
+
+async def get_or_create_cancellation_record(customer_id: str) -> CustomerCancellationRecord:
+    """Get or create cancellation record for customer"""
+    record = await db.customer_cancellations.find_one({"customer_id": customer_id})
+    if not record:
+        new_record = CustomerCancellationRecord(customer_id=customer_id)
+        await db.customer_cancellations.insert_one(new_record.model_dump())
+        return new_record
+    return CustomerCancellationRecord(**record)
+
+@api_router.post("/rides/calculate-fare")
+async def calculate_ride_fare(ride_request: Dict[str, Any], request: Request):
+    """Calculate fare estimate for a ride"""
+    user = await require_auth(request)
+    
+    try:
+        pickup = Location(**ride_request['pickup_location'])
+        dropoff = Location(**ride_request['dropoff_location'])
+        stops = [RideStop(**stop) for stop in ride_request.get('stops', [])]
+        
+        # Calculate distance
+        distance_km = await calculate_distance(pickup, dropoff, stops)
+        
+        # Calculate fare: ₱30 base + ₱10 per km
+        base_fare = 30.0
+        per_km_rate = 10.0
+        estimated_fare = base_fare + (distance_km * per_km_rate)
+        
+        # Check for cancellation penalty
+        cancellation_record = await get_or_create_cancellation_record(user.id)
+        total_fare = estimated_fare + cancellation_record.penalty_amount
+        
+        return {
+            "distance_km": distance_km,
+            "base_fare": base_fare,
+            "per_km_rate": per_km_rate,
+            "estimated_fare": round(estimated_fare, 2),
+            "cancellation_fee": cancellation_record.penalty_amount,
+            "total_fare": round(total_fare, 2)
+        }
+    except Exception as e:
+        logger.error(f"Fare calculation error: {str(e)}")
+        raise HTTPException(status_code=400, detail=str(e))
+
+@api_router.post("/rides")
+async def create_ride(ride_data: Dict[str, Any], request: Request):
+    """Create a new ride request"""
+    user = await require_auth(request)
+    
+    # Check if user is suspended
+    cancellation_record = await get_or_create_cancellation_record(user.id)
+    if cancellation_record.suspension_until:
+        if cancellation_record.suspension_until > datetime.now(timezone.utc):
+            raise HTTPException(
+                status_code=403,
+                detail=f"Account suspended until {cancellation_record.suspension_until.isoformat()}. Reason: {cancellation_record.suspension_reason}"
+            )
+    
+    try:
+        pickup = Location(**ride_data['pickup_location'])
+        dropoff = Location(**ride_data['dropoff_location'])
+        stops = [RideStop(**stop) for stop in ride_data.get('stops', [])]
+        
+        # Calculate distance and fare
+        distance_km = await calculate_distance(pickup, dropoff, stops)
+        base_fare = 30.0
+        per_km_rate = 10.0
+        estimated_fare = base_fare + (distance_km * per_km_rate)
+        
+        # Add cancellation fee if any
+        actual_fare = estimated_fare + cancellation_record.penalty_amount
+        
+        # Create ride
+        ride = Ride(
+            customer_id=user.id,
+            customer_name=user.name,
+            customer_phone=user.phone or "",
+            pickup_location=pickup,
+            dropoff_location=dropoff,
+            stops=stops,
+            distance_km=distance_km,
+            estimated_fare=round(estimated_fare, 2),
+            actual_fare=round(actual_fare, 2),
+            cancellation_fee=cancellation_record.penalty_amount,
+            payment_method=PaymentMethod(ride_data.get('payment_method', 'cash')),
+            scheduled_time=datetime.fromisoformat(ride_data['scheduled_time']) if ride_data.get('scheduled_time') else None,
+            special_instructions=ride_data.get('special_instructions')
+        )
+        
+        await db.rides.insert_one(ride.model_dump())
+        
+        # Reset penalty after charging
+        if cancellation_record.penalty_amount > 0:
+            await db.customer_cancellations.update_one(
+                {"customer_id": user.id},
+                {"$set": {"penalty_amount": 0.0}}
+            )
+        
+        # If not scheduled, find and assign nearest available rider
+        if not ride.scheduled_time:
+            await assign_nearest_rider(ride.id)
+        
+        logger.info(f"Ride created: {ride.id} for customer {user.name}")
+        return ride
+    except Exception as e:
+        logger.error(f"Ride creation error: {str(e)}")
+        raise HTTPException(status_code=400, detail=str(e))
+
+async def assign_nearest_rider(ride_id: str):
+    """Find and assign nearest available rider to ride"""
+    ride = await db.rides.find_one({"id": ride_id})
+    if not ride:
+        return
+    
+    # Find available riders
+    available_riders = await db.riders.find({
+        "status": "available",
+        "current_ride_id": None,
+        "active_service": "ride_service"
+    }).to_list(100)
+    
+    if not available_riders:
+        logger.warning(f"No available riders for ride {ride_id}")
+        return
+    
+    # Find nearest rider (simple implementation - can be enhanced)
+    # For now, just assign the first available rider
+    rider = available_riders[0]
+    
+    # Update ride with rider info
+    await db.rides.update_one(
+        {"id": ride_id},
+        {"$set": {
+            "rider_id": rider['user_id'],
+            "rider_name": rider['name'],
+            "rider_phone": rider['phone'],
+            "rider_vehicle": rider.get('vehicle_type', 'Motorcycle'),
+            "status": RideStatus.ACCEPTED.value,
+            "updated_at": datetime.now(timezone.utc)
+        }}
+    )
+    
+    # Update rider status
+    await db.riders.update_one(
+        {"user_id": rider['user_id']},
+        {"$set": {
+            "status": RiderStatus.BUSY.value,
+            "current_ride_id": ride_id
+        }}
+    )
+    
+    logger.info(f"Rider {rider['name']} assigned to ride {ride_id}")
+
+@api_router.get("/rides")
+async def get_customer_rides(request: Request):
+    """Get all rides for current customer"""
+    user = await require_auth(request)
+    
+    rides = await db.rides.find({"customer_id": user.id}).sort("created_at", -1).to_list(100)
+    return [Ride(**ride) for ride in rides]
+
+@api_router.get("/rides/{ride_id}")
+async def get_ride(ride_id: str, request: Request):
+    """Get specific ride details"""
+    user = await require_auth(request)
+    
+    ride = await db.rides.find_one({"id": ride_id})
+    if not ride:
+        raise HTTPException(status_code=404, detail="Ride not found")
+    
+    # Check authorization
+    if ride['customer_id'] != user.id and user.role not in [UserRole.ADMIN, UserRole.RIDER]:
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    return Ride(**ride)
+
+@api_router.put("/rides/{ride_id}/cancel")
+async def cancel_ride(ride_id: str, request: Request):
+    """Cancel a ride and apply cancellation policy"""
+    user = await require_auth(request)
+    
+    ride = await db.rides.find_one({"id": ride_id})
+    if not ride:
+        raise HTTPException(status_code=404, detail="Ride not found")
+    
+    if ride['customer_id'] != user.id:
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    if ride['status'] in [RideStatus.COMPLETED.value, RideStatus.CANCELLED.value]:
+        raise HTTPException(status_code=400, detail="Cannot cancel completed or already cancelled ride")
+    
+    # Update ride status
+    await db.rides.update_one(
+        {"id": ride_id},
+        {"$set": {
+            "status": RideStatus.CANCELLED.value,
+            "updated_at": datetime.now(timezone.utc)
+        }}
+    )
+    
+    # Free up rider if assigned
+    if ride.get('rider_id'):
+        await db.riders.update_one(
+            {"user_id": ride['rider_id']},
+            {"$set": {
+                "status": RiderStatus.AVAILABLE.value,
+                "current_ride_id": None
+            }}
+        )
+    
+    # Apply cancellation policy
+    cancellation_record = await get_or_create_cancellation_record(user.id)
+    cancellation_record.total_cancellations += 1
+    cancellation_record.last_cancellation = datetime.now(timezone.utc)
+    
+    message = ""
+    
+    if cancellation_record.total_cancellations == 1:
+        message = "⚠️ Warning: This is your first cancellation. Next cancellation will incur a ₱5 fee."
+    elif cancellation_record.total_cancellations == 2:
+        cancellation_record.penalty_amount = 5.0
+        message = "Next ride will have a ₱5 cancellation fee. Further cancellations may result in suspension."
+    elif cancellation_record.total_cancellations == 3:
+        cancellation_record.suspension_until = datetime.now(timezone.utc) + timedelta(days=3)
+        cancellation_record.suspension_reason = "3 ride cancellations"
+        message = "Account suspended for 3 days due to 3 cancellations."
+    elif cancellation_record.total_cancellations == 4:
+        cancellation_record.suspension_until = datetime.now(timezone.utc) + timedelta(days=7)
+        cancellation_record.suspension_reason = "4 ride cancellations"
+        message = "Account suspended for 1 week due to 4 cancellations."
+    elif cancellation_record.total_cancellations >= 5:
+        cancellation_record.suspension_until = datetime.now(timezone.utc) + timedelta(days=36500)  # ~100 years (indefinite)
+        cancellation_record.suspension_reason = "5+ ride cancellations - Indefinite suspension"
+        message = "Account suspended indefinitely due to excessive cancellations."
+    
+    # Save cancellation record
+    await db.customer_cancellations.update_one(
+        {"customer_id": user.id},
+        {"$set": cancellation_record.model_dump()},
+        upsert=True
+    )
+    
+    logger.warning(f"Ride {ride_id} cancelled by {user.name}. Total cancellations: {cancellation_record.total_cancellations}")
+    
+    return {
+        "message": "Ride cancelled",
+        "cancellation_policy_message": message,
+        "total_cancellations": cancellation_record.total_cancellations
+    }
+
+# ============= RIDER RIDE ENDPOINTS =============
+@api_router.get("/rider/rides/available")
+async def get_available_rides(request: Request):
+    """Get available ride requests for riders"""
+    user = await require_auth(request)
+    
+    if user.role != UserRole.RIDER:
+        raise HTTPException(status_code=403, detail="Rider access only")
+    
+    # Get pending rides (not assigned or scheduled for later)
+    now = datetime.now(timezone.utc)
+    rides = await db.rides.find({
+        "status": RideStatus.PENDING.value,
+        "rider_id": None,
+        "$or": [
+            {"scheduled_time": None},
+            {"scheduled_time": {"$lte": now}}
+        ]
+    }).sort("created_at", 1).to_list(50)
+    
+    return [Ride(**ride) for ride in rides]
+
+@api_router.put("/rider/rides/{ride_id}/accept")
+async def accept_ride(ride_id: str, request: Request):
+    """Rider accepts a ride"""
+    user = await require_auth(request)
+    
+    if user.role != UserRole.RIDER:
+        raise HTTPException(status_code=403, detail="Rider access only")
+    
+    rider = await db.riders.find_one({"user_id": user.id})
+    if not rider:
+        raise HTTPException(status_code=404, detail="Rider profile not found")
+    
+    if rider['status'] != RiderStatus.AVAILABLE.value:
+        raise HTTPException(status_code=400, detail="Rider not available")
+    
+    ride = await db.rides.find_one({"id": ride_id})
+    if not ride or ride.get('rider_id'):
+        raise HTTPException(status_code=400, detail="Ride not available")
+    
+    # Assign ride to rider
+    await db.rides.update_one(
+        {"id": ride_id},
+        {"$set": {
+            "rider_id": user.id,
+            "rider_name": rider['name'],
+            "rider_phone": rider['phone'],
+            "rider_vehicle": rider.get('vehicle_type', 'Motorcycle'),
+            "status": RideStatus.ACCEPTED.value,
+            "updated_at": datetime.now(timezone.utc)
+        }}
+    )
+    
+    # Update rider status
+    await db.riders.update_one(
+        {"user_id": user.id},
+        {"$set": {
+            "status": RiderStatus.BUSY.value,
+            "current_ride_id": ride_id,
+            "active_service": ServiceType.RIDE_SERVICE.value
+        }}
+    )
+    
+    logger.info(f"Rider {rider['name']} accepted ride {ride_id}")
+    return {"message": "Ride accepted"}
+
+@api_router.put("/rider/rides/{ride_id}/status")
+async def update_ride_status(ride_id: str, status_update: Dict[str, Any], request: Request):
+    """Update ride status by rider"""
+    user = await require_auth(request)
+    
+    if user.role != UserRole.RIDER:
+        raise HTTPException(status_code=403, detail="Rider access only")
+    
+    ride = await db.rides.find_one({"id": ride_id, "rider_id": user.id})
+    if not ride:
+        raise HTTPException(status_code=404, detail="Ride not found or not assigned to you")
+    
+    new_status = status_update.get('status')
+    if not new_status:
+        raise HTTPException(status_code=400, detail="Status required")
+    
+    update_data = {
+        "status": new_status,
+        "updated_at": datetime.now(timezone.utc)
+    }
+    
+    # Handle specific status transitions
+    if new_status == RideStatus.PICKED_UP.value:
+        update_data['pickup_time'] = datetime.now(timezone.utc)
+    elif new_status == RideStatus.COMPLETED.value:
+        update_data['dropoff_time'] = datetime.now(timezone.utc)
+        update_data['payment_status'] = PaymentStatus.COMPLETED.value
+        
+        # Free up rider
+        await db.riders.update_one(
+            {"user_id": user.id},
+            {"$set": {
+                "status": RiderStatus.AVAILABLE.value,
+                "current_ride_id": None
+            },
+            "$inc": {"total_rides": 1}}
+        )
+    
+    await db.rides.update_one({"id": ride_id}, {"$set": update_data})
+    
+    logger.info(f"Ride {ride_id} status updated to {new_status}")
+    return {"message": "Status updated"}
+
+@api_router.get("/rider/current-ride")
+async def get_current_ride(request: Request):
+    """Get rider's current active ride"""
+    user = await require_auth(request)
+    
+    if user.role != UserRole.RIDER:
+        raise HTTPException(status_code=403, detail="Rider access only")
+    
+    rider = await db.riders.find_one({"user_id": user.id})
+    if not rider or not rider.get('current_ride_id'):
+        return None
+    
+    ride = await db.rides.find_one({"id": rider['current_ride_id']})
+    if not ride:
+        return None
+    
+    return Ride(**ride)
+
+@api_router.put("/rider/toggle-service")
+async def toggle_rider_service(service_data: Dict[str, Any], request: Request):
+    """Toggle rider between food delivery and ride service"""
+    user = await require_auth(request)
+    
+    if user.role != UserRole.RIDER:
+        raise HTTPException(status_code=403, detail="Rider access only")
+    
+    service_type = service_data.get('service_type')
+    if service_type not in [ServiceType.FOOD_DELIVERY.value, ServiceType.RIDE_SERVICE.value]:
+        raise HTTPException(status_code=400, detail="Invalid service type")
+    
+    rider = await db.riders.find_one({"user_id": user.id})
+    if rider and rider['status'] == RiderStatus.BUSY.value:
+        raise HTTPException(status_code=400, detail="Cannot switch service while on active job")
+    
+    await db.riders.update_one(
+        {"user_id": user.id},
+        {"$set": {"active_service": service_type}}
+    )
+    
+    logger.info(f"Rider {user.name} switched to {service_type}")
+    return {"message": f"Switched to {service_type}"}
+
 # ============= HEALTH CHECK =============
 @api_router.get("/health")
 async def health_check():
