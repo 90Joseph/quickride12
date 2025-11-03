@@ -80,6 +80,20 @@ class PaymentMethod(str, Enum):
     GCASH = "gcash"
     CASH = "cash"
 
+class RideStatus(str, Enum):
+    PENDING = "pending"
+    ACCEPTED = "accepted"
+    RIDER_ARRIVED = "rider_arrived"
+    PICKED_UP = "picked_up"
+    IN_TRANSIT = "in_transit"
+    COMPLETED = "completed"
+    CANCELLED = "cancelled"
+
+class ServiceType(str, Enum):
+    FOOD_DELIVERY = "food_delivery"
+    RIDE_SERVICE = "ride_service"
+
+
 # ============= MODELS =============
 class User(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
