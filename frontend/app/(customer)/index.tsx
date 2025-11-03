@@ -219,8 +219,188 @@ export default function HomeScreen() {
   };
 
   const handleLocationPress = () => {
-    console.log('📍 Location button pressed');
-    setShowLocationPicker(!showLocationPicker);
+    console.log('📍 Location button pressed - Opening map picker');
+    setMapLoaded(false);
+    setShowLocationPicker(true);
+    
+    // Get user's current location
+    if (typeof navigator !== 'undefined' && navigator.geolocation) {
+      console.log('🔍 Requesting geolocation...');
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const newLocation = {
+            lat: position.coords.latitude,
+            lng: position.coords.longitude
+          };
+          setTempLocation(newLocation);
+          console.log('✅ Got current location:', newLocation);
+        },
+        (error) => {
+          console.error('❌ Error getting location:', error);
+        },
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+      );
+    }
+  };
+
+  // Load Google Maps and initialize map
+  const loadMapPicker = () => {
+    console.log('🗺️ loadMapPicker called');
+    if (typeof window === 'undefined') {
+      console.log('❌ Window is undefined');
+      return;
+    }
+
+    console.log('✅ Window is defined');
+    const apiKey = 'AIzaSyA0m1oRlXLQWjxacqjEJ6zJW3WvmOWvQkQ';
+
+    if ((window as any).google && (window as any).google.maps) {
+      console.log('✅ Google Maps already loaded, initializing...');
+      setTimeout(() => initializeMapPicker(), 100);
+      return;
+    }
+
+    console.log('🔄 Google Maps not loaded, checking for existing script...');
+    const existingScript = document.querySelector('script[src*="maps.googleapis.com"]');
+    if (existingScript) {
+      console.log('✅ Script tag exists, waiting for Google Maps to load...');
+      const checkInterval = setInterval(() => {
+        if ((window as any).google && (window as any).google.maps) {
+          clearInterval(checkInterval);
+          console.log('✅ Google Maps loaded from existing script');
+          initializeMapPicker();
+        }
+      }, 100);
+      
+      setTimeout(() => {
+        clearInterval(checkInterval);
+        if (!mapLoaded) {
+          console.error('⏱️ Timeout waiting for Google Maps');
+        }
+      }, 10000);
+      return;
+    }
+
+    console.log('📝 Creating new Google Maps script tag...');
+    const script = document.createElement('script');
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places`;
+    script.async = true;
+    script.defer = true;
+    script.onload = () => {
+      console.log('✅ Script loaded, waiting for google.maps...');
+      setTimeout(() => {
+        if ((window as any).google && (window as any).google.maps) {
+          console.log('✅ Google Maps API ready!');
+          initializeMapPicker();
+        } else {
+          console.error('❌ Google Maps API not available after script load');
+        }
+      }, 100);
+    };
+    script.onerror = (error) => {
+      console.error('❌ Failed to load Google Maps script:', error);
+    };
+    document.head.appendChild(script);
+    console.log('✅ Script tag appended to document');
+  };
+
+  // Initialize interactive map
+  const initializeMapPicker = () => {
+    console.log('🗺️ initializeMapPicker called');
+    const google = (window as any).google;
+    if (!google) {
+      console.error('❌ Google object not available');
+      return;
+    }
+    if (!mapRef.current) {
+      console.error('❌ Map ref not available');
+      return;
+    }
+
+    console.log('✅ Creating map with center:', tempLocation);
+
+    const map = new google.maps.Map(mapRef.current, {
+      center: tempLocation,
+      zoom: 16,
+      disableDefaultUI: false,
+      zoomControl: true,
+      mapTypeControl: false,
+      streetViewControl: false,
+      fullscreenControl: false,
+    });
+
+    console.log('✅ Map created, adding marker...');
+
+    // Add draggable marker
+    const marker = new google.maps.Marker({
+      position: tempLocation,
+      map,
+      draggable: true,
+      icon: {
+        path: google.maps.SymbolPath.CIRCLE,
+        scale: 15,
+        fillColor: '#FF6B6B',
+        fillOpacity: 1,
+        strokeColor: '#FFF',
+        strokeWeight: 3,
+      },
+    });
+
+    console.log('✅ Marker added');
+    markerRef.current = marker;
+
+    // Update location when marker is dragged
+    marker.addListener('dragend', () => {
+      const position = marker.getPosition();
+      const newLocation = {
+        lat: position.lat(),
+        lng: position.lng()
+      };
+      console.log('📍 Marker dragged to:', newLocation);
+      setTempLocation(newLocation);
+      getAddressFromCoordinates(newLocation.lat, newLocation.lng);
+    });
+
+    // Update location when map is clicked
+    map.addListener('click', (event: any) => {
+      const newLocation = {
+        lat: event.latLng.lat(),
+        lng: event.latLng.lng()
+      };
+      console.log('📍 Map clicked at:', newLocation);
+      marker.setPosition(newLocation);
+      setTempLocation(newLocation);
+      getAddressFromCoordinates(newLocation.lat, newLocation.lng);
+    });
+
+    // Get initial address
+    getAddressFromCoordinates(tempLocation.lat, tempLocation.lng);
+    
+    setMapLoaded(true);
+    console.log('✅ Map initialization complete!');
+  };
+
+  // Reverse geocoding to get address from coordinates
+  const getAddressFromCoordinates = async (lat: number, lng: number) => {
+    const google = (window as any).google;
+    if (!google) return;
+
+    const geocoder = new google.maps.Geocoder();
+    geocoder.geocode({ location: { lat, lng } }, (results: any, status: any) => {
+      if (status === 'OK' && results[0]) {
+        const address = results[0].formatted_address;
+        setUserAddress(address);
+        setSelectedLocation(address);
+        console.log('📍 Address:', address);
+      }
+    });
+  };
+
+  // Confirm selected location
+  const confirmLocation = () => {
+    setSelectedLocation(userAddress || selectedLocation);
+    setShowLocationPicker(false);
+    console.log('✅ Location confirmed:', { lat: tempLocation.lat, lng: tempLocation.lng, address: userAddress });
   };
 
   const handleNotificationPress = () => {
