@@ -410,23 +410,59 @@ export default function HomeScreen() {
 
     console.log('✅ Map created, adding marker...');
 
-    // Add draggable marker
+    // Add draggable marker with enhanced visibility
     const marker = new google.maps.Marker({
       position: tempLocation,
       map,
       draggable: true,
+      animation: google.maps.Animation.DROP, // Drop animation on load
       icon: {
         path: google.maps.SymbolPath.CIRCLE,
-        scale: 15,
+        scale: 18, // Larger size
         fillColor: '#FF6B6B',
         fillOpacity: 1,
         strokeColor: '#FFF',
-        strokeWeight: 3,
+        strokeWeight: 4,
       },
+      title: 'Drag me to your exact location',
     });
 
     console.log('✅ Marker added');
     markerRef.current = marker;
+
+    // Add pulsing circle around marker for better visibility
+    const pulsingCircle = new google.maps.Circle({
+      map: map,
+      center: tempLocation,
+      radius: 30, // 30 meters radius
+      fillColor: '#FF6B6B',
+      fillOpacity: 0.2,
+      strokeColor: '#FF6B6B',
+      strokeOpacity: 0.6,
+      strokeWeight: 2,
+    });
+
+    // Animate pulsing effect
+    let growing = true;
+    let radius = 30;
+    const pulseInterval = setInterval(() => {
+      if (growing) {
+        radius += 2;
+        if (radius >= 60) growing = false;
+      } else {
+        radius -= 2;
+        if (radius <= 30) growing = true;
+      }
+      pulsingCircle.setRadius(radius);
+    }, 100);
+
+    // Update circle position when marker is dragged
+    marker.addListener('drag', () => {
+      const position = marker.getPosition();
+      if (position) {
+        pulsingCircle.setCenter({ lat: position.lat(), lng: position.lng() });
+      }
+    });
 
     // Update location when marker is dragged
     marker.addListener('dragend', () => {
