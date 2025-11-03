@@ -793,69 +793,83 @@ async def update_order_status(order_id: str, status_update: Dict[str, str], requ
     
     # Auto-assign rider when order is marked as ready_for_pickup
     if new_status == OrderStatus.READY_FOR_PICKUP and not order.get("rider_id"):
+        logger.info(f"🚀 Attempting auto-assignment for order {order_id}")
+        
         # Get restaurant location
         restaurant = await db.restaurants.find_one({"id": order["restaurant_id"]})
-        restaurant_lat = restaurant["location"]["latitude"]
-        restaurant_lon = restaurant["location"]["longitude"]
         
-        # Find available riders who are marked as available
-        available_riders = await db.riders.find({
-            "status": RiderStatus.AVAILABLE,
-            "is_available": True,  # Only riders who toggled availability ON
-            "current_location": {"$exists": True, "$ne": None}
-        }).to_list(100)
-        
-        if available_riders:
-            # Calculate distance for each rider and filter within 10km
-            riders_with_distance = []
-            for rider in available_riders:
-                if rider.get("current_location"):
-                    rider_lat = rider["current_location"]["latitude"]
-                    rider_lon = rider["current_location"]["longitude"]
-                    distance = calculate_distance(
-                        restaurant_lat, restaurant_lon,
-                        rider_lat, rider_lon
-                    )
-                    if distance <= 10.0:  # 10km radius
-                        riders_with_distance.append({
-                            "rider": rider,
-                            "distance": distance
-                        })
-            
-            if riders_with_distance:
-                # Sort by distance and assign to nearest rider
-                riders_with_distance.sort(key=lambda x: x["distance"])
-                nearest_rider = riders_with_distance[0]["rider"]
-                distance_km = riders_with_distance[0]["distance"]
-                
-                update_data["rider_id"] = nearest_rider["id"]
-                update_data["rider_name"] = nearest_rider["name"]
-                update_data["rider_phone"] = nearest_rider["phone"]
-                # Update status to rider_assigned
-                update_data["status"] = OrderStatus.RIDER_ASSIGNED
-                new_status = OrderStatus.RIDER_ASSIGNED
-                
-                # Update rider status to busy AND set current_order_id
-                await db.riders.update_one(
-                    {"id": nearest_rider["id"]},
-                    {"$set": {
-                        "status": RiderStatus.BUSY,
-                        "current_order_id": order_id  # FIX: Set current order
-                    }}
-                )
-                
-                logger.info(f"Auto-assigned nearest rider {nearest_rider['name']} ({nearest_rider['id']}) to order {order_id} - Distance: {distance_km:.2f}km")
-                
-                # Emit event to rider
-                await sio.emit('new_delivery_assignment', {
-                    "order_id": order_id,
-                    "order": Order(**order).dict(),
-                    "distance_km": distance_km
-                }, room=f"rider_{nearest_rider['user_id']}")
-            else:
-                logger.warning(f"No riders available within 10km for order {order_id} at restaurant location ({restaurant_lat}, {restaurant_lon})")
+        if not restaurant:
+            logger.error(f"❌ Restaurant {order['restaurant_id']} not found for order {order_id}")
+        elif not restaurant.get("location"):
+            logger.error(f"❌ Restaurant {order['restaurant_id']} has no location set")
         else:
-            logger.warning(f"No available riders found for order {order_id}")
+            restaurant_lat = restaurant["location"]["latitude"]
+            restaurant_lon = restaurant["location"]["longitude"]
+            logger.info(f"📍 Restaurant location: {restaurant_lat}, {restaurant_lon}")
+            
+            # Find available riders who are marked as available
+            available_riders = await db.riders.find({
+                "status": RiderStatus.AVAILABLE,
+                "is_available": True,  # Only riders who toggled availability ON
+                "current_location": {"$exists": True, "$ne": None}
+            }).to_list(100)
+            
+            logger.info(f"👥 Found {len(available_riders)} riders with status=AVAILABLE, is_available=True, and location set")
+            
+            if available_riders:
+                # Calculate distance for each rider and filter within 10km
+                riders_with_distance = []
+                for rider in available_riders:
+                    if rider.get("current_location"):
+                        rider_lat = rider["current_location"]["latitude"]
+                        rider_lon = rider["current_location"]["longitude"]
+                        distance = calculate_distance(
+                            restaurant_lat, restaurant_lon,
+                            rider_lat, rider_lon
+                        )
+                        logger.info(f"  📏 Rider {rider['name']} is {distance:.2f}km away")
+                        if distance <= 10.0:  # 10km radius
+                            riders_with_distance.append({
+                                "rider": rider,
+                                "distance": distance
+                            })
+                
+                logger.info(f"✅ {len(riders_with_distance)} riders within 10km radius")
+                
+                if riders_with_distance:
+                    # Sort by distance and assign to nearest rider
+                    riders_with_distance.sort(key=lambda x: x["distance"])
+                    nearest_rider = riders_with_distance[0]["rider"]
+                    distance_km = riders_with_distance[0]["distance"]
+                    
+                    update_data["rider_id"] = nearest_rider["id"]
+                    update_data["rider_name"] = nearest_rider["name"]
+                    update_data["rider_phone"] = nearest_rider["phone"]
+                    # Update status to rider_assigned
+                    update_data["status"] = OrderStatus.RIDER_ASSIGNED
+                    new_status = OrderStatus.RIDER_ASSIGNED
+                    
+                    # Update rider status to busy AND set current_order_id
+                    await db.riders.update_one(
+                        {"id": nearest_rider["id"]},
+                        {"$set": {
+                            "status": RiderStatus.BUSY,
+                            "current_order_id": order_id  # FIX: Set current order
+                        }}
+                    )
+                    
+                    logger.info(f"✅ Auto-assigned nearest rider {nearest_rider['name']} ({nearest_rider['id']}) to order {order_id} - Distance: {distance_km:.2f}km")
+                    
+                    # Emit event to rider
+                    await sio.emit('new_delivery_assignment', {
+                        "order_id": order_id,
+                        "order": Order(**order).dict(),
+                        "distance_km": distance_km
+                    }, room=f"rider_{nearest_rider['user_id']}")
+                else:
+                    logger.warning(f"⚠️ No riders available within 10km for order {order_id} at restaurant location ({restaurant_lat}, {restaurant_lon})")
+            else:
+                logger.warning(f"⚠️ No available riders found for order {order_id}. Requirements: status=AVAILABLE, is_available=True, current_location set")
     
     # When order is delivered, clear rider's current_order_id and set back to available
     if new_status == OrderStatus.DELIVERED and order.get("rider_id"):
