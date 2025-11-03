@@ -47,6 +47,150 @@ export default function CheckoutScreen() {
   const deliveryFee = riderFee + appFee; // 25% total
   const total = subtotal + deliveryFee;
 
+  // Open map picker and get current location
+  const openMapPicker = () => {
+    setTempLocation({
+      lat: parseFloat(latitude) || 14.5547,
+      lng: parseFloat(longitude) || 121.0244
+    });
+    setShowMapPicker(true);
+    
+    // Get user's current location
+    if (typeof navigator !== 'undefined' && navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const newLocation = {
+            lat: position.coords.latitude,
+            lng: position.coords.longitude
+          };
+          setTempLocation(newLocation);
+          console.log('Got current location:', newLocation);
+        },
+        (error) => {
+          console.error('Error getting location:', error);
+        },
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+      );
+    }
+  };
+
+  // Load Google Maps and initialize map
+  const loadMapPicker = () => {
+    if (typeof window === 'undefined') return;
+
+    const apiKey = 'AIzaSyA0m1oRlXLQWjxacqjEJ6zJW3WvmOWvQkQ';
+
+    if ((window as any).google && (window as any).google.maps) {
+      initializeMapPicker();
+      return;
+    }
+
+    const existingScript = document.querySelector('script[src*="maps.googleapis.com"]');
+    if (existingScript) {
+      const checkInterval = setInterval(() => {
+        if ((window as any).google && (window as any).google.maps) {
+          clearInterval(checkInterval);
+          initializeMapPicker();
+        }
+      }, 100);
+      return;
+    }
+
+    const script = document.createElement('script');
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places`;
+    script.async = true;
+    script.defer = true;
+    script.onload = () => {
+      setTimeout(() => {
+        if ((window as any).google && (window as any).google.maps) {
+          initializeMapPicker();
+        }
+      }, 100);
+    };
+    document.head.appendChild(script);
+  };
+
+  // Initialize interactive map
+  const initializeMapPicker = () => {
+    const google = (window as any).google;
+    if (!google || !mapRef.current) return;
+
+    const map = new google.maps.Map(mapRef.current, {
+      center: tempLocation,
+      zoom: 16,
+      disableDefaultUI: false,
+      zoomControl: true,
+      mapTypeControl: false,
+      streetViewControl: false,
+      fullscreenControl: false,
+    });
+
+    // Add draggable marker
+    const marker = new google.maps.Marker({
+      position: tempLocation,
+      map,
+      draggable: true,
+      icon: {
+        path: google.maps.SymbolPath.CIRCLE,
+        scale: 15,
+        fillColor: '#FF6B6B',
+        fillOpacity: 1,
+        strokeColor: '#FFF',
+        strokeWeight: 3,
+      },
+    });
+
+    markerRef.current = marker;
+
+    // Update location when marker is dragged
+    marker.addListener('dragend', () => {
+      const position = marker.getPosition();
+      const newLocation = {
+        lat: position.lat(),
+        lng: position.lng()
+      };
+      setTempLocation(newLocation);
+      getAddressFromCoordinates(newLocation.lat, newLocation.lng);
+    });
+
+    // Update location when map is clicked
+    map.addListener('click', (event: any) => {
+      const newLocation = {
+        lat: event.latLng.lat(),
+        lng: event.latLng.lng()
+      };
+      marker.setPosition(newLocation);
+      setTempLocation(newLocation);
+      getAddressFromCoordinates(newLocation.lat, newLocation.lng);
+    });
+
+    // Get initial address
+    getAddressFromCoordinates(tempLocation.lat, tempLocation.lng);
+    
+    setMapLoaded(true);
+  };
+
+  // Reverse geocoding to get address from coordinates
+  const getAddressFromCoordinates = async (lat: number, lng: number) => {
+    const google = (window as any).google;
+    if (!google) return;
+
+    const geocoder = new google.maps.Geocoder();
+    geocoder.geocode({ location: { lat, lng } }, (results: any, status: any) => {
+      if (status === 'OK' && results[0]) {
+        setDeliveryAddress(results[0].formatted_address);
+      }
+    });
+  };
+
+  // Confirm selected location
+  const confirmLocation = () => {
+    setLatitude(tempLocation.lat.toString());
+    setLongitude(tempLocation.lng.toString());
+    setShowMapPicker(false);
+    console.log('Location confirmed:', tempLocation, deliveryAddress);
+  };
+
   const handlePlaceOrder = async () => {
     console.log('Place Order clicked');
     
