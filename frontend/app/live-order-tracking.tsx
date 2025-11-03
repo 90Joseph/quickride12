@@ -51,10 +51,10 @@ export default function LiveOrderTrackingScreen() {
   }, [orderId]);
 
   useEffect(() => {
-    if (order && Platform.OS === 'web') {
+    if (order && riderLocation && Platform.OS === 'web') {
       loadMap();
     }
-  }, [order]);
+  }, [order, riderLocation]);
 
   const fetchOrder = async () => {
     try {
