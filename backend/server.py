@@ -2104,7 +2104,7 @@ async def toggle_rider_service(service_data: Dict[str, Any], request: Request):
 # ============= HEALTH CHECK =============
 @api_router.get("/health")
 async def health_check():
-    return {"status": "healthy", "service": "QuickBite API"}
+    return {"status": "healthy", "service": "QuickRide API"}
 
 # Include router
 app.include_router(api_router)
