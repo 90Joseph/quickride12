@@ -1661,7 +1661,8 @@ async def calculate_distance(origin: Location, destination: Location, stops: Lis
         waypoints = ""
         if stops:
             waypoint_coords = [f"{stop.location.latitude},{stop.location.longitude}" for stop in sorted(stops, key=lambda x: x.order)]
-            waypoints = f"&waypoints={"|".join(waypoint_coords)}"
+            waypoints_str = "|".join(waypoint_coords)
+            waypoints = f"&waypoints={waypoints_str}"
         
         url = f"https://maps.googleapis.com/maps/api/distancematrix/json?origins={origin.latitude},{origin.longitude}&destinations={destination.latitude},{destination.longitude}{waypoints}&mode=driving&key={api_key}"
         
