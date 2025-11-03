@@ -1,20 +1,46 @@
 #!/usr/bin/env python3
 """
-Backend API Testing for GCash Payment Integration
-Tests the complete GCash payment flow for QuickBite Food Delivery App
+Backend API Testing for Live Navigation and Tracking Features
+Tests the new rider navigation and customer tracking endpoints
 """
 
 import requests
 import json
-import base64
-import uuid
+import sys
 from datetime import datetime
-import os
+import uuid
 
-# Get backend URL from environment
-BACKEND_URL = "https://quickbite-ride.preview.emergentagent.com/api"
+# Configuration
+BASE_URL = "https://quickbite-ride.preview.emergentagent.com/api"
+HEADERS = {"Content-Type": "application/json"}
 
-class GCashPaymentTester:
+class TestResults:
+    def __init__(self):
+        self.passed = 0
+        self.failed = 0
+        self.errors = []
+    
+    def log_pass(self, test_name):
+        print(f"✅ PASS: {test_name}")
+        self.passed += 1
+    
+    def log_fail(self, test_name, error):
+        print(f"❌ FAIL: {test_name} - {error}")
+        self.failed += 1
+        self.errors.append(f"{test_name}: {error}")
+    
+    def summary(self):
+        total = self.passed + self.failed
+        print(f"\n{'='*60}")
+        print(f"TEST SUMMARY: {self.passed}/{total} tests passed")
+        if self.errors:
+            print(f"\nFAILED TESTS:")
+            for error in self.errors:
+                print(f"  - {error}")
+        print(f"{'='*60}")
+        return self.failed == 0
+
+class NavigationTrackingTester:
     def __init__(self):
         self.customer_session = requests.Session()
         self.restaurant_session = requests.Session()
