@@ -1020,14 +1020,14 @@ export default function HomeScreen() {
                 <TextInput
                   style={styles.searchInput}
                   placeholder="Search for a place..."
-                  value={searchQuery}
+                  value={locationSearchQuery}
                   onChangeText={handleSearchLocation}
                   autoCapitalize="none"
                   autoCorrect={false}
                 />
-                {searchQuery.length > 0 && (
+                {locationSearchQuery.length > 0 && (
                   <TouchableOpacity onPress={() => {
-                    setSearchQuery('');
+                    setLocationSearchQuery('');
                     setSearchResults([]);
                     setShowSearchResults(false);
                   }}>
