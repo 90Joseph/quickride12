@@ -335,6 +335,45 @@ export default function RiderAvailableScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
+      {/* Availability Toggle */}
+      <View style={styles.availabilityCard}>
+        <View style={styles.availabilityInfo}>
+          <Ionicons 
+            name={isAvailable ? "checkmark-circle" : "close-circle"} 
+            size={28} 
+            color={isAvailable ? '#4CAF50' : '#FF6B6B'} 
+          />
+          <View style={styles.availabilityTextContainer}>
+            <Text style={styles.availabilityTitle}>
+              {isAvailable ? '🟢 Available for Delivery' : '🔴 Offline'}
+            </Text>
+            <Text style={styles.availabilitySubtext}>
+              {isAvailable ? 'You will receive new orders' : 'Toggle ON to receive orders'}
+            </Text>
+          </View>
+        </View>
+        <Switch
+          value={isAvailable}
+          onValueChange={toggleAvailability}
+          trackColor={{ false: '#FFE0E0', true: '#C8E6C9' }}
+          thumbColor={isAvailable ? '#4CAF50' : '#FF6B6B'}
+          ios_backgroundColor="#FFE0E0"
+        />
+      </View>
+
+      {/* Nearby Orders Info */}
+      {isAvailable && nearbyOrders.length > 0 && (
+        <View style={styles.nearbyInfoCard}>
+          <Ionicons name="location" size={20} color="#2196F3" />
+          <Text style={styles.nearbyInfoText}>
+            {nearbyOrders.length} order{nearbyOrders.length !== 1 ? 's' : ''} within 10km
+          </Text>
+          <Text style={styles.nearbyInfoSubtext}>
+            Nearest: {nearbyOrders[0]?.distance_km}km away
+          </Text>
+        </View>
+      )}
+
       {/* Service Toggle Header */}
       <View style={styles.toggleHeader}>
         <View style={styles.toggleContainer}>
