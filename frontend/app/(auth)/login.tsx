@@ -170,7 +170,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 36,
     fontWeight: 'bold',
-    color: '#2196F3',
+    color: '#FF6B6B',
     marginTop: 16,
   },
   subtitle: {
@@ -183,7 +183,7 @@ const styles = StyleSheet.create({
     marginTop: 32,
   },
   signInButton: {
-    backgroundColor: '#2196F3',
+    backgroundColor: '#FF6B6B',
     padding: 18,
     borderRadius: 12,
     alignItems: 'center',
@@ -200,11 +200,11 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     alignItems: 'center',
     borderWidth: 2,
-    borderColor: '#2196F3',
+    borderColor: '#FF6B6B',
     marginBottom: 24,
   },
   registerButtonText: {
-    color: '#2196F3',
+    color: '#FF6B6B',
     fontSize: 18,
     fontWeight: 'bold',
   },
