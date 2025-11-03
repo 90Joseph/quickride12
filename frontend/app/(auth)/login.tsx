@@ -239,15 +239,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#333',
   },
-  },
-  roleCardTitleSelected: {
-    color: '#FF6B6B',
-  },
-  roleCardSubtitle: {
-    fontSize: 12,
-    color: '#999',
-    position: 'absolute',
-    bottom: 8,
+});
     left: 76,
   },
   loginButton: {
