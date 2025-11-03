@@ -103,9 +103,10 @@
 #====================================================================================================
 
 user_problem_statement: |
-  User requested to add functional features to Restaurant Menu Management and Restaurant Profile screens.
-  Both screens were showing "Coming soon" placeholders. The requirement was to provide fully functional 
-  buttons and management features for restaurant owners to manage their menu items and restaurant profiles.
+  User requested live navigation and tracking features for both riders and customers.
+  The requirement is for riders to see directions to pickup/delivery locations and for customers
+  to track their orders in real-time with live rider location, distance, and ETA updates.
+  This includes both food delivery orders and moto-taxi rides.
 
 backend:
   - task: "Menu Item CRUD API - Add menu item"
