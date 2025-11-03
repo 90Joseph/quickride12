@@ -65,7 +65,10 @@ def make_request(method, endpoint, data=None, headers=None, auth_token=None):
         
         return response
     except requests.exceptions.RequestException as e:
-        print(f"Request failed: {e}")
+        print(f"Request failed for {method} {endpoint}: {e}")
+        return None
+    except Exception as e:
+        print(f"Unexpected error for {method} {endpoint}: {e}")
         return None
 
 def register_test_user(email, password, name, role):
