@@ -430,6 +430,17 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
   },
+  distanceContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 8,
+    gap: 6,
+  },
+  distanceText: {
+    fontSize: 14,
+    color: '#2196F3',
+    fontWeight: '600',
+  },
   detailsCard: {
     backgroundColor: '#FFF',
     marginHorizontal: 16,
