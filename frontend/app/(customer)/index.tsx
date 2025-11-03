@@ -2004,26 +2004,58 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#EEE',
   },
-  instructionCard: {
+  searchInputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#F5F5F5',
+    borderRadius: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    gap: 8,
+  },
+  searchInput: {
+    flex: 1,
+    fontSize: 14,
+    color: '#333',
+    outlineStyle: 'none',
+  },
+  searchResultsContainer: {
+    maxHeight: 250,
+    backgroundColor: '#FFF',
+    borderRadius: 12,
+    marginTop: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  searchResultItem: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    backgroundColor: '#E3F2FD',
-    borderRadius: 12,
     padding: 12,
     gap: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#F0F0F0',
   },
-  instructionTextContainer: {
+  searchResultTextContainer: {
     flex: 1,
   },
-  instructionTitle: {
+  searchResultMain: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#1976D2',
-    marginBottom: 4,
+    color: '#333',
+    marginBottom: 2,
   },
-  instructionText: {
+  searchResultSecondary: {
     fontSize: 12,
-    color: '#1565C0',
-    lineHeight: 18,
+    color: '#666',
+  },
+  tipText: {
+    fontSize: 12,
+    color: '#666',
+    marginTop: 8,
+    textAlign: 'center',
+    fontStyle: 'italic',
   },
 });
