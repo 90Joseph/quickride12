@@ -792,6 +792,90 @@ export default function CheckoutScreen() {
           </View>
         </SafeAreaView>
       </Modal>
+
+      {/* Location Verification Modal */}
+      <Modal
+        visible={showLocationVerification}
+        animationType="slide"
+        onRequestClose={() => setShowLocationVerification(false)}
+      >
+        <SafeAreaView style={styles.modalContainer}>
+          {/* Header */}
+          <View style={styles.mapHeader}>
+            <TouchableOpacity onPress={() => setShowLocationVerification(false)}>
+              <Ionicons name="close" size={28} color="#333" />
+            </TouchableOpacity>
+            <Text style={styles.mapHeaderTitle}>Verify Delivery Location</Text>
+            <View style={{ width: 28 }} />
+          </View>
+
+          {/* Map Container */}
+          {Platform.OS === 'web' && (
+            <View style={styles.mapPickerContainer}>
+              {!verificationMapLoaded && (
+                <View style={styles.mapLoading}>
+                  <ActivityIndicator size="large" color="#FF6B6B" />
+                  <Text style={styles.mapLoadingText}>Loading verification map...</Text>
+                </View>
+              )}
+              {/* @ts-ignore */}
+              <div 
+                ref={verificationMapRef} 
+                style={{ 
+                  width: '100%', 
+                  height: '100%',
+                  display: verificationMapLoaded ? 'block' : 'none'
+                }} 
+              />
+            </View>
+          )}
+
+          {/* Address Display */}
+          <View style={styles.mapAddressContainer}>
+            <View style={styles.mapAddressCard}>
+              <Ionicons name="location" size={24} color="#FF6B6B" />
+              <View style={styles.mapAddressTextContainer}>
+                <Text style={styles.mapAddressLabel}>Delivery Address</Text>
+                <Text style={styles.mapAddressText} numberOfLines={3}>
+                  {deliveryAddress}
+                </Text>
+                <Text style={styles.mapCoordinates}>
+                  📍 {parseFloat(latitude).toFixed(6)}, {parseFloat(longitude).toFixed(6)}
+                </Text>
+              </View>
+            </View>
+            
+            <View style={styles.verificationNote}>
+              <Ionicons name="information-circle" size={20} color="#0066CC" />
+              <Text style={styles.verificationNoteText}>
+                Please verify this is your correct delivery location. Your order will be delivered to this address.
+              </Text>
+            </View>
+          </View>
+
+          {/* Action Buttons */}
+          <View style={styles.mapFooter}>
+            <TouchableOpacity
+              style={styles.editLocationButton}
+              onPress={() => {
+                setShowLocationVerification(false);
+                setTimeout(() => setShowMapPicker(true), 300);
+              }}
+            >
+              <Ionicons name="pencil" size={20} color="#FF6B6B" />
+              <Text style={styles.editLocationText}>Edit Location</Text>
+            </TouchableOpacity>
+            
+            <TouchableOpacity
+              style={styles.confirmOrderButton}
+              onPress={confirmAndPlaceOrder}
+            >
+              <Ionicons name="checkmark-circle" size={24} color="#FFF" />
+              <Text style={styles.confirmOrderText}>Confirm & Place Order</Text>
+            </TouchableOpacity>
+          </View>
+        </SafeAreaView>
+      </Modal>
     </SafeAreaView>
   );
 }
