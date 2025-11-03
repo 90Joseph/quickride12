@@ -477,7 +477,7 @@ export default function HomeScreen() {
 
   // Search location using Google Places Autocomplete
   const handleSearchLocation = (query: string) => {
-    setSearchQuery(query);
+    setLocationSearchQuery(query);
     
     // Clear previous timeout
     if (searchTimeoutRef.current) {
@@ -529,7 +529,7 @@ export default function HomeScreen() {
         };
         setTempLocation(location);
         setUserAddress(place.formatted_address);
-        setSearchQuery('');
+        setLocationSearchQuery('');
         setShowSearchResults(false);
         
         // Move marker on map
