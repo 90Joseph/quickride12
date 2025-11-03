@@ -446,6 +446,11 @@ export default function CheckoutScreen() {
 
   // Confirm and place order after location verification
   const confirmAndPlaceOrder = async () => {
+    console.log('🛒 Confirm and Place Order clicked');
+    
+    // Close verification modal
+    setShowLocationVerification(false);
+    
     setLoading(true);
 
     try {
