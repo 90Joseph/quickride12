@@ -554,31 +554,49 @@ export default function HomeScreen() {
     const google = (window as any).google;
     if (!google) return;
 
+    console.log('📍 Selecting place with ID:', placeId);
+
     const service = new google.maps.places.PlacesService(document.createElement('div'));
-    service.getDetails({ placeId }, (place: any, status: any) => {
-      if (status === 'OK' && place.geometry) {
+    service.getDetails({ placeId, fields: ['geometry', 'formatted_address', 'name'] }, (place: any, status: any) => {
+      if (status === google.maps.places.PlacesServiceStatus.OK && place.geometry) {
         const location = {
           lat: place.geometry.location.lat(),
           lng: place.geometry.location.lng()
         };
+        
+        console.log('✅ Place found:', place.name, location);
+        
         setTempLocation(location);
-        setUserAddress(place.formatted_address);
+        setUserAddress(place.formatted_address || place.name);
         setLocationSearchQuery('');
+        setSearchResults([]);
         setShowSearchResults(false);
         
-        // Move marker on map
-        if (markerRef.current) {
+        // Move marker on map if it exists
+        if (markerRef.current && mapRef.current) {
           markerRef.current.setPosition(location);
+          
+          // Animate marker with bounce
+          markerRef.current.setAnimation(google.maps.Animation.BOUNCE);
+          setTimeout(() => {
+            if (markerRef.current) {
+              markerRef.current.setAnimation(null);
+            }
+          }, 2100); // Bounce for ~2 seconds
+          
+          // Center and zoom map on selected location
+          const currentMap = markerRef.current.getMap();
+          if (currentMap) {
+            currentMap.setCenter(location);
+            currentMap.setZoom(17); // Closer zoom for better view
+          }
+          
+          console.log('✅ Map centered and marker positioned at:', location);
+        } else {
+          console.warn('⚠️ Marker or map ref not available yet');
         }
-        
-        // Center map on selected location
-        if (mapRef.current) {
-          const map = new google.maps.Map(mapRef.current, {});
-          map.setCenter(location);
-          map.setZoom(16);
-        }
-        
-        console.log('✅ Location selected from search:', place.formatted_address);
+      } else {
+        console.error('❌ Failed to get place details:', status);
       }
     });
   };
