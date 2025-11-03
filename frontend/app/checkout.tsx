@@ -315,6 +315,13 @@ export default function CheckoutScreen() {
     }
   };
 
+  // Load map when modal opens
+  React.useEffect(() => {
+    if (showMapPicker && Platform.OS === 'web') {
+      loadMapPicker();
+    }
+  }, [showMapPicker]);
+
   if (items.length === 0) {
     return (
       <SafeAreaView style={styles.container}>
