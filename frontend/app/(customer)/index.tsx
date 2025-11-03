@@ -247,9 +247,13 @@ export default function HomeScreen() {
   // Handle quick location selection
   const handleQuickLocation = async (type: 'current' | 'home' | 'work' | 'school' | 'custom') => {
     if (type === 'current') {
-      // Get current GPS location
+      // Get current GPS location and show on map for verification
       if (typeof navigator !== 'undefined' && navigator.geolocation) {
         console.log('🔍 Getting current location...');
+        setShowQuickLocations(false);
+        setMapLoaded(false);
+        setShowLocationPicker(true); // Open map modal
+        
         navigator.geolocation.getCurrentPosition(
           async (position) => {
             const newLocation = {
@@ -257,18 +261,27 @@ export default function HomeScreen() {
               lng: position.coords.longitude
             };
             setTempLocation(newLocation);
+            console.log('✅ Current GPS location:', newLocation);
+            
             // Get address from coordinates
-            await getAddressFromCoordinates(newLocation.lat, newLocation.lng);
-            setSelectedLocation(userAddress || 'Current Location');
-            setShowQuickLocations(false);
-            console.log('✅ Current location set:', newLocation);
+            if ((window as any).google) {
+              await getAddressFromCoordinates(newLocation.lat, newLocation.lng);
+            }
+            
+            Alert.alert(
+              'GPS Location Found',
+              'Your current location is shown on the map. You can adjust the marker if needed, then click Confirm.'
+            );
           },
           (error) => {
             console.error('❌ Error getting location:', error);
-            Alert.alert('Location Error', 'Unable to get your current location. Please check permissions.');
+            setShowLocationPicker(false);
+            Alert.alert('Location Error', 'Unable to get your current location. Please check permissions or select manually on the map.');
           },
           { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
         );
+      } else {
+        Alert.alert('GPS Not Available', 'Your device does not support GPS location. Please select location manually.');
       }
     } else if (type === 'custom') {
       // Open map picker for custom location
