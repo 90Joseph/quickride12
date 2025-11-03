@@ -101,53 +101,45 @@ export default function LoginScreen() {
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.content}>
           <View style={styles.header}>
-            <Ionicons name="fast-food" size={80} color="#FF6B6B" />
-            <Text style={styles.title}>QuickBite</Text>
-            <Text style={styles.subtitle}>Food Delivery at Your Fingertips</Text>
+            <Ionicons name="bicycle" size={80} color="#2196F3" />
+            <Text style={styles.title}>QuickRide</Text>
+            <Text style={styles.subtitle}>Food & Ride Services at Your Fingertips</Text>
           </View>
 
-          <View style={styles.roleSection}>
-            <Text style={styles.roleTitle}>I am a:</Text>
-            
+          <View style={styles.buttonsSection}>
             <TouchableOpacity
-              style={[
-                styles.roleCard,
-                selectedRole === 'customer' && styles.roleCardSelected,
-              ]}
-              onPress={() => {
-                setSelectedRole('customer');
-                router.push('/(auth)/signin' as any);
-              }}
+              style={styles.signInButton}
+              onPress={() => router.push('/(auth)/signin' as any)}
             >
-              <Ionicons
-                name="person"
-                size={40}
-                color={selectedRole === 'customer' ? '#FF6B6B' : '#666'}
-              />
-              <Text
-                style={[
-                  styles.roleCardTitle,
-                  selectedRole === 'customer' && styles.roleCardTitleSelected,
-                ]}
-              >
-                Customer
-              </Text>
-              <Text style={styles.roleCardSubtitle}>Order delicious food</Text>
+              <Text style={styles.signInButtonText}>Sign In</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
-              style={[
-                styles.roleCard,
-                selectedRole === 'restaurant' && styles.roleCardSelected,
-              ]}
-              onPress={() => {
-                setSelectedRole('restaurant');
-                router.push('/(auth)/signin' as any);
-              }}
+              style={styles.registerButton}
+              onPress={() => router.push('/(auth)/register' as any)}
             >
-              <Ionicons
-                name="restaurant"
-                size={40}
+              <Text style={styles.registerButtonText}>Create Account</Text>
+            </TouchableOpacity>
+
+            <View style={styles.divider}>
+              <View style={styles.dividerLine} />
+              <Text style={styles.dividerText}>OR</Text>
+              <View style={styles.dividerLine} />
+            </View>
+
+            <TouchableOpacity
+              style={styles.googleButton}
+              onPress={handleLogin}
+            >
+              <Ionicons name="logo-google" size={24} color="#DB4437" />
+              <Text style={styles.googleButtonText}>Continue with Google</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </ScrollView>
+    </SafeAreaView>
+  );
+}
                 color={selectedRole === 'restaurant' ? '#FF6B6B' : '#666'}
               />
               <Text
