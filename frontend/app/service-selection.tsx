@@ -45,29 +45,9 @@ export default function ServiceSelectionScreen() {
               end={{ x: 1, y: 1 }}
               style={styles.gradientCard}
             >
-              <View style={styles.iconContainer}>
-                <Ionicons name="fast-food" size={40} color="#FFF" />
-              </View>
-              <Text style={styles.serviceTitle}>Food Delivery</Text>
-              <Text style={styles.serviceDescription}>
-                Order from your favorite restaurants
-              </Text>
-              <View style={styles.serviceFeatures}>
-                <View style={styles.featureItem}>
-                  <Ionicons name="checkmark-circle" size={14} color="#FFF" />
-                  <Text style={styles.featureText}>Quick delivery</Text>
-                </View>
-                <View style={styles.featureItem}>
-                  <Ionicons name="checkmark-circle" size={14} color="#FFF" />
-                  <Text style={styles.featureText}>Track your order</Text>
-                </View>
-                <View style={styles.featureItem}>
-                  <Ionicons name="checkmark-circle" size={14} color="#FFF" />
-                  <Text style={styles.featureText}>Multiple restaurants</Text>
-                </View>
-              </View>
-              <View style={styles.arrowButton}>
-                <Ionicons name="arrow-forward" size={20} color="#FFF" />
+              <View style={styles.cardContent}>
+                <Ionicons name="fast-food" size={48} color="#FFF" />
+                <Text style={styles.serviceTitle}>Food Delivery</Text>
               </View>
             </LinearGradient>
           </TouchableOpacity>
@@ -84,29 +64,9 @@ export default function ServiceSelectionScreen() {
               end={{ x: 1, y: 1 }}
               style={styles.gradientCard}
             >
-              <View style={styles.iconContainer}>
-                <Ionicons name="bicycle" size={40} color="#FFF" />
-              </View>
-              <Text style={styles.serviceTitle}>Moto-Taxi Ride</Text>
-              <Text style={styles.serviceDescription}>
-                Fast and affordable motorcycle rides
-              </Text>
-              <View style={styles.serviceFeatures}>
-                <View style={styles.featureItem}>
-                  <Ionicons name="checkmark-circle" size={14} color="#FFF" />
-                  <Text style={styles.featureText}>₱30 base fare</Text>
-                </View>
-                <View style={styles.featureItem}>
-                  <Ionicons name="checkmark-circle" size={14} color="#FFF" />
-                  <Text style={styles.featureText}>Live tracking</Text>
-                </View>
-                <View style={styles.featureItem}>
-                  <Ionicons name="checkmark-circle" size={14} color="#FFF" />
-                  <Text style={styles.featureText}>Schedule rides</Text>
-                </View>
-              </View>
-              <View style={styles.arrowButton}>
-                <Ionicons name="arrow-forward" size={20} color="#FFF" />
+              <View style={styles.cardContent}>
+                <Ionicons name="bicycle" size={48} color="#FFF" />
+                <Text style={styles.serviceTitle}>Moto-Taxi Ride</Text>
               </View>
             </LinearGradient>
           </TouchableOpacity>
