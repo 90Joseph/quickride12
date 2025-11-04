@@ -30,6 +30,8 @@ export default function LiveOrderTrackingScreen() {
   const params = useLocalSearchParams();
   const orderId = params.orderId as string;
   const mapRef = useRef<any>(null);
+  const mapInstanceRef = useRef<any>(null); // Track if map is already initialized
+  const initializedOrderIdRef = useRef<string | null>(null); // Track initialized order ID
 
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
