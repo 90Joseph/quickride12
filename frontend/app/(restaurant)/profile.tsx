@@ -69,12 +69,160 @@ export default function RestaurantProfileScreen() {
         setFormOperatingHours(data.operating_hours || '9:00 AM - 10:00 PM');
         setFormAddress(data.location?.address || '');
         setFormImage(data.image_base64 || null);
+        
+        // Set initial location
+        if (data.location) {
+          setTempLatitude(data.location.latitude || 14.5995);
+          setTempLongitude(data.location.longitude || 120.9842);
+        }
       }
     } catch (error) {
       console.error('Error fetching restaurant:', error);
     } finally {
       setLoading(false);
     }
+  };
+
+  // Load Google Maps and initialize
+  const loadMap = () => {
+    if (typeof window === 'undefined' || !Platform.OS === 'web') return;
+
+    const apiKey = process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY || 'AIzaSyDJqsXxZXuu808lFZXARvy4rd0xktuqwJQ';
+
+    if ((window as any).google && (window as any).google.maps) {
+      setTimeout(() => initializeMap(), 100);
+      return;
+    }
+
+    const existingScript = document.querySelector('script[src*="maps.googleapis.com"]');
+    if (existingScript) {
+      const checkInterval = setInterval(() => {
+        if ((window as any).google && (window as any).google.maps) {
+          clearInterval(checkInterval);
+          initializeMap();
+        }
+      }, 100);
+      return;
+    }
+
+    const script = document.createElement('script');
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places`;
+    script.async = true;
+    script.defer = true;
+    script.onload = () => {
+      setTimeout(() => {
+        if ((window as any).google && (window as any).google.maps) {
+          initializeMap();
+        }
+      }, 200);
+    };
+    document.head.appendChild(script);
+  };
+
+  // Initialize map with marker
+  const initializeMap = () => {
+    const google = (window as any).google;
+    if (!google || !mapRef.current) return;
+
+    const location = { lat: tempLatitude, lng: tempLongitude };
+
+    const map = new google.maps.Map(mapRef.current, {
+      center: location,
+      zoom: 16,
+      disableDefaultUI: false,
+      zoomControl: true,
+      mapTypeControl: false,
+      streetViewControl: false,
+    });
+
+    // Add draggable marker
+    const marker = new google.maps.Marker({
+      position: location,
+      map,
+      draggable: true,
+      icon: {
+        path: google.maps.SymbolPath.CIRCLE,
+        scale: 20,
+        fillColor: '#FF6B6B',
+        fillOpacity: 1,
+        strokeColor: '#FFF',
+        strokeWeight: 5,
+      },
+      title: 'Drag to set restaurant location',
+    });
+
+    // Update coordinates when marker is dragged
+    marker.addListener('dragend', (event: any) => {
+      const lat = event.latLng.lat();
+      const lng = event.latLng.lng();
+      setTempLatitude(lat);
+      setTempLongitude(lng);
+      
+      // Reverse geocode to get address
+      reverseGeocode(lat, lng);
+    });
+
+    // Pulsing circle
+    const pulsingCircle = new google.maps.Circle({
+      map: map,
+      center: location,
+      radius: 50,
+      fillColor: '#FF6B6B',
+      fillOpacity: 0.15,
+      strokeColor: '#FF6B6B',
+      strokeOpacity: 0.5,
+      strokeWeight: 2,
+    });
+
+    // Animate pulsing
+    let growing = true;
+    let radius = 50;
+    setInterval(() => {
+      if (growing) {
+        radius += 3;
+        if (radius >= 100) growing = false;
+      } else {
+        radius -= 3;
+        if (radius <= 50) growing = true;
+      }
+      pulsingCircle.setRadius(radius);
+    }, 100);
+
+    setMapLoaded(true);
+  };
+
+  // Reverse geocode to get address
+  const reverseGeocode = async (lat: number, lng: number) => {
+    if (Platform.OS === 'web' && (window as any).google) {
+      const google = (window as any).google;
+      const geocoder = new google.maps.Geocoder();
+      
+      geocoder.geocode({ location: { lat, lng } }, (results: any, status: any) => {
+        if (status === 'OK' && results[0]) {
+          setFormAddress(results[0].formatted_address);
+        }
+      });
+    }
+  };
+
+  // Open location modal
+  const openLocationModal = () => {
+    if (restaurant?.location) {
+      setTempLatitude(restaurant.location.latitude);
+      setTempLongitude(restaurant.location.longitude);
+    }
+    setShowLocationModal(true);
+    setMapLoaded(false);
+    setTimeout(() => loadMap(), 300);
+  };
+
+  // Confirm location selection
+  const confirmLocation = () => {
+    // Update form with new location
+    if (Platform.OS === 'web') {
+      window.alert(`Location updated to: ${tempLatitude.toFixed(6)}, ${tempLongitude.toFixed(6)}`);
+    }
+    setShowLocationModal(false);
   };
 
   const pickImage = async () => {
