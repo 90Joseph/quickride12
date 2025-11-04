@@ -55,12 +55,12 @@ export default function LiveOrderTrackingScreen() {
     }
   }, [orderId]);
 
-  // Initialize map only once when order is loaded, NOT when rider location updates
+  // Initialize map once when order is loaded (rider location is optional)
   useEffect(() => {
-    if (order && riderLocation && Platform.OS === 'web') {
+    if (order && Platform.OS === 'web') {
       // Only initialize map if it hasn't been initialized yet or order changed
       if (!mapInstanceRef.current || initializedOrderIdRef.current !== order.id) {
-        console.log('🗺️ Initializing map for order:', order.id);
+        console.log('🗺️ Initializing map for order:', order.id, 'Rider location:', riderLocation ? 'available' : 'not yet available');
         initializedOrderIdRef.current = order.id;
         loadMap();
       } else {
