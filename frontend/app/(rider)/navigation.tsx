@@ -441,44 +441,16 @@ export default function RiderNavigationScreen() {
       }
     }
 
-    // Draw route
+    // Draw route using Routes API (new)
     if (pickupLocation || dropoffLocation) {
-      const directionsService = new google.maps.DirectionsService();
-      const directionsRenderer = new google.maps.DirectionsRenderer({
-        map: map,
-        suppressMarkers: true,
-        polylineOptions: {
-          strokeColor: '#2196F3',
-          strokeWeight: 4,
-        },
-      });
-
       const origin = userPosition; // Use userPosition with proper lat/lng
       const destination = currentJob.data.status === 'picked_up' || currentJob.data.status === 'out_for_delivery'
         ? dropoffLocation
         : pickupLocation;
 
       if (destination) {
-        console.log('🗺️ Getting directions from', origin, 'to', destination);
-        directionsService.route(
-          {
-            origin: origin,
-            destination: destination,
-            travelMode: google.maps.TravelMode.DRIVING,
-          },
-          (result: any, status: any) => {
-            if (status === 'OK') {
-              directionsRenderer.setDirections(result);
-              // Extract distance and ETA
-              const leg = result.routes[0].legs[0];
-              setDistanceToDestination(leg.distance.text);
-              setEtaToDestination(leg.duration.text);
-              console.log('✅ Directions loaded:', leg.distance.text, leg.duration.text);
-            } else {
-              console.error('❌ Directions request failed:', status);
-            }
-          }
-        );
+        console.log('🗺️ Getting route from', origin, 'to', destination);
+        fetchRouteFromRoutesAPI(origin, destination, map);
       }
     }
 
