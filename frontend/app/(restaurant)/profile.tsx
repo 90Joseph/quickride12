@@ -51,6 +51,11 @@ export default function RestaurantProfileScreen() {
   const [tempLatitude, setTempLatitude] = useState(14.5995);
   const [tempLongitude, setTempLongitude] = useState(120.9842);
   const mapRef = useRef<any>(null);
+  
+  // Search state
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [searching, setSearching] = useState(false);
 
   useEffect(() => {
     fetchRestaurant();
