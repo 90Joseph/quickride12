@@ -321,13 +321,9 @@ metadata:
 test_plan:
   current_focus:
     - "Map Verification Modal in Checkout"
-    - "Add /rider/current-order endpoint"
-    - "Add /orders/{order_id}/rider-location endpoint"
-    - "Rider Navigation Screen with Live Directions"
     - "Customer Live Order Tracking"
     - "Periodic Location Updates from Rider"
-  stuck_tasks:
-    - "Rider Navigation Screen with Live Directions"
+  stuck_tasks: []
   test_all: false
   test_priority: "high_first"
 
