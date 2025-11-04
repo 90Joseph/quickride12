@@ -395,19 +395,17 @@ export default function RiderNavigationScreen() {
         if (lat !== null && lng !== null) {
           dropoffLocation = { lat, lng };
           
-          // Customer marker (dropoff)
+          // Customer marker (dropoff) - Home/Person icon
           new google.maps.Marker({
             position: dropoffLocation,
             map,
             icon: {
-              path: google.maps.SymbolPath.CIRCLE,
-              scale: 10,
-              fillColor: '#FF6B6B',
-              fillOpacity: 1,
-              strokeColor: '#FFF',
-              strokeWeight: 2,
+              url: createIconUrl('🏠', '#4CAF50'),
+              scaledSize: new google.maps.Size(48, 48),
+              anchor: new google.maps.Point(24, 24),
             },
             title: 'Dropoff: ' + currentJob.data.customer_name,
+            zIndex: 800,
           });
         } else {
           console.warn('Invalid delivery coordinates:', deliveryLocation);
