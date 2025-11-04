@@ -283,7 +283,8 @@ test_plan:
     - "Rider Navigation Screen with Live Directions"
     - "Customer Live Order Tracking"
     - "Periodic Location Updates from Rider"
-  stuck_tasks: []
+  stuck_tasks:
+    - "Rider Navigation Screen with Live Directions"
   test_all: false
   test_priority: "high_first"
 
@@ -420,3 +421,36 @@ agent_communication:
       - Confirm no React errors in console
       - Test "Edit Location" button functionality
       - Test "Confirm & Place Order" button after verification
+
+  - agent: "testing"
+    message: |
+      ❌ CRITICAL ISSUE FOUND: Rider Navigation Screen Authentication Failure
+      
+      PROBLEM:
+      - Cannot test rider navigation map functionality due to authentication blocking access
+      - App redirects to login page even with valid session token
+      - Frontend auth store not properly initialized with localStorage session token
+      
+      TESTING ATTEMPTED:
+      - Created test rider account and active food order
+      - Verified backend APIs work correctly with Bearer token authentication
+      - Confirmed Google Maps API can load when script is injected
+      - Multiple attempts to bypass authentication failed
+      
+      ROOT CAUSE:
+      - Auth store (/app/frontend/store/authStore.ts) starts empty on page load
+      - _layout.tsx redirects to login when no user in store
+      - Session token exists in localStorage but not loaded into auth store
+      - setAuthToken() not called during app initialization
+      
+      IMPACT ON MAP TESTING:
+      - Cannot verify if map appears after performance fix
+      - Cannot test route polylines, markers, distance, or ETA display
+      - Cannot confirm if map refresh issue is resolved
+      - All rider navigation features are inaccessible
+      
+      RECOMMENDATION:
+      - HIGH PRIORITY: Fix frontend authentication initialization
+      - Load session token from localStorage into auth store on app startup
+      - Ensure axios auth headers are set when session token exists
+      - After auth fix, re-test rider navigation map functionality
