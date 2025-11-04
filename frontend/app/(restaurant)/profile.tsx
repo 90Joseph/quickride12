@@ -667,6 +667,59 @@ export default function RestaurantProfileScreen() {
             📍 Drag the marker to your restaurant's exact location
           </Text>
 
+          {/* Search Bar */}
+          <View style={styles.searchContainer}>
+            <View style={styles.searchInputWrapper}>
+              <Ionicons name="search" size={20} color="#999" style={styles.searchIcon} />
+              <TextInput
+                style={styles.searchInput}
+                placeholder="Search for a place..."
+                value={searchQuery}
+                onChangeText={(text) => {
+                  setSearchQuery(text);
+                  searchLocation(text);
+                }}
+                placeholderTextColor="#999"
+              />
+              {searchQuery.length > 0 && (
+                <TouchableOpacity onPress={() => {
+                  setSearchQuery('');
+                  setSearchResults([]);
+                }}>
+                  <Ionicons name="close-circle" size={20} color="#999" />
+                </TouchableOpacity>
+              )}
+            </View>
+
+            {/* Search Results Dropdown */}
+            {searchResults.length > 0 && (
+              <View style={styles.searchResultsDropdown}>
+                {searchResults.map((place, index) => (
+                  <TouchableOpacity
+                    key={index}
+                    style={styles.searchResultItem}
+                    onPress={() => selectSearchResult(place)}
+                  >
+                    <Ionicons name="location" size={20} color="#FF6B6B" />
+                    <View style={styles.searchResultTextContainer}>
+                      <Text style={styles.searchResultName}>{place.name}</Text>
+                      <Text style={styles.searchResultAddress} numberOfLines={1}>
+                        {place.formatted_address}
+                      </Text>
+                    </View>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            )}
+
+            {searching && (
+              <View style={styles.searchingIndicator}>
+                <ActivityIndicator size="small" color="#FF6B6B" />
+                <Text style={styles.searchingText}>Searching...</Text>
+              </View>
+            )}
+          </View>
+
           {/* Map Container */}
           {Platform.OS === 'web' ? (
             <View style={styles.mapContainer}>
