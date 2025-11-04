@@ -262,8 +262,9 @@ export default function RestaurantProfileScreen() {
         operating_hours: formOperatingHours,
         image_base64: formImage,
         location: {
-          ...restaurant.location,
           address: formAddress,
+          latitude: tempLatitude,
+          longitude: tempLongitude,
         },
       };
 
