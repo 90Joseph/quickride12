@@ -371,20 +371,18 @@ export default function RiderNavigationScreen() {
         if (lat !== null && lng !== null) {
           pickupLocation = { lat, lng };
           
-          // Restaurant marker (pickup)
+          // Restaurant marker (pickup) - Restaurant/Store icon
           new google.maps.Marker({
             position: pickupLocation,
             map,
             icon: {
-              path: google.maps.SymbolPath.CIRCLE,
-              scale: 10,
-            fillColor: '#4CAF50',
-            fillOpacity: 1,
-            strokeColor: '#FFF',
-            strokeWeight: 2,
-          },
-          title: 'Pickup: ' + currentJob.data.restaurant_name,
-        });
+              url: createIconUrl('🏪', '#FF6B6B'),
+              scaledSize: new google.maps.Size(48, 48),
+              anchor: new google.maps.Point(24, 24),
+            },
+            title: 'Pickup: ' + currentJob.data.restaurant_name,
+            zIndex: 900,
+          });
         } else {
           console.warn('Invalid restaurant coordinates:', restaurantLocation);
         }
