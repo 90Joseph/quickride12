@@ -55,11 +55,21 @@ export default function LiveOrderTrackingScreen() {
     }
   }, [orderId]);
 
+  // Initialize map only once when order is loaded, NOT when rider location updates
   useEffect(() => {
     if (order && riderLocation && Platform.OS === 'web') {
-      loadMap();
+      // Only initialize map if it hasn't been initialized yet or order changed
+      if (!mapInstanceRef.current || initializedOrderIdRef.current !== order.id) {
+        console.log('🗺️ Initializing map for order:', order.id);
+        initializedOrderIdRef.current = order.id;
+        loadMap();
+      } else {
+        console.log('⏭️ Skipping map re-initialization for order:', order.id);
+        // Update markers without re-initializing map
+        updateMapMarkers();
+      }
     }
-  }, [order, riderLocation]);
+  }, [order?.id, riderLocation]);
 
   const fetchOrder = async () => {
     try {
