@@ -479,12 +479,22 @@ export default function RiderNavigationScreen() {
     }
 
     // Fit bounds to show all markers
-    const bounds = new google.maps.LatLngBounds();
-    bounds.extend(userLocation);
-    if (pickupLocation) bounds.extend(pickupLocation);
-    if (dropoffLocation) bounds.extend(dropoffLocation);
-    map.fitBounds(bounds);
-  };
+    try {
+      const bounds = new google.maps.LatLngBounds();
+      bounds.extend(userPosition); // Use userPosition instead of userLocation
+      if (pickupLocation) bounds.extend(pickupLocation);
+      if (dropoffLocation) bounds.extend(dropoffLocation);
+      map.fitBounds(bounds);
+      console.log('✅ Map bounds fitted successfully');
+    } catch (error) {
+      console.error('❌ Error fitting map bounds:', error);
+    }
+  } catch (error) {
+    console.error('❌ Error initializing map:', error);
+    setMapError('Failed to initialize map: ' + error.message);
+    setMapLoaded(false);
+  }
+};
 
   const handleStatusUpdate = async (newStatus: string) => {
     if (!currentJob) return;
