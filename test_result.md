@@ -259,11 +259,11 @@ frontend:
 
   - task: "Customer Live Order Tracking"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/frontend/app/live-order-tracking.tsx"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
@@ -277,6 +277,49 @@ frontend:
           - Animated rider marker with directional arrow
           - Auto-zoom to show both customer and rider on map
           - Order status with color-coded badges
+      - working: true
+        agent: "testing"
+        comment: |
+          ✅ MAP RE-INITIALIZATION FIX SUCCESSFULLY VERIFIED - PERFORMANCE ISSUE RESOLVED
+          
+          OBJECTIVE COMPLETED: Tested customer live order tracking map to verify it loads correctly and doesn't continuously refresh
+          
+          TESTING RESULTS:
+          ✅ Successfully accessed live-order-tracking page with proper authentication
+          ✅ Order details loaded correctly (Track Order header, restaurant name, rider info)
+          ✅ Google Maps API loaded successfully with customer location marker (🏠)
+          ✅ Distance and ETA displayed correctly ("1 m • ETA: 1 min")
+          ✅ Order status showing "On the Way" with proper color coding
+          
+          MAP RE-INITIALIZATION TEST RESULTS (20-second monitoring):
+          ✅ Map initialized successfully: 1 time ONLY (at page load)
+          ✅ Skip re-initialization messages: 7 times (every 3 seconds as expected)
+          ✅ NO continuous map refresh detected
+          ✅ "🗺️ Initializing map for order" appeared ONLY ONCE
+          ✅ "⏭️ Skipping map re-initialization" appeared 7 times during monitoring
+          ✅ "🔄 Updating map markers" appeared 7 times (location updates without map refresh)
+          
+          PERFORMANCE FIX VERIFICATION:
+          ✅ Map does NOT re-initialize every 3 seconds when rider location updates
+          ✅ mapInstanceRef and initializedOrderIdRef refs are working correctly
+          ✅ Map initializes once per order, not on every rider location update
+          ✅ Rider location updates every 3 seconds but map stays stable
+          
+          CONSOLE LOG EVIDENCE:
+          - Map initialization: "🗺️ Initializing map for order: order-1762244203" (1 time only)
+          - Skip messages: "⏭️ Skipping map re-initialization for order: order-1762244203" (7 times)
+          - Location updates: "🔄 Updating map markers with new rider location" (7 times)
+          - Google Maps loaded: "✅ Map initialized successfully"
+          
+          MINOR ISSUE (Non-blocking):
+          - React Native console warnings about "Unexpected text node" (cosmetic, doesn't affect functionality)
+          
+          CONCLUSION: 
+          ✅ Customer live order tracking map re-initialization performance issue has been SUCCESSFULLY RESOLVED
+          ✅ Ref-based solution prevents continuous map refresh as intended
+          ✅ Map loads once and stays stable while rider location updates every 3 seconds
+          ✅ All core functionality working: authentication, order display, map rendering, distance/ETA calculation
+          ✅ Performance fix is working perfectly - map only initializes once per order
 
   - task: "Map Verification Modal in Checkout"
     implemented: true
