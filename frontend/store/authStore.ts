@@ -79,6 +79,11 @@ export const useAuthStore = create<AuthStore>((set) => ({
           sessionToken: storedToken,
           user: JSON.parse(storedUser),
         });
+        
+        // Immediately set the auth token in API headers
+        const { setAuthToken } = require('../utils/api');
+        setAuthToken(storedToken);
+        console.log('✅ Auth token set in API headers during initialization');
       }
     } catch (error) {
       console.error('Error initializing auth:', error);
