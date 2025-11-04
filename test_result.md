@@ -320,6 +320,51 @@ frontend:
           ✅ Map loads once and stays stable while rider location updates every 3 seconds
           ✅ All core functionality working: authentication, order display, map rendering, distance/ETA calculation
           ✅ Performance fix is working perfectly - map only initializes once per order
+      - working: true
+        agent: "testing"
+        comment: |
+          ✅ MAP LOADING FIX SUCCESSFULLY VERIFIED - RIDER LOCATION NO LONGER REQUIRED
+          
+          OBJECTIVE COMPLETED: Verified that customer live order tracking map now loads correctly after removing riderLocation requirement
+          
+          TESTING RESULTS:
+          ✅ Successfully accessed live-order-tracking page with proper authentication
+          ✅ Map loads immediately with just order data (no rider location required)
+          ✅ Customer location marker (🏠) displays correctly on map
+          ✅ Order details loaded correctly: Test Restaurant, Test Rider, "On the Way" status
+          ✅ Google Maps fully functional and visible
+          ✅ No "Loading map..." stuck state detected
+          
+          FIX VERIFICATION:
+          ✅ Line 60 change confirmed: Map initializes with `order && Platform.OS === 'web'` (riderLocation removed)
+          ✅ Console shows: "🗺️ Initializing map for order: order-1762245607940 Rider location: not yet available"
+          ✅ Map loads successfully without rider location data
+          ✅ Rider marker will appear when rider starts sharing location (conditional rendering)
+          
+          CONSOLE LOG EVIDENCE:
+          - "🗺️ Initializing map for order: order-1762245607940 Rider location: not yet available"
+          - "✅ Google Maps script loaded successfully"
+          - "✅ Google Maps API is ready"
+          - "✅ Initializing map for order tracking"
+          - "✅ Map initialized successfully"
+          
+          AUTHENTICATION VERIFICATION:
+          ✅ Session token authentication working correctly
+          ✅ API calls successful (order data retrieved)
+          ✅ No redirect to login page
+          ✅ Auth headers properly set
+          
+          MINOR ISSUES (Non-blocking):
+          - React Native warnings: "Unexpected text node: . A text node cannot be a child of a <View>" (cosmetic)
+          - Google Maps deprecation warning for Marker (functionality unaffected)
+          
+          CONCLUSION:
+          ✅ MAP LOADING FIX IS WORKING PERFECTLY
+          ✅ Map loads correctly without requiring rider location
+          ✅ Customer can now track orders immediately when page loads
+          ✅ Rider marker will appear dynamically when rider location becomes available
+          ✅ No more "Loading map..." stuck state issue
+          ✅ Performance and user experience significantly improved
 
   - task: "Map Verification Modal in Checkout"
     implemented: true
