@@ -56,30 +56,30 @@ export const useAuthStore = create<AuthStore>((set) => ({
   setUser: (user) => {
     set({ user });
     if (user) {
-      AsyncStorage.setItem('user', JSON.stringify(user));
+      storage.setItem('user', JSON.stringify(user));
     } else {
-      AsyncStorage.removeItem('user');
+      storage.removeItem('user');
     }
   },
   setSessionToken: (token) => {
     set({ sessionToken: token });
     if (token) {
-      AsyncStorage.setItem('sessionToken', token);
+      storage.setItem('sessionToken', token);
     } else {
-      AsyncStorage.removeItem('sessionToken');
+      storage.removeItem('sessionToken');
     }
   },
   setLoading: (loading) => set({ isLoading: loading }),
   logout: () => {
     set({ user: null, sessionToken: null });
-    AsyncStorage.removeItem('user');
-    AsyncStorage.removeItem('sessionToken');
+    storage.removeItem('user');
+    storage.removeItem('sessionToken');
   },
   initializeAuth: async () => {
     try {
       const [storedToken, storedUser] = await Promise.all([
-        AsyncStorage.getItem('sessionToken'),
-        AsyncStorage.getItem('user'),
+        storage.getItem('sessionToken'),
+        storage.getItem('user'),
       ]);
 
       if (storedToken && storedUser) {
