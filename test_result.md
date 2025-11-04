@@ -364,7 +364,6 @@ metadata:
 test_plan:
   current_focus:
     - "Map Verification Modal in Checkout"
-    - "Customer Live Order Tracking"
     - "Periodic Location Updates from Rider"
   stuck_tasks: []
   test_all: false
@@ -617,3 +616,40 @@ agent_communication:
       ✅ All map functionality preserved with enhanced visual markers
       
       MINOR NOTE: Full icon visibility testing requires active job assignment, but implementation is verified and functional.
+
+  - agent: "testing"
+    message: |
+      ✅ CUSTOMER LIVE ORDER TRACKING MAP RE-INITIALIZATION FIX VERIFIED - PERFORMANCE ISSUE RESOLVED
+      
+      OBJECTIVE COMPLETED: Tested customer live order tracking map to verify it loads correctly and doesn't continuously refresh
+      
+      KEY FINDINGS:
+      🗺️ MAP RE-INITIALIZATION ANALYSIS:
+      - ✅ Map initialized ONLY ONCE during page load (expected behavior)
+      - ✅ "⏭️ Skipping map re-initialization" appeared 7 times during 20-second monitoring
+      - ✅ "🔄 Updating map markers" appeared 7 times (location updates without map refresh)
+      - ✅ NO continuous map refresh detected - performance fix is WORKING PERFECTLY
+      - ✅ mapInstanceRef and initializedOrderIdRef refs prevent unnecessary re-initialization
+      
+      📱 FUNCTIONALITY VERIFICATION:
+      - ✅ Successfully accessed live-order-tracking page with proper authentication
+      - ✅ Order details loaded correctly (Track Order header, restaurant name, rider info)
+      - ✅ Google Maps API loaded successfully with customer location marker (🏠)
+      - ✅ Distance and ETA displayed correctly ("1 m • ETA: 1 min")
+      - ✅ Order status showing "On the Way" with proper color coding
+      - ✅ Real-time rider location updates every 3 seconds without map refresh
+      
+      📊 CONSOLE LOG EVIDENCE (20-second monitoring):
+      - Map initialization: "🗺️ Initializing map for order" (1 time only at page load)
+      - Skip messages: "⏭️ Skipping map re-initialization" (7 times every 3 seconds)
+      - Location updates: "🔄 Updating map markers with new rider location" (7 times)
+      - Google Maps loaded: "✅ Map initialized successfully"
+      
+      🎯 CONCLUSION:
+      - ✅ Customer live order tracking map performance fix is FULLY SUCCESSFUL
+      - ✅ Map does NOT continuously refresh every 3 seconds as intended
+      - ✅ Rider location updates every 3 seconds but map stays stable
+      - ✅ All core functionality working: authentication, order display, map rendering, distance/ETA
+      - ✅ Performance issue completely eliminated by using refs to prevent re-initialization
+      
+      MINOR ISSUE: React Native console warnings about "Unexpected text node" (cosmetic, doesn't affect functionality)
