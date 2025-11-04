@@ -342,6 +342,39 @@ frontend:
           - Ensured div element is wrapped inside View component to prevent "unexpected text node" error
           - Applied same fix to both map picker modal and verification modal
           - Properly handling web-only Google Maps div element within React Native component hierarchy
+      - working: false
+        agent: "testing"
+        comment: |
+          ❌ CRITICAL ISSUE DIAGNOSED: Customer Live Order Tracking Map Stuck on "Loading map..."
+          
+          ROOT CAUSE IDENTIFIED:
+          - Authentication failure preventing API data access
+          - 401 errors on /api/orders/{orderId} and /api/orders/{orderId}/rider-location
+          - Map initialization logic requires both order data AND rider location data
+          - Without successful API calls, map loading conditions are never met
+          
+          CONSOLE ERRORS FOUND:
+          - "Failed to load resource: 401" on /api/orders/test-order-123
+          - "Error fetching order: AxiosError" 
+          - "Failed to load resource: 401" on /api/orders/test-order-123/rider-location
+          - "Error fetching rider location: AxiosError"
+          
+          TECHNICAL ANALYSIS:
+          - useEffect hook on line 59-72 in live-order-tracking.tsx depends on order && riderLocation
+          - Map only initializes when both conditions are met: order data + rider location
+          - Authentication redirects prevent access to live tracking page
+          - API failures cause infinite "Loading map..." state
+          
+          IMPACT:
+          - Customers cannot track their orders in real-time
+          - Map never loads due to missing prerequisite data
+          - Poor user experience with stuck loading state
+          
+          REQUIRED FIXES:
+          1. Fix authentication flow for live order tracking access
+          2. Add proper error handling for API failures
+          3. Show meaningful error messages instead of infinite loading
+          4. Consider fallback behavior when order/rider data unavailable
 
   - task: "Periodic Location Updates from Rider"
     implemented: true
@@ -365,7 +398,8 @@ test_plan:
   current_focus:
     - "Map Verification Modal in Checkout"
     - "Periodic Location Updates from Rider"
-  stuck_tasks: []
+  stuck_tasks:
+    - "Map Verification Modal in Checkout"
   test_all: false
   test_priority: "high_first"
 
@@ -656,37 +690,43 @@ agent_communication:
 
   - agent: "testing"
     message: |
-      ✅ CUSTOMER LIVE ORDER TRACKING MAP RE-INITIALIZATION FIX VERIFIED - PERFORMANCE ISSUE RESOLVED
+      ❌ CRITICAL ISSUE DIAGNOSED: Live Order Tracking Map Stuck on "Loading map..."
       
-      OBJECTIVE COMPLETED: Tested customer live order tracking map to verify it loads correctly and doesn't continuously refresh
+      CUSTOMER REPORTED ISSUE CONFIRMED: Map is stuck on "Loading map..." message
       
-      KEY FINDINGS:
-      🗺️ MAP RE-INITIALIZATION ANALYSIS:
-      - ✅ Map initialized ONLY ONCE during page load (expected behavior)
-      - ✅ "⏭️ Skipping map re-initialization" appeared 7 times during 20-second monitoring
-      - ✅ "🔄 Updating map markers" appeared 7 times (location updates without map refresh)
-      - ✅ NO continuous map refresh detected - performance fix is WORKING PERFECTLY
-      - ✅ mapInstanceRef and initializedOrderIdRef refs prevent unnecessary re-initialization
+      ROOT CAUSE ANALYSIS:
+      🔍 AUTHENTICATION FAILURE BLOCKING MAP ACCESS:
+      - Users redirected to login page when accessing /live-order-tracking
+      - 401 authentication errors prevent API data retrieval
+      - Map initialization depends on successful order and rider location API calls
       
-      📱 FUNCTIONALITY VERIFICATION:
-      - ✅ Successfully accessed live-order-tracking page with proper authentication
-      - ✅ Order details loaded correctly (Track Order header, restaurant name, rider info)
-      - ✅ Google Maps API loaded successfully with customer location marker (🏠)
-      - ✅ Distance and ETA displayed correctly ("1 m • ETA: 1 min")
-      - ✅ Order status showing "On the Way" with proper color coding
-      - ✅ Real-time rider location updates every 3 seconds without map refresh
+      📊 CONSOLE ERRORS IDENTIFIED:
+      - "Failed to load resource: 401" on /api/orders/{orderId}
+      - "Error fetching order: AxiosError"
+      - "Failed to load resource: 401" on /api/orders/{orderId}/rider-location  
+      - "Error fetching rider location: AxiosError"
       
-      📊 CONSOLE LOG EVIDENCE (20-second monitoring):
-      - Map initialization: "🗺️ Initializing map for order" (1 time only at page load)
-      - Skip messages: "⏭️ Skipping map re-initialization" (7 times every 3 seconds)
-      - Location updates: "🔄 Updating map markers with new rider location" (7 times)
-      - Google Maps loaded: "✅ Map initialized successfully"
+      🗺️ MAP LOADING LOGIC ANALYSIS:
+      - useEffect hook (lines 59-72) requires both `order` AND `riderLocation` data
+      - Map only initializes when: order && riderLocation && Platform.OS === 'web'
+      - Without successful API calls, these conditions are never met
+      - Page remains stuck in "Loading map..." state indefinitely
       
-      🎯 CONCLUSION:
-      - ✅ Customer live order tracking map performance fix is FULLY SUCCESSFUL
-      - ✅ Map does NOT continuously refresh every 3 seconds as intended
-      - ✅ Rider location updates every 3 seconds but map stays stable
-      - ✅ All core functionality working: authentication, order display, map rendering, distance/ETA
-      - ✅ Performance issue completely eliminated by using refs to prevent re-initialization
+      💥 IMPACT ON USER EXPERIENCE:
+      - Customers cannot track their orders in real-time
+      - Infinite loading state with no error feedback
+      - No fallback or error handling for authentication failures
+      - Poor UX - users don't know why map won't load
       
-      MINOR ISSUE: React Native console warnings about "Unexpected text node" (cosmetic, doesn't affect functionality)
+      🔧 REQUIRED FIXES (HIGH PRIORITY):
+      1. **Fix Authentication Flow**: Ensure authenticated users can access live tracking
+      2. **Add Error Handling**: Show meaningful error messages for API failures
+      3. **Improve UX**: Add retry buttons and fallback states
+      4. **Add Loading States**: Distinguish between "loading order" vs "loading map"
+      5. **Authentication Check**: Verify user permissions before showing tracking page
+      
+      🎯 RECOMMENDATION:
+      - This is a CRITICAL authentication and error handling issue
+      - Map functionality is working correctly when data is available
+      - Primary focus should be on fixing the authentication flow
+      - Secondary focus on improving error handling and user feedback
