@@ -324,19 +324,28 @@ export default function RiderNavigationScreen() {
     setMapLoaded(true);
     console.log('✅ Map initialized successfully');
 
-    // Current location marker (rider)
+    // Create custom SVG icons for better visibility
+    const createIconUrl = (icon: string, color: string) => {
+      const svg = `
+        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48">
+          <circle cx="24" cy="24" r="20" fill="${color}" stroke="white" stroke-width="3"/>
+          <text x="24" y="30" font-size="20" text-anchor="middle" fill="white">${icon}</text>
+        </svg>
+      `;
+      return 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(svg);
+    };
+
+    // Current location marker (rider) - Motorcycle icon
     new google.maps.Marker({
       position: userPosition,
       map,
       icon: {
-        path: google.maps.SymbolPath.CIRCLE,
-        scale: 12,
-        fillColor: '#2196F3',
-        fillOpacity: 1,
-        strokeColor: '#FFF',
-        strokeWeight: 3,
+        url: createIconUrl('🏍️', '#2196F3'),
+        scaledSize: new google.maps.Size(48, 48),
+        anchor: new google.maps.Point(24, 24),
       },
-      title: 'Your Location',
+      title: 'Your Location (Rider)',
+      zIndex: 1000,
     });
 
     let pickupLocation, dropoffLocation;
