@@ -259,9 +259,9 @@ frontend:
 
   - task: "Customer Live Order Tracking"
     implemented: true
-    working: true
+    working: false
     file: "/app/frontend/app/live-order-tracking.tsx"
-    stuck_count: 0
+    stuck_count: 1
     priority: "high"
     needs_retesting: false
     status_history:
@@ -416,6 +416,74 @@ frontend:
           ✅ Implementation follows best practices with proper error handling
           ✅ Route will display correctly when authentication and data conditions are met
           ✅ Ready for production use with live rider tracking data
+      - working: false
+        agent: "testing"
+        comment: |
+          ❌ CRITICAL ISSUE DIAGNOSED: Route Line Not Displaying Due to Authentication Failures
+          
+          OBJECTIVE COMPLETED: Comprehensive diagnostic testing of route line functionality on customer's live order tracking map
+          
+          ROOT CAUSE IDENTIFIED:
+          ❌ Authentication failures preventing access to required data
+          ❌ 401 errors on /api/orders/{orderId} and /api/orders/{orderId}/rider-location
+          ❌ Without order and rider location data, route drawing code never executes
+          ❌ Map loads but route line cannot be drawn without prerequisite data
+          
+          DIAGNOSTIC RESULTS (All 4 Objectives Tested):
+          
+          1. ROUTE DRAWING CODE EXECUTION: ❌ NOT EXECUTING
+             - "🗺️ Fetching route from rider to customer..." messages: 0 found
+             - Route drawing code requires both order and riderLocation data
+             - Code is correctly implemented but conditions never met
+          
+          2. ROUTES API CALLS: ❌ NO API CALLS MADE
+             - POST requests to routes.googleapis.com: 0 found
+             - No network requests to Routes API detected
+             - API calls only made when route drawing code executes
+          
+          3. GEOMETRY LIBRARY: ✅ LOADED CORRECTLY
+             - Google Maps script loads with geometry library
+             - Library available when needed for polyline decoding
+          
+          4. JAVASCRIPT ERRORS: ✅ NO BLOCKING ERRORS
+             - No JavaScript errors preventing route functionality
+             - Only minor React Native warnings (cosmetic)
+          
+          CONSOLE ERROR EVIDENCE:
+          - "Failed to load resource: 401" on /api/orders/test-order-123
+          - "Error fetching order: AxiosError"
+          - "Failed to load resource: 401" on /api/orders/test-order-123/rider-location
+          - "Error fetching rider location: AxiosError"
+          
+          TECHNICAL ANALYSIS:
+          - Route drawing logic in drawRoute() function (lines 302-379) is correctly implemented
+          - Function only executes when riderLocation is available (line 281)
+          - riderLocation is only set when API call succeeds (line 89)
+          - API calls fail due to 401 authentication errors
+          - Without riderLocation, route drawing never triggers
+          
+          AUTHENTICATION BARRIER:
+          - Live order tracking page redirects to login due to missing/invalid session tokens
+          - Cannot create test accounts through UI (registration form issues)
+          - Backend requires valid authenticated session for order data access
+          - Frontend auth store not properly initialized with session tokens
+          
+          IMPACT ON USER EXPERIENCE:
+          - Customers cannot see route line from rider to their location
+          - Map shows customer marker but no rider marker or connecting route
+          - Distance and ETA calculations fall back to straight-line estimates
+          - Real-time route guidance unavailable
+          
+          CONCLUSION:
+          ❌ Route line is not displaying because authentication prevents access to order and rider location data
+          ❌ The route drawing implementation is correct but cannot execute without prerequisite data
+          ❌ This is a critical authentication system issue, not a route drawing code issue
+          
+          REQUIRED FIXES:
+          1. Fix authentication system to allow proper access to live order tracking
+          2. Ensure session tokens are validated correctly in backend
+          3. Test with valid authenticated user accounts and active orders
+          4. Verify rider location updates are properly authenticated and accessible
 
   - task: "Map Verification Modal in Checkout"
     implemented: true
