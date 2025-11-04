@@ -489,17 +489,38 @@ export default function RestaurantProfileScreen() {
           <View style={styles.formGroup}>
             <Text style={styles.label}>Address</Text>
             {editing ? (
-              <TextInput
-                style={[styles.input, styles.textArea]}
-                value={formAddress}
-                onChangeText={setFormAddress}
-                placeholder="Enter full address"
-                placeholderTextColor="#999"
-                multiline
-                numberOfLines={3}
-              />
+              <>
+                <TextInput
+                  style={[styles.input, styles.textArea]}
+                  value={formAddress}
+                  onChangeText={setFormAddress}
+                  placeholder="Enter full address"
+                  placeholderTextColor="#999"
+                  multiline
+                  numberOfLines={3}
+                />
+                {Platform.OS === 'web' && (
+                  <TouchableOpacity
+                    style={styles.editLocationButton}
+                    onPress={openLocationModal}
+                  >
+                    <Ionicons name="location" size={18} color="#FF6B6B" />
+                    <Text style={styles.editLocationText}>Edit Location on Map</Text>
+                  </TouchableOpacity>
+                )}
+                <View style={styles.coordinatesDisplay}>
+                  <Text style={styles.coordinatesText}>
+                    📍 {tempLatitude.toFixed(6)}, {tempLongitude.toFixed(6)}
+                  </Text>
+                </View>
+              </>
             ) : (
-              <Text style={styles.value}>{restaurant.location.address}</Text>
+              <>
+                <Text style={styles.value}>{restaurant.location.address}</Text>
+                <Text style={styles.coordinatesText}>
+                  📍 {restaurant.location.latitude.toFixed(6)}, {restaurant.location.longitude.toFixed(6)}
+                </Text>
+              </>
             )}
           </View>
         </View>
@@ -520,6 +541,91 @@ export default function RestaurantProfileScreen() {
           </View>
         )}
       </ScrollView>
+
+      {/* Location Editor Modal */}
+      <Modal
+        visible={showLocationModal}
+        animationType="slide"
+        transparent={false}
+        onRequestClose={() => setShowLocationModal(false)}
+      >
+        <SafeAreaView style={styles.modalContainer}>
+          <View style={styles.modalHeader}>
+            <Text style={styles.modalTitle}>Set Restaurant Location</Text>
+            <TouchableOpacity
+              style={styles.modalCloseButton}
+              onPress={() => setShowLocationModal(false)}
+            >
+              <Ionicons name="close" size={28} color="#333" />
+            </TouchableOpacity>
+          </View>
+
+          <Text style={styles.modalInstructions}>
+            📍 Drag the marker to your restaurant's exact location
+          </Text>
+
+          {/* Map Container */}
+          {Platform.OS === 'web' ? (
+            <View style={styles.mapContainer}>
+              {!mapLoaded && (
+                <View style={styles.mapLoading}>
+                  <ActivityIndicator size="large" color="#FF6B6B" />
+                  <Text style={styles.mapLoadingText}>Loading map...</Text>
+                </View>
+              )}
+              <View style={{ flex: 1, opacity: mapLoaded ? 1 : 0 }}>
+                {/* @ts-ignore - Web-specific div for Google Maps */}
+                <div 
+                  ref={mapRef} 
+                  style={{ 
+                    width: '100%', 
+                    height: '100%',
+                  }} 
+                />
+              </View>
+            </View>
+          ) : (
+            <View style={styles.mapPlaceholder}>
+              <Ionicons name="map" size={64} color="#CCC" />
+              <Text style={styles.mapPlaceholderText}>Map available on web</Text>
+            </View>
+          )}
+
+          <View style={styles.locationInfo}>
+            <View style={styles.coordinatesCard}>
+              <Ionicons name="navigate" size={20} color="#FF6B6B" />
+              <View style={styles.coordinatesDetail}>
+                <Text style={styles.coordsLabel}>Latitude</Text>
+                <Text style={styles.coordsValue}>{tempLatitude.toFixed(6)}</Text>
+              </View>
+              <View style={styles.coordinatesDetail}>
+                <Text style={styles.coordsLabel}>Longitude</Text>
+                <Text style={styles.coordsValue}>{tempLongitude.toFixed(6)}</Text>
+              </View>
+            </View>
+            
+            <Text style={styles.addressPreview} numberOfLines={2}>
+              {formAddress || 'Address will appear here'}
+            </Text>
+          </View>
+
+          <View style={styles.modalActions}>
+            <TouchableOpacity
+              style={styles.modalCancelButton}
+              onPress={() => setShowLocationModal(false)}
+            >
+              <Text style={styles.modalCancelText}>Cancel</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.modalConfirmButton}
+              onPress={confirmLocation}
+            >
+              <Ionicons name="checkmark" size={20} color="#FFF" />
+              <Text style={styles.modalConfirmText}>Confirm Location</Text>
+            </TouchableOpacity>
+          </View>
+        </SafeAreaView>
+      </Modal>
     </SafeAreaView>
   );
 }
