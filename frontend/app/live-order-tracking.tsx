@@ -38,6 +38,11 @@ export default function LiveOrderTrackingScreen() {
   const mapRef = useRef<any>(null);
   const mapInstanceRef = useRef<any>(null); // Track if map is already initialized
   const initializedOrderIdRef = useRef<string | null>(null); // Track initialized order ID
+  const bottomSheetRef = useRef<BottomSheet>(null); // Bottom sheet control
+  
+  // ALL HOOKS MUST BE CALLED BEFORE ANY CONDITIONAL RETURNS
+  const insets = useSafeAreaInsets();
+  const snapPoints = useMemo(() => ['20%', '50%', '90%'], []);
 
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
