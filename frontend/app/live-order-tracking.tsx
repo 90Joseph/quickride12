@@ -519,112 +519,167 @@ export default function LiveOrderTrackingScreen() {
   }
 
   const statusInfo = getStatusInfo(order.status);
+  const insets = useSafeAreaInsets();
+  const bottomSheetRef = useRef<BottomSheet>(null);
+  
+  // Define snap points for bottom sheet
+  const snapPoints = useMemo(() => ['20%', '50%', '90%'], []);
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.headerBackButton}>
-          <Ionicons name="arrow-back" size={24} color="#333" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Track Order</Text>
-        <View style={{ width: 24 }} />
-      </View>
-
-      {/* Map */}
-      {Platform.OS === 'web' ? (
-        <View style={styles.mapContainer}>
-          {!mapLoaded && !mapError && (
-            <View style={styles.mapLoadingOverlay}>
-              <ActivityIndicator size="large" color="#FF6B6B" />
-              <Text style={styles.mapLoadingText}>Loading map...</Text>
-            </View>
-          )}
-          {mapError && (
-            <View style={styles.mapLoadingOverlay}>
-              <Ionicons name="alert-circle" size={48} color="#FF6B6B" />
-              <Text style={styles.errorText}>{mapError}</Text>
-              <TouchableOpacity 
-                style={styles.retryButton}
-                onPress={() => {
-                  setMapError('');
-                  setScriptLoaded(false);
-                  setMapLoaded(false);
-                  loadMap();
-                }}
-              >
-                <Text style={styles.retryButtonText}>Retry</Text>
-              </TouchableOpacity>
-            </View>
-          )}
-          {/* @ts-ignore - Web-only div for Google Maps */}
-          {Platform.OS === 'web' ? (
-            <View style={{ 
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              width: '100%',
-              height: '100%',
-              opacity: mapLoaded ? 1 : 0,
-            }}>
-              <div 
-                ref={mapRef} 
-                style={{ 
-                  width: '100%', 
-                  height: '100%', 
-                }} 
-              />
-            </View>
-          ) : null}
-        </View>
-      ) : (
-        <View style={[styles.mapContainer, styles.mapPlaceholder]}>
-          <Ionicons name="map" size={64} color="#CCC" />
-          <Text style={styles.mapPlaceholderText}>Map available on web</Text>
-        </View>
-      )}
-
-      {/* Status Card */}
-      <View style={styles.statusCard}>
-        <View style={[styles.statusIndicator, { backgroundColor: statusInfo.color }]}>
-          <Ionicons name={statusInfo.icon as any} size={32} color="#FFF" />
-        </View>
-        <View style={styles.statusTextContainer}>
-          <Text style={styles.statusLabel}>Order Status</Text>
-          <Text style={[styles.statusText, { color: statusInfo.color }]}>
-            {statusInfo.label}
-          </Text>
-          {riderLocation && distance && (
-            <View style={styles.distanceContainer}>
-              <Ionicons name="navigate-circle" size={16} color="#2196F3" />
-              <Text style={styles.distanceText}>{distance} • ETA: {eta}</Text>
-            </View>
-          )}
-        </View>
-      </View>
-
-      {/* Order Details */}
-      <View style={styles.detailsCard}>
-        <Text style={styles.detailsTitle}>Order Details</Text>
-        <View style={styles.detailRow}>
-          <Text style={styles.detailLabel}>Restaurant:</Text>
-          <Text style={styles.detailValue}>{order.restaurant_name}</Text>
-        </View>
-        <View style={styles.detailRow}>
-          <Text style={styles.detailLabel}>Total:</Text>
-          <Text style={styles.detailValue}>₱{order.total_amount.toFixed(2)}</Text>
-        </View>
-        {order.rider_name && (
-          <View style={styles.detailRow}>
-            <Text style={styles.detailLabel}>Rider:</Text>
-            <Text style={styles.detailValue}>{order.rider_name}</Text>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <View style={styles.container}>
+        {/* Full-screen Map */}
+        {Platform.OS === 'web' ? (
+          <View style={styles.fullScreenMap}>
+            {!mapLoaded && !mapError && (
+              <View style={styles.mapLoadingOverlay}>
+                <ActivityIndicator size="large" color="#FF6B6B" />
+                <Text style={styles.mapLoadingText}>Loading map...</Text>
+              </View>
+            )}
+            {mapError && (
+              <View style={styles.mapLoadingOverlay}>
+                <Ionicons name="alert-circle" size={48} color="#FF6B6B" />
+                <Text style={styles.errorText}>{mapError}</Text>
+                <TouchableOpacity 
+                  style={styles.retryButton}
+                  onPress={() => {
+                    setMapError('');
+                    setScriptLoaded(false);
+                    setMapLoaded(false);
+                    loadMap();
+                  }}
+                >
+                  <Text style={styles.retryButtonText}>Retry</Text>
+                </TouchableOpacity>
+              </View>
+            )}
+            {/* @ts-ignore - Web-only div for Google Maps */}
+            {Platform.OS === 'web' ? (
+              <View style={{ 
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                width: '100%',
+                height: '100%',
+                opacity: mapLoaded ? 1 : 0,
+              }}>
+                <div 
+                  ref={mapRef} 
+                  style={{ 
+                    width: '100%', 
+                    height: '100%', 
+                  }} 
+                />
+              </View>
+            ) : null}
+          </View>
+        ) : (
+          <View style={[styles.fullScreenMap, styles.mapPlaceholder]}>
+            <Ionicons name="map" size={64} color="#CCC" />
+            <Text style={styles.mapPlaceholderText}>Map available on web</Text>
           </View>
         )}
-        <View style={styles.detailRow}>
-          <Text style={styles.detailLabel}>Delivery to:</Text>
-          <Text style={styles.detailValue}>{order.delivery_address?.address}</Text>
-        </View>
+
+        {/* Back Button Overlay */}
+        <TouchableOpacity 
+          onPress={() => router.back()} 
+          style={[styles.backButtonOverlay, { top: insets.top + 10 }]}
+        >
+          <Ionicons name="arrow-back" size={24} color="#333" />
+        </TouchableOpacity>
+
+        {/* Draggable Bottom Sheet */}
+        <BottomSheet
+          ref={bottomSheetRef}
+          index={0}
+          snapPoints={snapPoints}
+          enablePanDownToClose={false}
+          backgroundStyle={styles.bottomSheetBackground}
+          handleIndicatorStyle={styles.bottomSheetIndicator}
+        >
+          <BottomSheetScrollView style={styles.bottomSheetContent}>
+            {/* Minimized View - Key Info */}
+            <View style={styles.minimizedSection}>
+              <View style={styles.minimizedRow}>
+                <View style={[styles.statusBadge, { backgroundColor: statusInfo.color }]}>
+                  <Ionicons name={statusInfo.icon as any} size={20} color="#FFF" />
+                </View>
+                <View style={styles.minimizedInfo}>
+                  <Text style={styles.minimizedStatus}>{statusInfo.label}</Text>
+                  {riderLocation && distance && (
+                    <View style={styles.minimizedETA}>
+                      <Ionicons name="time-outline" size={16} color="#666" />
+                      <Text style={styles.minimizedETAText}>
+                        {distance} • {eta}
+                      </Text>
+                    </View>
+                  )}
+                </View>
+              </View>
+              <Text style={styles.pullUpHint}>↑ Pull up for details</Text>
+            </View>
+
+            {/* Full Details - Visible when dragged up */}
+            <View style={styles.detailsSection}>
+              <Text style={styles.sectionTitle}>Order Information</Text>
+              
+              <View style={styles.infoCard}>
+                <View style={styles.infoRow}>
+                  <Ionicons name="restaurant-outline" size={20} color="#666" />
+                  <View style={styles.infoTextContainer}>
+                    <Text style={styles.infoLabel}>Restaurant</Text>
+                    <Text style={styles.infoValue}>{order.restaurant_name}</Text>
+                  </View>
+                </View>
+
+                <View style={styles.infoRow}>
+                  <Ionicons name="cash-outline" size={20} color="#666" />
+                  <View style={styles.infoTextContainer}>
+                    <Text style={styles.infoLabel}>Total Amount</Text>
+                    <Text style={styles.infoValue}>₱{order.total_amount.toFixed(2)}</Text>
+                  </View>
+                </View>
+
+                {order.rider_name && (
+                  <View style={styles.infoRow}>
+                    <Ionicons name="bicycle-outline" size={20} color="#666" />
+                    <View style={styles.infoTextContainer}>
+                      <Text style={styles.infoLabel}>Rider</Text>
+                      <Text style={styles.infoValue}>{order.rider_name}</Text>
+                      {order.rider_phone && (
+                        <Text style={styles.infoSubValue}>{order.rider_phone}</Text>
+                      )}
+                    </View>
+                  </View>
+                )}
+
+                <View style={styles.infoRow}>
+                  <Ionicons name="location-outline" size={20} color="#666" />
+                  <View style={styles.infoTextContainer}>
+                    <Text style={styles.infoLabel}>Delivery Address</Text>
+                    <Text style={styles.infoValue}>{order.delivery_address?.address}</Text>
+                  </View>
+                </View>
+              </View>
+
+              <Text style={styles.sectionTitle}>Order Items</Text>
+              <View style={styles.itemsCard}>
+                {order.items.map((item: any, index: number) => (
+                  <View key={index} style={styles.itemRow}>
+                    <View style={styles.itemInfo}>
+                      <Text style={styles.itemQuantity}>{item.quantity}x</Text>
+                      <Text style={styles.itemName}>{item.name}</Text>
+                    </View>
+                    <Text style={styles.itemPrice}>₱{item.price.toFixed(2)}</Text>
+                  </View>
+                ))}
+              </View>
+            </View>
+          </BottomSheetScrollView>
+        </BottomSheet>
       </View>
-    </SafeAreaView>
+    </GestureHandlerRootView>
   );
 }
 
