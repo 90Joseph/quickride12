@@ -618,6 +618,196 @@ const fetchRouteFromRoutesAPI = async (origin: any, destination: any, map: any) 
     }
   };
 
+  // Start turn-by-turn navigation
+  const startNavigation = async () => {
+    if (!userLocation || !currentJob || !mapInstanceRef.current) {
+      Alert.alert('Error', 'Cannot start navigation. Location or job data missing.');
+      return;
+    }
+
+    try {
+      console.log('🧭 Starting turn-by-turn navigation...');
+      setIsNavigating(true);
+
+      // Get destination based on job status
+      let destination;
+      if (currentJob.type === 'order') {
+        const status = currentJob.data.status;
+        if (status === 'accepted' || status === 'rider_assigned') {
+          // Go to restaurant
+          destination = {
+            lat: currentJob.data.restaurant_location?.latitude,
+            lng: currentJob.data.restaurant_location?.longitude,
+          };
+        } else {
+          // Go to customer
+          destination = {
+            lat: currentJob.data.delivery_address?.latitude,
+            lng: currentJob.data.delivery_address?.longitude,
+          };
+        }
+      } else {
+        // Moto-taxi
+        const status = currentJob.data.status;
+        if (status === 'accepted') {
+          destination = {
+            lat: currentJob.data.pickup_location?.latitude,
+            lng: currentJob.data.pickup_location?.longitude,
+          };
+        } else {
+          destination = {
+            lat: currentJob.data.dropoff_location?.latitude,
+            lng: currentJob.data.dropoff_location?.longitude,
+          };
+        }
+      }
+
+      if (!destination.lat || !destination.lng) {
+        Alert.alert('Error', 'Invalid destination coordinates');
+        return;
+      }
+
+      // Use Google Maps Directions API
+      const google = (window as any).google;
+      if (!google || !google.maps) {
+        Alert.alert('Error', 'Google Maps not loaded');
+        return;
+      }
+
+      const directionsService = new google.maps.DirectionsService();
+      const directionsRenderer = new google.maps.DirectionsRenderer({
+        map: mapInstanceRef.current,
+        suppressMarkers: true,
+        polylineOptions: {
+          strokeColor: '#4CAF50',
+          strokeWeight: 6,
+          strokeOpacity: 0.9,
+        },
+      });
+
+      directionsRendererRef.current = directionsRenderer;
+
+      const request = {
+        origin: { lat: userLocation.latitude, lng: userLocation.longitude },
+        destination: destination,
+        travelMode: google.maps.TravelMode.DRIVING,
+      };
+
+      directionsService.route(request, (result: any, status: any) => {
+        if (status === 'OK' && result) {
+          directionsRenderer.setDirections(result);
+          
+          const route = result.routes[0];
+          const leg = route.legs[0];
+          
+          setNavigationSteps(leg.steps);
+          setCurrentStep(leg.steps[0]);
+          setRemainingDistance(leg.distance.text);
+          setRemainingTime(leg.duration.text);
+
+          // Center map on current location with navigation view
+          mapInstanceRef.current.setCenter({ lat: userLocation.latitude, lng: userLocation.longitude });
+          mapInstanceRef.current.setZoom(17);
+
+          console.log('✅ Navigation started with', leg.steps.length, 'steps');
+          
+          // Speak first instruction if possible
+          if (leg.steps[0]?.instructions) {
+            speakInstruction(leg.steps[0].instructions);
+          }
+        } else {
+          console.error('❌ Directions request failed:', status);
+          Alert.alert('Error', 'Could not get directions');
+          setIsNavigating(false);
+        }
+      });
+
+    } catch (error) {
+      console.error('❌ Error starting navigation:', error);
+      Alert.alert('Error', 'Failed to start navigation');
+      setIsNavigating(false);
+    }
+  };
+
+  // Stop navigation
+  const stopNavigation = () => {
+    console.log('🛑 Stopping navigation');
+    setIsNavigating(false);
+    setCurrentStep(null);
+    setNavigationSteps([]);
+    setRemainingDistance('');
+    setRemainingTime('');
+    
+    if (directionsRendererRef.current) {
+      directionsRendererRef.current.setMap(null);
+      directionsRendererRef.current = null;
+    }
+
+    // Reload normal route view
+    if (mapInstanceRef.current) {
+      mapInstanceRef.current.setZoom(14);
+    }
+  };
+
+  // Text-to-speech for navigation instructions
+  const speakInstruction = (instruction: string) => {
+    if ('speechSynthesis' in window) {
+      // Remove HTML tags
+      const cleanText = instruction.replace(/<[^>]*>/g, '');
+      const utterance = new SpeechSynthesisUtterance(cleanText);
+      utterance.rate = 0.9;
+      utterance.pitch = 1;
+      window.speechSynthesis.speak(utterance);
+    }
+  };
+
+  // Update navigation based on current location
+  useEffect(() => {
+    if (isNavigating && userLocation && navigationSteps.length > 0) {
+      // Find closest upcoming step
+      const google = (window as any).google;
+      if (!google || !google.maps) return;
+
+      const currentLatLng = new google.maps.LatLng(userLocation.latitude, userLocation.longitude);
+      
+      let closestStepIndex = 0;
+      let minDistance = Infinity;
+
+      navigationSteps.forEach((step, index) => {
+        const stepLatLng = new google.maps.LatLng(step.start_location.lat(), step.start_location.lng());
+        const distance = google.maps.geometry.spherical.computeDistanceBetween(currentLatLng, stepLatLng);
+        
+        if (distance < minDistance) {
+          minDistance = distance;
+          closestStepIndex = index;
+        }
+      });
+
+      // Update current step if changed
+      if (closestStepIndex !== navigationSteps.indexOf(currentStep)) {
+        const newStep = navigationSteps[closestStepIndex];
+        setCurrentStep(newStep);
+        
+        // Speak new instruction
+        if (newStep?.instructions) {
+          speakInstruction(newStep.instructions);
+        }
+      }
+
+      // Update remaining distance/time
+      let totalDistance = 0;
+      let totalDuration = 0;
+      
+      for (let i = closestStepIndex; i < navigationSteps.length; i++) {
+        totalDistance += navigationSteps[i].distance.value;
+        totalDuration += navigationSteps[i].duration.value;
+      }
+
+      setRemainingDistance(`${(totalDistance / 1000).toFixed(1)} km`);
+      setRemainingTime(`${Math.ceil(totalDuration / 60)} min`);
+    }
+  }, [userLocation, isNavigating]);
+
   const getNextAction = () => {
     if (!currentJob) return null;
 
