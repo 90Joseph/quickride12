@@ -524,11 +524,6 @@ export default function LiveOrderTrackingScreen() {
   }
 
   const statusInfo = getStatusInfo(order.status);
-  const insets = useSafeAreaInsets();
-  const bottomSheetRef = useRef<BottomSheet>(null);
-  
-  // Define snap points for bottom sheet
-  const snapPoints = useMemo(() => ['20%', '50%', '90%'], []);
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
