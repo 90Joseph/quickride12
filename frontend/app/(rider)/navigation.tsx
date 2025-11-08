@@ -709,23 +709,18 @@ const fetchRouteFromRoutesAPI = async (origin: any, destination: any, map: any) 
           setRemainingTime(leg.duration.text);
 
           console.log('✅ Navigation started with', leg.steps.length, 'steps');
-          console.log('🎬 Starting smooth transition to navigation mode...');
+          console.log('🎬 Starting native smooth transition...');
 
           // ========================================
-          // BUTTERY-SMOOTH TRANSITION ORCHESTRATION
-          // Using requestAnimationFrame for 60fps smoothness
+          // NATIVE GOOGLE MAPS SMOOTH TRANSITION
+          // Using Google Maps' built-in smooth animations
           // ========================================
           
           const currentLocation = { lat: userLocation.latitude, lng: userLocation.longitude };
           
-          // Ultra-gentle easing function (ease-out-quart) - most comfortable
-          const easeOutQuart = (t: number): number => {
-            return 1 - Math.pow(1 - t, 4);
-          };
-          
           // Calculate initial bearing for heading
           let initialBearing = 0;
-          if (leg.steps[0] && mapInstanceRef.current.setHeading) {
+          if (leg.steps[0]) {
             const firstStepStart = leg.steps[0].start_location;
             const firstStepEnd = leg.steps[0].end_location;
             initialBearing = google.maps.geometry.spherical.computeHeading(
@@ -734,122 +729,17 @@ const fetchRouteFromRoutesAPI = async (origin: any, destination: any, map: any) 
             );
           }
 
-          // STEP 1: Immediately start minimizing bottom sheet (smooth native animation)
+          // Minimize bottom sheet immediately (smooth native animation)
           if (bottomSheetRef.current) {
-            bottomSheetRef.current.snapToIndex(0); // Snap to 12% (minimized)
-            console.log('📱 Bottom sheet minimizing...');
+            bottomSheetRef.current.snapToIndex(0);
+            console.log('📱 Bottom sheet minimized');
           }
 
-          // Small delay before starting map animations (gives user moment to adjust)
-          setTimeout(() => {
-            console.log('🎬 Starting ultra-smooth map transition...');
-
-            // STEP 2: Silky-smooth zoom with requestAnimationFrame (2000ms)
-            if (mapInstanceRef.current) {
-              console.log('🔍 Zooming to navigation view...');
-              
-              const startZoom = mapInstanceRef.current.getZoom() || 14;
-              const targetZoom = 18;
-              const zoomDuration = 2000; // Even longer for comfort
-              const zoomStartTime = performance.now();
-
-              const animateZoom = (currentTime: number) => {
-                if (!mapInstanceRef.current) return;
-
-                const elapsed = currentTime - zoomStartTime;
-                const progress = Math.min(elapsed / zoomDuration, 1);
-                const easedProgress = easeOutQuart(progress);
-                
-                const newZoom = startZoom + ((targetZoom - startZoom) * easedProgress);
-                mapInstanceRef.current.setZoom(newZoom);
-                
-                // Continuously pan to keep centered (smooth follow)
-                mapInstanceRef.current.panTo(currentLocation);
-
-                if (progress < 1) {
-                  requestAnimationFrame(animateZoom);
-                } else {
-                  console.log('✅ Zoom complete');
-                }
-              };
-
-              requestAnimationFrame(animateZoom);
-            }
-
-            // STEP 3: Gentle tilt animation (1500ms, starting at 400ms)
-            setTimeout(() => {
-              if (mapInstanceRef.current && mapInstanceRef.current.setTilt) {
-                console.log('📐 Tilting map to 3D view...');
-                
-                const targetTilt = 45;
-                const tiltDuration = 1500;
-                const tiltStartTime = performance.now();
-
-                const animateTilt = (currentTime: number) => {
-                  if (!mapInstanceRef.current) return;
-
-                  const elapsed = currentTime - tiltStartTime;
-                  const progress = Math.min(elapsed / tiltDuration, 1);
-                  const easedProgress = easeOutQuart(progress);
-                  
-                  const currentTilt = targetTilt * easedProgress;
-                  
-                  if (mapInstanceRef.current.setTilt) {
-                    mapInstanceRef.current.setTilt(currentTilt);
-                  }
-
-                  if (progress < 1) {
-                    requestAnimationFrame(animateTilt);
-                  } else {
-                    console.log('✅ Tilt complete');
-                  }
-                };
-
-                requestAnimationFrame(animateTilt);
-              }
-            }, 400);
-
-            // STEP 4: Smooth rotation (1200ms, starting at 800ms)
-            setTimeout(() => {
-              if (mapInstanceRef.current && mapInstanceRef.current.setHeading) {
-                console.log('🧭 Rotating map to route direction...');
-                
-                const targetHeading = initialBearing;
-                const rotationDuration = 1200;
-                const rotationStartTime = performance.now();
-
-                const animateRotation = (currentTime: number) => {
-                  if (!mapInstanceRef.current) return;
-
-                  const elapsed = currentTime - rotationStartTime;
-                  const progress = Math.min(elapsed / rotationDuration, 1);
-                  const easedProgress = easeOutQuart(progress);
-                  
-                  const currentHeading = targetHeading * easedProgress;
-                  
-                  if (mapInstanceRef.current.setHeading) {
-                    mapInstanceRef.current.setHeading(currentHeading);
-                  }
-
-                  if (progress < 1) {
-                    requestAnimationFrame(animateRotation);
-                  } else {
-                    console.log('✅ Rotation complete');
-                  }
-                };
-
-                requestAnimationFrame(animateRotation);
-              }
-            }, 800);
-
-            // STEP 5: Silky-smooth dark mode fade (1800ms, starting immediately)
-            setTimeout(() => {
-              if (!mapInstanceRef.current) return;
-              
-              console.log('🌙 Fading to dark mode - hiding unnecessary markers...');
-              
-              // Apply dark mode styles immediately (simplified for compatibility)
-              mapInstanceRef.current.setOptions({
+          // Use Google Maps native smooth panTo with animation
+          console.log('🗺️ Applying smooth map transition...');
+          
+          // Apply dark mode immediately
+          mapInstanceRef.current.setOptions({
                 styles: [
                   // Dark backgrounds
                   { elementType: "geometry", stylers: [{ color: "#242f3e" }] },
