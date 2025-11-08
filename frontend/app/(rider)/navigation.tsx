@@ -727,41 +727,29 @@ const fetchRouteFromRoutesAPI = async (origin: any, destination: any, map: any) 
           handleIndicatorStyle={styles.bottomSheetIndicator}
         >
           <BottomSheetScrollView style={styles.bottomSheetContent}>
-            {/* Minimized View - Key Info */}
+            {/* Minimized View - Ultra Compact */}
             <View style={styles.minimizedSection}>
-              <View style={styles.minimizedHeader}>
-                <View style={styles.jobTypeBadge}>
-                  <Text style={styles.jobTypeEmoji}>
+              <View style={styles.minimizedRow}>
+                <View style={styles.compactInfo}>
+                  <Text style={styles.compactEmoji}>
                     {currentJob.type === 'order' ? '🍔' : '🏍️'}
                   </Text>
-                  <Text style={styles.jobTypeText}>
-                    {currentJob.type === 'order' ? 'Food Delivery' : 'Moto-Taxi'}
-                  </Text>
-                </View>
-                <View style={styles.earningsBadge}>
-                  <Text style={styles.earningsText}>
+                  <Text style={styles.compactText}>
                     ₱{currentJob.type === 'order' 
                       ? currentJob.data.total_amount.toFixed(2)
                       : currentJob.data.actual_fare.toFixed(2)}
                   </Text>
+                  {distanceToDestination && (
+                    <>
+                      <Text style={styles.compactDivider}>•</Text>
+                      <Text style={styles.compactSubText}>{distanceToDestination}</Text>
+                      <Text style={styles.compactDivider}>•</Text>
+                      <Text style={styles.compactSubText}>{etaToDestination}</Text>
+                    </>
+                  )}
                 </View>
+                <Ionicons name="chevron-up" size={20} color="#999" />
               </View>
-
-              {distanceToDestination && etaToDestination && (
-                <View style={styles.minimizedETA}>
-                  <View style={styles.etaItem}>
-                    <Ionicons name="navigate" size={16} color="#2196F3" />
-                    <Text style={styles.etaText}>{distanceToDestination}</Text>
-                  </View>
-                  <Text style={styles.etaDot}>•</Text>
-                  <View style={styles.etaItem}>
-                    <Ionicons name="time-outline" size={16} color="#2196F3" />
-                    <Text style={styles.etaText}>{etaToDestination}</Text>
-                  </View>
-                </View>
-              )}
-
-              <Text style={styles.pullUpHint}>↑ Pull up for details</Text>
             </View>
 
             {/* Full Details - Visible when dragged up */}
