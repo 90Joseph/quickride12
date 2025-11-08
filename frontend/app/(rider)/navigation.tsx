@@ -972,9 +972,16 @@ const fetchRouteFromRoutesAPI = async (origin: any, destination: any, map: any) 
                 ],
               });
 
-              step++;
-            }, transitionInterval); // Smooth fade over 1500ms
-          }, 300);
+                if (progress < 1) {
+                  requestAnimationFrame(animateDarkMode);
+                } else {
+                  console.log('✅ Dark mode transition complete');
+                }
+              };
+
+              requestAnimationFrame(animateDarkMode);
+            }, 0); // Start dark mode immediately (within the 200ms delay parent)
+          }, 200); // End of main transition orchestration
 
           console.log('📍 GPS-style navigation mode activated - map will follow your movement');
           
