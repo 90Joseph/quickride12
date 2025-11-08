@@ -679,9 +679,9 @@ const fetchRouteFromRoutesAPI = async (origin: any, destination: any, map: any) 
         map: mapInstanceRef.current,
         suppressMarkers: true,
         polylineOptions: {
-          strokeColor: '#4CAF50',
-          strokeWeight: 6,
-          strokeOpacity: 0.9,
+          strokeColor: '#4285F4', // Google Maps blue
+          strokeWeight: 8, // Thicker line like Google Maps
+          strokeOpacity: 1,
         },
       });
 
