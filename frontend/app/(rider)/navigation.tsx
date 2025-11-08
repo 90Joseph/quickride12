@@ -843,24 +843,19 @@ const fetchRouteFromRoutesAPI = async (origin: any, destination: any, map: any) 
             }, 800);
           }, 200); // 200ms initial delay for comfort
 
-          // STEP 5: Ultra-smooth fade to dark mode (1500ms with easing, starting at 300ms)
-          setTimeout(() => {
-            console.log('🌙 Transitioning to dark mode - hiding unnecessary markers...');
-            
-            // Gradually fade to dark mode with CLEAN, MINIMAL styling
-            const transitionSteps = 40; // More steps for smoother color fade
-            const transitionDuration = 1500;
-            const transitionInterval = transitionDuration / transitionSteps;
-            let step = 0;
+            // STEP 5: Silky-smooth dark mode fade (1800ms, starting immediately with delay)
+            setTimeout(() => {
+              console.log('🌙 Fading to dark mode - hiding unnecessary markers...');
+              
+              const darkModeDuration = 1800;
+              const darkModeStartTime = performance.now();
 
-            const darkModeIntervalId = setInterval(() => {
-              if (step >= transitionSteps || !mapInstanceRef.current) {
-                clearInterval(darkModeIntervalId);
-                return;
-              }
+              const animateDarkMode = (currentTime: number) => {
+                if (!mapInstanceRef.current) return;
 
-              const progress = step / transitionSteps;
-              const easedProgress = easeInOutCubic(progress);
+                const elapsed = currentTime - darkModeStartTime;
+                const progress = Math.min(elapsed / darkModeDuration, 1);
+                const easedProgress = easeOutQuart(progress);
 
               mapInstanceRef.current.setOptions({
                 styles: [
