@@ -853,8 +853,6 @@ const fetchRouteFromRoutesAPI = async (origin: any, destination: any, map: any) 
                   },
                 ],
               });
-              
-          });
 
           // Use smooth native pan and zoom with single animation
           mapInstanceRef.current.panTo(currentLocation);
