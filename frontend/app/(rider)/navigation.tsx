@@ -831,8 +831,82 @@ const fetchRouteFromRoutesAPI = async (origin: any, destination: any, map: any) 
           previousLocationRef.current.longitude
         );
         bearing = google.maps.geometry.spherical.computeHeading(prevLatLng, currentLatLng);
+        setCurrentBearing(bearing);
       }
       previousLocationRef.current = userLocation;
+
+      // Create or update rider marker with direction cone (flashlight effect)
+      if (!riderMarkerRef.current) {
+        // Create blue dot marker (like Google Maps)
+        riderMarkerRef.current = new google.maps.Marker({
+          position: currentLatLng,
+          map: mapInstanceRef.current,
+          icon: {
+            path: google.maps.SymbolPath.CIRCLE,
+            scale: 10,
+            fillColor: '#4285F4',
+            fillOpacity: 1,
+            strokeColor: '#FFFFFF',
+            strokeWeight: 3,
+          },
+          zIndex: 2000,
+        });
+
+        // Create direction cone (flashlight)
+        const coneSize = 0.0008; // Adjust size as needed
+        const coneAngle = 60; // Cone width in degrees
+        
+        const conePath = [];
+        conePath.push(currentLatLng); // Start at rider position
+        
+        // Create arc for the cone
+        for (let i = -coneAngle / 2; i <= coneAngle / 2; i += 5) {
+          const angle = bearing + i;
+          const point = google.maps.geometry.spherical.computeOffset(
+            currentLatLng,
+            coneSize * 111000, // Convert to meters
+            angle
+          );
+          conePath.push(point);
+        }
+        conePath.push(currentLatLng); // Close the path
+
+        directionConeRef.current = new google.maps.Polygon({
+          paths: conePath,
+          map: mapInstanceRef.current,
+          fillColor: '#4285F4',
+          fillOpacity: 0.3,
+          strokeColor: '#4285F4',
+          strokeOpacity: 0.5,
+          strokeWeight: 1,
+          zIndex: 1999,
+        });
+      } else {
+        // Update marker position
+        riderMarkerRef.current.setPosition(currentLatLng);
+        
+        // Update direction cone
+        if (directionConeRef.current) {
+          const coneSize = 0.0008;
+          const coneAngle = 60;
+          
+          const conePath = [];
+          conePath.push(currentLatLng);
+          
+          for (let i = -coneAngle / 2; i <= coneAngle / 2; i += 5) {
+            const angle = bearing + i;
+            const point = google.maps.geometry.spherical.computeOffset(
+              currentLatLng,
+              coneSize * 111000,
+              angle
+            );
+            conePath.push(point);
+          }
+          conePath.push(currentLatLng);
+          
+          directionConeRef.current.setPaths(conePath);
+        }
+      }
 
       // Smoothly animate map to follow rider's location with rotation
       mapInstanceRef.current.panTo(currentLatLng);
