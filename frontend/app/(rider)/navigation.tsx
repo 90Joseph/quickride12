@@ -654,125 +654,190 @@ const fetchRouteFromRoutesAPI = async (origin: any, destination: any, map: any) 
   const nextAction = getNextAction();
 
   return (
-    <SafeAreaView style={styles.container}>
-      {/* Map */}
-      {Platform.OS === 'web' ? (
-        <View style={styles.mapContainer}>
-          {!mapLoaded && !mapError && (
-            <View style={styles.mapLoadingOverlay}>
-              <ActivityIndicator size="large" color="#FF6B6B" />
-              <Text style={styles.mapLoadingText}>Loading map...</Text>
-            </View>
-          )}
-          {mapError && (
-            <View style={styles.mapLoadingOverlay}>
-              <Ionicons name="alert-circle" size={48} color="#FF6B6B" />
-              <Text style={styles.errorText}>{mapError}</Text>
-              <TouchableOpacity 
-                style={styles.retryButton}
-                onPress={() => {
-                  setMapError('');
-                  setScriptLoaded(false);
-                  setMapLoaded(false);
-                  loadMap();
-                }}
-              >
-                <Text style={styles.retryButtonText}>Retry</Text>
-              </TouchableOpacity>
-            </View>
-          )}
-          {/* @ts-ignore - Web-only div for Google Maps */}
-          {Platform.OS === 'web' ? (
-            <View style={{ 
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              width: '100%',
-              height: '100%',
-              opacity: mapLoaded ? 1 : 0,
-            }}>
-              <div 
-                ref={mapRef} 
-                style={{ 
-                  width: '100%', 
-                  height: '100%',
-                }} 
-              />
-            </View>
-          ) : null}
-        </View>
-      ) : (
-        <View style={[styles.mapContainer, styles.mapPlaceholder]}>
-          <Ionicons name="map" size={64} color="#CCC" />
-          <Text style={styles.mapPlaceholderText}>Map available on web</Text>
-        </View>
-      )}
-
-      {/* Job Info Card */}
-      <View style={styles.infoCard}>
-        <View style={styles.infoHeader}>
-          <View>
-            <Text style={styles.jobType}>
-              {currentJob.type === 'order' ? '🍔 Food Delivery' : '🏍️ Moto-Taxi Ride'}
-            </Text>
-            <Text style={styles.jobTitle}>
-              {currentJob.type === 'order' 
-                ? currentJob.data.restaurant_name 
-                : currentJob.data.customer_name}
-            </Text>
-          </View>
-          <View style={styles.amountBadge}>
-            <Text style={styles.amountText}>
-              ₱{currentJob.type === 'order' 
-                ? currentJob.data.total_amount.toFixed(2)
-                : currentJob.data.actual_fare.toFixed(2)}
-            </Text>
-          </View>
-        </View>
-
-        <View style={styles.locationInfo}>
-          <View style={styles.locationRow}>
-            <Ionicons name="location" size={20} color="#4CAF50" />
-            <Text style={styles.locationText}>
-              {currentJob.type === 'order'
-                ? currentJob.data.restaurant_location?.address || 'Restaurant'
-                : currentJob.data.pickup_location?.address || 'Pickup'}
-            </Text>
-          </View>
-          <View style={styles.locationRow}>
-            <Ionicons name="location" size={20} color="#FF6B6B" />
-            <Text style={styles.locationText}>
-              {currentJob.type === 'order'
-                ? currentJob.data.delivery_address?.address
-                : currentJob.data.dropoff_location?.address}
-            </Text>
-          </View>
-          {distanceToDestination && etaToDestination && (
-            <View style={styles.etaCard}>
-              <View style={styles.etaItem}>
-                <Ionicons name="navigate" size={20} color="#2196F3" />
-                <Text style={styles.etaLabel}>{distanceToDestination}</Text>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <View style={styles.container}>
+        {/* Full-screen Map */}
+        {Platform.OS === 'web' ? (
+          <View style={styles.fullScreenMap}>
+            {!mapLoaded && !mapError && (
+              <View style={styles.mapLoadingOverlay}>
+                <ActivityIndicator size="large" color="#FF6B6B" />
+                <Text style={styles.mapLoadingText}>Loading map...</Text>
               </View>
-              <View style={styles.etaDivider} />
-              <View style={styles.etaItem}>
-                <Ionicons name="time" size={20} color="#2196F3" />
-                <Text style={styles.etaLabel}>ETA: {etaToDestination}</Text>
+            )}
+            {mapError && (
+              <View style={styles.mapLoadingOverlay}>
+                <Ionicons name="alert-circle" size={48} color="#FF6B6B" />
+                <Text style={styles.errorText}>{mapError}</Text>
+                <TouchableOpacity 
+                  style={styles.retryButton}
+                  onPress={() => {
+                    setMapError('');
+                    setScriptLoaded(false);
+                    setMapLoaded(false);
+                    loadMap();
+                  }}
+                >
+                  <Text style={styles.retryButtonText}>Retry</Text>
+                </TouchableOpacity>
               </View>
-            </View>
-          )}
-        </View>
-
-        {nextAction && (
-          <TouchableOpacity
-            style={styles.actionButton}
-            onPress={() => handleStatusUpdate(nextAction.status)}
-          >
-            <Ionicons name={nextAction.icon as any} size={24} color="#FFF" />
-            <Text style={styles.actionButtonText}>{nextAction.label}</Text>
-          </TouchableOpacity>
+            )}
+            {/* @ts-ignore - Web-only div for Google Maps */}
+            {Platform.OS === 'web' ? (
+              <View style={{ 
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                width: '100%',
+                height: '100%',
+                opacity: mapLoaded ? 1 : 0,
+              }}>
+                <div 
+                  ref={mapRef} 
+                  style={{ 
+                    width: '100%', 
+                    height: '100%',
+                  }} 
+                />
+              </View>
+            ) : null}
+          </View>
+        ) : (
+          <View style={[styles.fullScreenMap, styles.mapPlaceholder]}>
+            <Ionicons name="map" size={64} color="#CCC" />
+            <Text style={styles.mapPlaceholderText}>Map available on web</Text>
+          </View>
         )}
+
+        {/* Back Button Overlay */}
+        <TouchableOpacity 
+          onPress={() => router.back()} 
+          style={[styles.backButtonOverlay, { top: insets.top + 10 }]}
+        >
+          <Ionicons name="arrow-back" size={24} color="#333" />
+        </TouchableOpacity>
+
+        {/* Draggable Bottom Sheet */}
+        <BottomSheet
+          ref={bottomSheetRef}
+          index={0}
+          snapPoints={snapPoints}
+          enablePanDownToClose={false}
+          backgroundStyle={styles.bottomSheetBackground}
+          handleIndicatorStyle={styles.bottomSheetIndicator}
+        >
+          <BottomSheetScrollView style={styles.bottomSheetContent}>
+            {/* Minimized View - Key Info */}
+            <View style={styles.minimizedSection}>
+              <View style={styles.minimizedHeader}>
+                <View style={styles.jobTypeBadge}>
+                  <Text style={styles.jobTypeEmoji}>
+                    {currentJob.type === 'order' ? '🍔' : '🏍️'}
+                  </Text>
+                  <Text style={styles.jobTypeText}>
+                    {currentJob.type === 'order' ? 'Food Delivery' : 'Moto-Taxi'}
+                  </Text>
+                </View>
+                <View style={styles.earningsBadge}>
+                  <Text style={styles.earningsText}>
+                    ₱{currentJob.type === 'order' 
+                      ? currentJob.data.total_amount.toFixed(2)
+                      : currentJob.data.actual_fare.toFixed(2)}
+                  </Text>
+                </View>
+              </View>
+
+              {distanceToDestination && etaToDestination && (
+                <View style={styles.minimizedETA}>
+                  <View style={styles.etaItem}>
+                    <Ionicons name="navigate" size={16} color="#2196F3" />
+                    <Text style={styles.etaText}>{distanceToDestination}</Text>
+                  </View>
+                  <Text style={styles.etaDot}>•</Text>
+                  <View style={styles.etaItem}>
+                    <Ionicons name="time-outline" size={16} color="#2196F3" />
+                    <Text style={styles.etaText}>{etaToDestination}</Text>
+                  </View>
+                </View>
+              )}
+
+              <Text style={styles.pullUpHint}>↑ Pull up for details</Text>
+            </View>
+
+            {/* Full Details - Visible when dragged up */}
+            <View style={styles.detailsSection}>
+              <Text style={styles.sectionTitle}>
+                {currentJob.type === 'order' ? 'Delivery Details' : 'Ride Details'}
+              </Text>
+
+              <View style={styles.detailCard}>
+                <View style={styles.detailRow}>
+                  <Ionicons name="location" size={20} color="#4CAF50" />
+                  <View style={styles.detailTextContainer}>
+                    <Text style={styles.detailLabel}>Pickup Location</Text>
+                    <Text style={styles.detailValue}>
+                      {currentJob.type === 'order'
+                        ? currentJob.data.restaurant_name
+                        : currentJob.data.customer_name}
+                    </Text>
+                    <Text style={styles.detailSubValue}>
+                      {currentJob.type === 'order'
+                        ? currentJob.data.restaurant_location?.address || ''
+                        : currentJob.data.pickup_location?.address || ''}
+                    </Text>
+                  </View>
+                </View>
+
+                <View style={styles.routeDivider}>
+                  <View style={styles.routeLine} />
+                </View>
+
+                <View style={styles.detailRow}>
+                  <Ionicons name="location" size={20} color="#FF6B6B" />
+                  <View style={styles.detailTextContainer}>
+                    <Text style={styles.detailLabel}>Drop-off Location</Text>
+                    <Text style={styles.detailValue}>
+                      {currentJob.type === 'order'
+                        ? currentJob.data.customer_name || 'Customer'
+                        : 'Destination'}
+                    </Text>
+                    <Text style={styles.detailSubValue}>
+                      {currentJob.type === 'order'
+                        ? currentJob.data.delivery_address?.address
+                        : currentJob.data.dropoff_location?.address}
+                    </Text>
+                  </View>
+                </View>
+              </View>
+
+              {currentJob.type === 'order' && currentJob.data.items && (
+                <>
+                  <Text style={styles.sectionTitle}>Order Items</Text>
+                  <View style={styles.itemsCard}>
+                    {currentJob.data.items.map((item: any, index: number) => (
+                      <View key={index} style={styles.itemRow}>
+                        <Text style={styles.itemQuantity}>{item.quantity}x</Text>
+                        <Text style={styles.itemName}>{item.name}</Text>
+                      </View>
+                    ))}
+                  </View>
+                </>
+              )}
+
+              {nextAction && (
+                <TouchableOpacity
+                  style={styles.actionButton}
+                  onPress={() => handleStatusUpdate(nextAction.status)}
+                >
+                  <Ionicons name={nextAction.icon as any} size={24} color="#FFF" />
+                  <Text style={styles.actionButtonText}>{nextAction.label}</Text>
+                </TouchableOpacity>
+              )}
+            </View>
+          </BottomSheetScrollView>
+        </BottomSheet>
       </View>
-    </SafeAreaView>
+    </GestureHandlerRootView>
   );
 }
 
