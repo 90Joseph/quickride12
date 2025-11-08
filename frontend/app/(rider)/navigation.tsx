@@ -853,7 +853,7 @@ const fetchRouteFromRoutesAPI = async (origin: any, destination: any, map: any) 
               mapInstanceRef.current.setOptions({
                 styles: [
                   // Dark backgrounds
-                  { elementType: "geometry", stylers: [{ color: "#242f3e", lightness: (1 - progress) * 20 }] },
+                  { elementType: "geometry", stylers: [{ color: "#242f3e" }] },
                   { elementType: "labels.text.stroke", stylers: [{ color: "#242f3e" }] },
                   
                   // HIDE ALL POIs (Points of Interest) - no clutter
