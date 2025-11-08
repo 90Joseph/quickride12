@@ -974,7 +974,7 @@ const fetchRouteFromRoutesAPI = async (origin: any, destination: any, map: any) 
             speakInstruction(leg.steps[0].instructions);
           }
         }, 200); // End of main transition orchestration delay
-        } else {
+      } else {
           console.error('❌ Directions request failed:', status);
           Alert.alert('Error', 'Could not get directions');
           setIsNavigating(false);
