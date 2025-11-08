@@ -1034,6 +1034,25 @@ const fetchRouteFromRoutesAPI = async (origin: any, destination: any, map: any) 
                 </>
               )}
 
+              {/* Start/Stop Navigation Button */}
+              {!isNavigating ? (
+                <TouchableOpacity
+                  style={styles.navigationButton}
+                  onPress={startNavigation}
+                >
+                  <Ionicons name="navigate" size={24} color="#FFF" />
+                  <Text style={styles.actionButtonText}>Start Navigation</Text>
+                </TouchableOpacity>
+              ) : (
+                <TouchableOpacity
+                  style={styles.stopNavigationButton}
+                  onPress={stopNavigation}
+                >
+                  <Ionicons name="stop-circle" size={24} color="#FFF" />
+                  <Text style={styles.actionButtonText}>Stop Navigation</Text>
+                </TouchableOpacity>
+              )}
+
               {nextAction && (
                 <TouchableOpacity
                   style={styles.actionButton}
