@@ -712,10 +712,17 @@ const fetchRouteFromRoutesAPI = async (origin: any, destination: any, map: any) 
           console.log('🎬 Starting smooth transition to navigation mode...');
 
           // ========================================
-          // SMOOTH TRANSITION ORCHESTRATION
+          // ULTRA-SMOOTH TRANSITION ORCHESTRATION
           // ========================================
           
           const currentLocation = { lat: userLocation.latitude, lng: userLocation.longitude };
+          
+          // Easing function for smooth, comfortable transitions (ease-in-out)
+          const easeInOutCubic = (t: number): number => {
+            return t < 0.5 
+              ? 4 * t * t * t 
+              : 1 - Math.pow(-2 * t + 2, 3) / 2;
+          };
           
           // Calculate initial bearing for heading
           let initialBearing = 0;
@@ -728,84 +735,97 @@ const fetchRouteFromRoutesAPI = async (origin: any, destination: any, map: any) 
             );
           }
 
-          // STEP 1: Immediately start minimizing bottom sheet (300ms animation)
+          // STEP 1: Immediately start minimizing bottom sheet (400ms animation)
           if (bottomSheetRef.current) {
             bottomSheetRef.current.snapToIndex(0); // Snap to 12% (minimized)
             console.log('📱 Bottom sheet minimizing...');
           }
 
-          // STEP 2: Start smooth zoom-in animation (1000ms)
+          // STEP 2: Ultra-smooth zoom-in animation (1500ms with easing)
           setTimeout(() => {
             if (mapInstanceRef.current) {
               console.log('🔍 Zooming to navigation view...');
               mapInstanceRef.current.panTo(currentLocation);
               
-              // Smooth zoom transition from current zoom to 18
+              // Smooth zoom transition with easing
               const startZoom = mapInstanceRef.current.getZoom() || 14;
               const targetZoom = 18;
-              const zoomSteps = 20;
-              const zoomIncrement = (targetZoom - startZoom) / zoomSteps;
+              const zoomSteps = 40; // More steps = smoother
+              const zoomDuration = 1500; // Longer duration
+              const zoomInterval = zoomDuration / zoomSteps;
               let currentZoomStep = 0;
 
-              const zoomInterval = setInterval(() => {
+              const zoomIntervalId = setInterval(() => {
                 if (currentZoomStep >= zoomSteps || !mapInstanceRef.current) {
-                  clearInterval(zoomInterval);
+                  clearInterval(zoomIntervalId);
                   return;
                 }
-                const newZoom = startZoom + (zoomIncrement * currentZoomStep);
+                
+                const progress = currentZoomStep / zoomSteps;
+                const easedProgress = easeInOutCubic(progress);
+                const newZoom = startZoom + ((targetZoom - startZoom) * easedProgress);
+                
                 mapInstanceRef.current.setZoom(newZoom);
                 currentZoomStep++;
-              }, 50); // 50ms * 20 steps = 1000ms total
+              }, zoomInterval);
             }
-          }, 100); // Start zoom after 100ms
+          }, 150); // Start zoom after 150ms
 
-          // STEP 3: Gradually apply tilt (500ms, starting at 400ms)
+          // STEP 3: Gradually apply tilt (1200ms with easing, starting at 500ms)
           setTimeout(() => {
             if (mapInstanceRef.current && mapInstanceRef.current.setTilt) {
               console.log('📐 Tilting map to 3D view...');
-              let currentTilt = 0;
               const targetTilt = 45;
-              const tiltSteps = 10;
-              const tiltIncrement = targetTilt / tiltSteps;
+              const tiltSteps = 30; // More steps = smoother
+              const tiltDuration = 1200;
+              const tiltInterval = tiltDuration / tiltSteps;
               let tiltStep = 0;
 
-              const tiltInterval = setInterval(() => {
+              const tiltIntervalId = setInterval(() => {
                 if (tiltStep >= tiltSteps || !mapInstanceRef.current) {
-                  clearInterval(tiltInterval);
+                  clearInterval(tiltIntervalId);
                   return;
                 }
-                currentTilt += tiltIncrement;
+                
+                const progress = tiltStep / tiltSteps;
+                const easedProgress = easeInOutCubic(progress);
+                const currentTilt = targetTilt * easedProgress;
+                
                 if (mapInstanceRef.current.setTilt) {
                   mapInstanceRef.current.setTilt(currentTilt);
                 }
                 tiltStep++;
-              }, 50); // 50ms * 10 steps = 500ms total
+              }, tiltInterval);
             }
-          }, 400);
+          }, 500);
 
-          // STEP 4: Apply heading rotation (300ms, starting at 600ms)
+          // STEP 4: Apply heading rotation (1000ms with easing, starting at 700ms)
           setTimeout(() => {
             if (mapInstanceRef.current && mapInstanceRef.current.setHeading) {
               console.log('🧭 Rotating map to route direction...');
-              let currentHeading = 0;
               const targetHeading = initialBearing;
-              const headingSteps = 6;
-              const headingIncrement = targetHeading / headingSteps;
+              const headingSteps = 25; // More steps = smoother
+              const headingDuration = 1000;
+              const headingInterval = headingDuration / headingSteps;
               let headingStep = 0;
 
-              const headingInterval = setInterval(() => {
+              const headingIntervalId = setInterval(() => {
                 if (headingStep >= headingSteps || !mapInstanceRef.current) {
-                  clearInterval(headingInterval);
+                  clearInterval(headingIntervalId);
                   return;
                 }
-                currentHeading += headingIncrement;
+                
+                const progress = headingStep / headingSteps;
+                const easedProgress = easeInOutCubic(progress);
+                const currentHeading = targetHeading * easedProgress;
+                
                 if (mapInstanceRef.current.setHeading) {
                   mapInstanceRef.current.setHeading(currentHeading);
                 }
                 headingStep++;
-              }, 50); // 50ms * 6 steps = 300ms total
+              }, headingInterval);
             }
-          }, 600);
+          }, 700);
 
           // STEP 5: Fade to dark mode with minimal distractions (800ms, starting at 200ms)
           setTimeout(() => {
