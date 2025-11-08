@@ -761,15 +761,47 @@ const fetchRouteFromRoutesAPI = async (origin: any, destination: any, map: any) 
     }
   };
 
-  // Update navigation based on current location
+  // Previous location for calculating bearing
+  const previousLocationRef = useRef<any>(null);
+
+  // Update navigation based on current location - Auto-follow like Google Maps
   useEffect(() => {
-    if (isNavigating && userLocation && navigationSteps.length > 0) {
-      // Find closest upcoming step
+    if (isNavigating && userLocation && navigationSteps.length > 0 && mapInstanceRef.current) {
       const google = (window as any).google;
       if (!google || !google.maps) return;
 
       const currentLatLng = new google.maps.LatLng(userLocation.latitude, userLocation.longitude);
       
+      // Calculate bearing (direction of travel) for map rotation
+      let bearing = 0;
+      if (previousLocationRef.current) {
+        const prevLatLng = new google.maps.LatLng(
+          previousLocationRef.current.latitude,
+          previousLocationRef.current.longitude
+        );
+        bearing = google.maps.geometry.spherical.computeHeading(prevLatLng, currentLatLng);
+      }
+      previousLocationRef.current = userLocation;
+
+      // Smoothly animate map to follow rider's location with rotation
+      mapInstanceRef.current.panTo(currentLatLng);
+      
+      // Set map heading (rotation) based on direction of travel
+      if (mapInstanceRef.current.setHeading) {
+        mapInstanceRef.current.setHeading(bearing);
+      }
+      
+      // Tilt map for 3D navigation view
+      if (mapInstanceRef.current.setTilt) {
+        mapInstanceRef.current.setTilt(45); // 45-degree tilt for navigation mode
+      }
+
+      // Keep zoom level for navigation
+      if (mapInstanceRef.current.getZoom() !== 18) {
+        mapInstanceRef.current.setZoom(18);
+      }
+
+      // Find closest upcoming step
       let closestStepIndex = 0;
       let minDistance = Infinity;
 
