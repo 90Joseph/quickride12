@@ -47,6 +47,7 @@ interface Ride {
 
 export default function RiderAvailableScreen() {
   const router = useRouter();
+  const { user } = useAuthStore();
   const [serviceType, setServiceType] = useState<'food_delivery' | 'ride_service'>('food_delivery');
   const [orders, setOrders] = useState<Order[]>([]);
   const [rides, setRides] = useState<Ride[]>([]);
@@ -62,6 +63,25 @@ export default function RiderAvailableScreen() {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [searching, setSearching] = useState(false);
+
+  // Early return if user is not a rider
+  if (user && user.role !== 'rider') {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={styles.emptyContainer}>
+          <Ionicons name="lock-closed" size={80} color="#FF6B6B" />
+          <Text style={styles.emptyText}>Access Restricted</Text>
+          <Text style={styles.emptySubtext}>This screen is only accessible to riders</Text>
+          <TouchableOpacity 
+            style={styles.actionButton}
+            onPress={() => router.replace('/(auth)/login')}
+          >
+            <Text style={styles.actionButtonText}>Go to Login</Text>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   useEffect(() => {
     fetchData();
