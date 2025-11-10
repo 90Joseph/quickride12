@@ -743,6 +743,42 @@ test_plan:
 agent_communication:
   - agent: "main"
     message: |
+      CRITICAL: Session Loss on Tab Switch - Auth Token Not Persisting
+      
+      ISSUE: User loses authentication when switching browser tabs and returning to the app.
+      
+      SYMPTOMS:
+      - User logs in as rider
+      - Switches to another browser tab
+      - Returns to app tab
+      - Session is lost - shows "User does not have rider access" or redirects to login
+      
+      FIXES ATTEMPTED:
+      1. Updated api.ts with restoreAuthToken() function
+      2. Added request interceptor to restore token before each API call
+      3. Added visibilitychange event listener to restore token on tab focus
+      4. Token restoration from localStorage implemented
+      
+      ISSUE PERSISTS: Session still lost on tab switch
+      
+      TESTING NEEDED:
+      1. Verify localStorage is actually storing sessionToken
+      2. Test if visibilitychange event fires correctly
+      3. Check if request interceptor is being called
+      4. Verify auth token is actually restored from localStorage
+      5. Test if authStore.initializeAuth() is working properly
+      6. Check browser console for any JavaScript errors during tab switch
+      
+      FILES INVOLVED:
+      - /app/frontend/utils/api.ts (auth token management)
+      - /app/frontend/store/authStore.ts (session persistence)
+      - /app/frontend/app/_layout.tsx (auth initialization)
+      
+      EXPECTED BEHAVIOR:
+      Session should persist when switching tabs and returning to the app
+      
+  - agent: "main"
+    message: |
       URGENT: Live Order Tracking - Route Line Not Displaying from Rider to Customer
       
       USER REPORT: Customer's live order tracking screen shows rider marker and customer marker but NO route line between them.
