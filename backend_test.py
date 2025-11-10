@@ -117,7 +117,7 @@ class LiveTrackingTester:
             self.log(f"❌ Rider profile error: {str(e)}")
             return False
         
-    def create_test_order(self):
+    def test_order_creation(self):
         """Create a test order and assign to rider"""
         self.log("📦 Creating test order for navigation testing...")
         
