@@ -2279,7 +2279,7 @@ async def get_order_rider_location(order_id: str, request: Request):
     if not order.get('rider_id'):
         return {"rider_assigned": False, "location": None}
     
-    rider = await db.riders.find_one({"user_id": order['rider_id']})
+    rider = await db.riders.find_one({"id": order['rider_id']})
     if not rider:
         return {"rider_assigned": True, "location": None}
     
