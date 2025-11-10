@@ -186,13 +186,14 @@ def create_test_order(customer_token, restaurant_id):
         return response.json().get("id")
     return None
 
-def test_navigation_apis():
-    """Main test function for navigation and tracking APIs"""
+def test_rider_403_errors():
+    """Main test function for diagnosing rider 403 forbidden errors"""
     results = TestResults()
     
-    print("🚀 Starting Backend API Tests for Live Navigation and Tracking")
-    print(f"Testing against: {BASE_URL}")
-    print("="*60)
+    print_header("RIDER 403 FORBIDDEN ERRORS - COMPREHENSIVE TESTING")
+    print_info(f"Testing backend: {BASE_URL}")
+    print_info(f"Test started: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+    print_warning("ISSUE: Customer users accessing rider screens see 403 errors despite guards")
     
     # Test data
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
