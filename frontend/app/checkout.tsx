@@ -517,6 +517,8 @@ export default function CheckoutScreen() {
       
       if (error.message === 'Request timeout - Please check your connection') {
         message = 'Request timeout. Please check your internet connection and try again.';
+      } else if (error.response?.status === 403) {
+        message = 'Only customers can place orders. Please login with a customer account.';
       } else if (error.response?.data?.detail) {
         message += error.response.data.detail;
       } else if (error.response?.status === 401) {
