@@ -1400,6 +1400,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 8,
   },
+  confirmOrderButtonDisabled: {
+    backgroundColor: '#A5D6A7',
+    opacity: 0.6,
+  },
   confirmOrderText: {
     color: '#FFF',
     fontSize: 15,
