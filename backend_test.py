@@ -231,20 +231,35 @@ class NavigationTester:
             self.log(f"❌ Error updating order status: {str(e)}", "ERROR")
             return False
             
-        # Manually assign the order to our test rider to ensure we have control
+        # Check which rider was actually assigned to the order
         try:
-            # Use rider session to accept the delivery
-            rider_headers = {"Authorization": f"Bearer {self.rider_token}"}
-            response = self.session.post(f"{BACKEND_URL}/orders/{self.test_order_id}/accept-delivery", 
-                                       headers=rider_headers)
+            response = customer_session.get(f"{BACKEND_URL}/orders/{self.test_order_id}", headers=headers)
             if response.status_code == 200:
-                self.log("✅ Order manually assigned to test rider")
+                order_data = response.json()
+                assigned_rider_id = order_data.get('rider_id')
+                assigned_rider_name = order_data.get('rider_name')
+                self.log(f"🔍 Order assigned to rider: {assigned_rider_name} (ID: {assigned_rider_id})")
+                self.log(f"🔍 Our test rider ID: {self.test_rider_id}")
+                
+                if assigned_rider_id != self.test_rider_id:
+                    self.log("⚠️ Order was assigned to a different rider, not our test rider", "WARNING")
+                    # Try to manually assign to our rider
+                    try:
+                        rider_headers = {"Authorization": f"Bearer {self.rider_token}"}
+                        response = self.session.post(f"{BACKEND_URL}/orders/{self.test_order_id}/accept-delivery", 
+                                                   headers=rider_headers)
+                        if response.status_code == 200:
+                            self.log("✅ Order manually reassigned to test rider")
+                        else:
+                            self.log(f"⚠️ Manual reassignment failed: {response.status_code} - {response.text}", "WARNING")
+                    except Exception as e:
+                        self.log(f"⚠️ Error in manual reassignment: {str(e)}", "WARNING")
+                else:
+                    self.log("✅ Order correctly assigned to our test rider")
             else:
-                self.log(f"⚠️ Manual assignment failed: {response.status_code} - {response.text}", "WARNING")
-                # Continue anyway, auto-assignment might have worked
+                self.log(f"❌ Failed to get order details: {response.status_code}", "ERROR")
         except Exception as e:
-            self.log(f"⚠️ Error in manual assignment: {str(e)}", "WARNING")
-            # Continue anyway
+            self.log(f"❌ Error checking order assignment: {str(e)}", "ERROR")
             
         return True
         
