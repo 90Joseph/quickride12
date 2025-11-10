@@ -1,20 +1,19 @@
 #!/usr/bin/env python3
 """
-Comprehensive Backend API Testing for Rider 403 Forbidden Errors
-Testing all rider endpoints with different authentication states to diagnose
-persistent 403 errors when customers access rider screens
+Backend Testing Script for "Start Navigation" Button Investigation
+Testing rider navigation functionality and related APIs to diagnose
+the error/unexpected behavior when clicking Start Navigation button
 """
 
 import requests
 import json
-import sys
 import time
-from datetime import datetime
 import uuid
+from datetime import datetime, timezone
+import sys
 
-# Configuration
-BASE_URL = "https://track-delivery-5.preview.emergentagent.com/api"
-HEADERS = {"Content-Type": "application/json"}
+# Backend URL from frontend environment
+BACKEND_URL = "https://track-delivery-5.preview.emergentagent.com/api"
 
 class Colors:
     GREEN = '\033[92m'
