@@ -167,6 +167,14 @@ export default function RiderNavigationScreen() {
   };
 
   const fetchCurrentJob = async () => {
+    // Guard: Only fetch if user is a rider
+    if (!user || user.role !== 'rider') {
+      console.log('⚠️ Skipping job fetch - user is not a rider');
+      setCurrentJob(null);
+      setLoading(false);
+      return;
+    }
+
     try {
       // Try to get current order (food delivery)
       const orderResponse = await api.get('/rider/current-order');
