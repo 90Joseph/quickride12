@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Session Loss Investigation - Frontend Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 10px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .status {
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 4px;
+        }
+        .pass { background-color: #d4edda; color: #155724; }
+        .fail { background-color: #f8d7da; color: #721c24; }
+        .warn { background-color: #fff3cd; color: #856404; }
+        .info { background-color: #d1ecf1; color: #0c5460; }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background-color: #0056b3; }
+        #console-output {
+            background-color: #000;
+            color: #00ff00;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            height: 200px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔍 Session Loss Investigation - Frontend Test</h1>
+    <p>This page simulates the frontend authentication behavior to investigate session loss on tab switch.</p>
+
+    <div class="test-section">
+        <h2>Test 1: localStorage Persistence</h2>
+        <button onclick="testLocalStoragePersistence()">Test localStorage</button>
+        <div id="localStorage-results"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Test 2: visibilitychange Event</h2>
+        <button onclick="setupVisibilityTest()">Setup Event Listener</button>
+        <p><strong>Instructions:</strong> Click the button above, then switch to another tab and come back to see if the event fires.</p>
+        <div id="visibility-results"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Test 3: Auth Token Simulation</h2>
+        <button onclick="simulateAuthFlow()">Simulate Auth Flow</button>
+        <div id="auth-results"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Test 4: API Request Headers</h2>
+        <button onclick="testAPIHeaders()">Test API Headers</button>
+        <div id="api-results"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Console Output</h2>
+        <div id="console-output"></div>
+        <button onclick="clearConsole()">Clear Console</button>
+    </div>
+
+    <script>
+        // Console logging to our custom console
+        const consoleOutput = document.getElementById('console-output');
+        
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const logMessage = `[${timestamp}] ${message}\n`;
+            consoleOutput.textContent += logMessage;
+            consoleOutput.scrollTop = consoleOutput.scrollHeight;
+            
+            // Also log to browser console
+            console.log(message);
+        }
+
+        function clearConsole() {
+            consoleOutput.textContent = '';
+        }
+
+        function showResult(containerId, status, message) {
+            const container = document.getElementById(containerId);
+            const div = document.createElement('div');
+            div.className = `status ${status}`;
+            div.textContent = message;
+            container.appendChild(div);
+        }
+
+        // Test 1: localStorage Persistence
+        function testLocalStoragePersistence() {
+            log('🔍 Testing localStorage persistence...');
+            
+            const testToken = 'test-session-token-' + Date.now();
+            const testUser = {
+                id: 'test-user-123',
+                name: 'Test User',
+                role: 'rider',
+                email: 'test@example.com'
+            };
+
+            try {
+                // Store data
+                localStorage.setItem('sessionToken', testToken);
+                localStorage.setItem('user', JSON.stringify(testUser));
+                log('✅ Data stored in localStorage');
+                showResult('localStorage-results', 'pass', 'Data successfully stored in localStorage');
+
+                // Retrieve data
+                const retrievedToken = localStorage.getItem('sessionToken');
+                const retrievedUser = JSON.parse(localStorage.getItem('user'));
+
+                if (retrievedToken === testToken && retrievedUser.id === testUser.id) {
+                    log('✅ Data successfully retrieved from localStorage');
+                    showResult('localStorage-results', 'pass', 'Data successfully retrieved from localStorage');
+                } else {
+                    log('❌ Data retrieval failed');
+                    showResult('localStorage-results', 'fail', 'Data retrieval failed');
+                }
+
+                // Test persistence after delay
+                setTimeout(() => {
+                    const delayedToken = localStorage.getItem('sessionToken');
+                    if (delayedToken === testToken) {
+                        log('✅ localStorage data persists after delay');
+                        showResult('localStorage-results', 'pass', 'Data persists after 2 second delay');
+                    } else {
+                        log('❌ localStorage data lost after delay');
+                        showResult('localStorage-results', 'fail', 'Data lost after delay');
+                    }
+                }, 2000);
+
+            } catch (error) {
+                log(`❌ localStorage test failed: ${error.message}`);
+                showResult('localStorage-results', 'fail', `localStorage test failed: ${error.message}`);
+            }
+        }
+
+        // Test 2: visibilitychange Event
+        let visibilityTestActive = false;
+        
+        function setupVisibilityTest() {
+            if (visibilityTestActive) {
+                log('⚠️ Visibility test already active');
+                return;
+            }
+
+            visibilityTestActive = true;
+            log('🔍 Setting up visibilitychange event listener...');
+            showResult('visibility-results', 'info', 'Event listener setup. Switch tabs to test.');
+
+            document.addEventListener('visibilitychange', function visibilityHandler() {
+                if (document.hidden) {
+                    log('👁️ Tab became hidden (user switched away)');
+                    showResult('visibility-results', 'warn', 'Tab became hidden');
+                } else {
+                    log('👁️ Tab became visible (user returned)');
+                    showResult('visibility-results', 'pass', 'Tab became visible - Event fired successfully!');
+                    
+                    // Simulate auth token restoration
+                    log('🔄 Simulating auth token restoration...');
+                    const storedToken = localStorage.getItem('sessionToken');
+                    if (storedToken) {
+                        log('✅ Auth token restored from localStorage');
+                        showResult('visibility-results', 'pass', 'Auth token would be restored');
+                    } else {
+                        log('❌ No auth token found in localStorage');
+                        showResult('visibility-results', 'fail', 'No auth token to restore');
+                    }
+                }
+            });
+
+            log('✅ visibilitychange event listener added');
+        }
+
+        // Test 3: Auth Flow Simulation
+        function simulateAuthFlow() {
+            log('🔍 Simulating complete auth flow...');
+
+            // Step 1: Simulate login response
+            const mockAuthResponse = {
+                user: {
+                    id: 'rider-' + Date.now(),
+                    name: 'Test Rider',
+                    email: 'rider@test.com',
+                    role: 'rider'
+                },
+                session_token: 'mock-token-' + Date.now()
+            };
+
+            // Step 2: Store in localStorage (simulating authStore)
+            localStorage.setItem('sessionToken', mockAuthResponse.session_token);
+            localStorage.setItem('user', JSON.stringify(mockAuthResponse.user));
+            log('✅ Auth data stored in localStorage');
+            showResult('auth-results', 'pass', 'Step 1: Auth data stored');
+
+            // Step 3: Simulate API token setting
+            window.mockAuthToken = mockAuthResponse.session_token;
+            log('✅ Auth token set in API headers (simulated)');
+            showResult('auth-results', 'pass', 'Step 2: API headers configured');
+
+            // Step 4: Simulate tab switch and restoration
+            setTimeout(() => {
+                log('🔄 Simulating tab switch and return...');
+                
+                // Check if data still exists
+                const restoredToken = localStorage.getItem('sessionToken');
+                const restoredUser = localStorage.getItem('user');
+                
+                if (restoredToken && restoredUser) {
+                    log('✅ Session data survived tab switch simulation');
+                    showResult('auth-results', 'pass', 'Step 3: Session data persisted');
+                    
+                    // Simulate restoration
+                    window.mockAuthToken = restoredToken;
+                    log('✅ Auth token restored after tab switch');
+                    showResult('auth-results', 'pass', 'Step 4: Token restoration successful');
+                } else {
+                    log('❌ Session data lost during tab switch simulation');
+                    showResult('auth-results', 'fail', 'Step 3: Session data lost');
+                }
+            }, 3000);
+        }
+
+        // Test 4: API Request Headers
+        async function testAPIHeaders() {
+            log('🔍 Testing API request headers...');
+
+            const testToken = localStorage.getItem('sessionToken') || 'test-token-123';
+            
+            // Test 1: Check if Authorization header would be set
+            const headers = new Headers();
+            headers.append('Authorization', `Bearer ${testToken}`);
+            headers.append('Content-Type', 'application/json');
+
+            log(`✅ Authorization header created: Bearer ${testToken.substring(0, 20)}...`);
+            showResult('api-results', 'pass', 'Authorization header format correct');
+
+            // Test 2: Simulate API call to backend
+            try {
+                const response = await fetch('https://track-delivery-5.preview.emergentagent.com/api/auth/me', {
+                    method: 'GET',
+                    headers: headers
+                });
+
+                if (response.status === 200) {
+                    const userData = await response.json();
+                    log('✅ API call successful with token');
+                    showResult('api-results', 'pass', `API call successful: ${userData.name || 'User authenticated'}`);
+                } else if (response.status === 401) {
+                    log('❌ API call failed: 401 Unauthorized (token invalid)');
+                    showResult('api-results', 'fail', 'API call failed: Token invalid or expired');
+                } else {
+                    log(`⚠️ API call returned: ${response.status}`);
+                    showResult('api-results', 'warn', `API call returned: ${response.status}`);
+                }
+            } catch (error) {
+                log(`❌ API call failed: ${error.message}`);
+                showResult('api-results', 'fail', `API call failed: ${error.message}`);
+            }
+        }
+
+        // Initialize page
+        log('🚀 Frontend Session Loss Investigation Tool Loaded');
+        log('📋 Instructions:');
+        log('1. Run localStorage test to verify browser storage');
+        log('2. Setup visibility event listener, then switch tabs');
+        log('3. Run auth flow simulation to test complete flow');
+        log('4. Test API headers with real backend calls');
+        log('');
+        log('🔍 Ready to investigate session loss issue...');
+    </script>
+</body>
+</html>
