@@ -65,7 +65,9 @@ class NavigationTester:
         }
         
         try:
-            response = self.session.post(f"{BACKEND_URL}/auth/register", json=customer_data)
+            # Use a new session for customer to avoid cookie conflicts
+            customer_session = requests.Session()
+            response = customer_session.post(f"{BACKEND_URL}/auth/register", json=customer_data)
             if response.status_code == 200:
                 data = response.json()
                 self.customer_token = data["session_token"]
