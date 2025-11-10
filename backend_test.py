@@ -386,8 +386,6 @@ class LiveTrackingTester:
 if __name__ == "__main__":
     tester = LiveTrackingTester()
     results = tester.run_comprehensive_test()
-        
-    def test_rider_current_order_api(self):
         """Test the /rider/current-order API that navigation screen uses"""
         self.log("🔍 Testing /rider/current-order API...")
         
