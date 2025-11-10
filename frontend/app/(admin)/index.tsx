@@ -62,16 +62,9 @@ export default function AdminDashboardScreen() {
     fetchDashboardData();
   };
 
-  const handleLogout = async () => {
-    try {
-      await api.post('/auth/logout');
-    } catch (error) {
-      console.error('Logout error:', error);
-    } finally {
-      setAuthToken(null);
-      authLogout();
-      router.replace('/(auth)/login');
-    }
+  const handleLogout = () => {
+    // Navigate to logout page instead of immediate logout
+    router.push('/logout');
   };
 
   if (loading) {
