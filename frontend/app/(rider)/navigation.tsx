@@ -53,6 +53,12 @@ export default function RiderNavigationScreen() {
   const directionConeRef = useRef<any>(null);
 
   useEffect(() => {
+    // Wait for auth to load and verify user is a rider before fetching
+    if (authLoading || !user || user.role !== 'rider') {
+      console.log('⚠️ Waiting for authentication or user is not a rider');
+      return;
+    }
+
     fetchCurrentJob();
     getUserLocation();
     
@@ -70,7 +76,7 @@ export default function RiderNavigationScreen() {
       clearInterval(jobInterval);
       clearInterval(locationInterval);
     };
-  }, []); // Empty dependency array - only run once on mount
+  }, [user, authLoading]); // Depend on user and authLoading
 
   // Separate effect for sending location updates to backend
   useEffect(() => {
