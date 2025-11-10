@@ -74,26 +74,8 @@ export default function RiderProfileScreen() {
   };
 
   const handleLogout = () => {
-    const confirmed = Platform.OS === 'web'
-      ? window.confirm('Are you sure you want to logout?')
-      : true;
-
-    if (Platform.OS !== 'web') {
-      Alert.alert('Logout', 'Are you sure you want to logout?', [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Logout',
-          onPress: () => {
-            logout();
-            router.replace('/(auth)/login' as any);
-          },
-          style: 'destructive',
-        },
-      ]);
-    } else if (confirmed) {
-      logout();
-      router.replace('/(auth)/login' as any);
-    }
+    // Navigate to logout page instead of showing alert
+    router.push('/logout');
   };
 
   const getStatusColor = (status: string) => {
