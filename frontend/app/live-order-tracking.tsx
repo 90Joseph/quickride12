@@ -265,6 +265,7 @@ export default function LiveOrderTrackingScreen() {
     mapInstanceRef.current = map;
     setMapLoaded(true);
     console.log('✅ Map initialized successfully');
+    console.log('📍 Rider location available?', riderLocation ? 'Yes' : 'No');
 
     // Delivery location marker (Customer - Red)
     if (order.delivery_address) {
