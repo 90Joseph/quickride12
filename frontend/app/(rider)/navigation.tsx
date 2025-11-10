@@ -186,8 +186,17 @@ export default function RiderNavigationScreen() {
 
       setCurrentJob(null);
       setLoading(false);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error fetching current job:', error);
+      
+      // Handle 403 (Forbidden) - user is not a rider
+      if (error.response?.status === 403) {
+        console.log('User does not have rider access');
+        setCurrentJob(null);
+        setLoading(false);
+        return;
+      }
+      
       setLoading(false);
     }
   };
