@@ -1,19 +1,19 @@
 #!/usr/bin/env python3
 """
-Backend API Testing for Live Order Tracking - Route Line Issue Investigation
-Focus: Testing rider location API and route line functionality
+Backend Testing Script for Session Loss Investigation
+Testing authentication persistence and session validation
 """
 
 import requests
 import json
 import time
-from datetime import datetime, timezone
+import sys
+from datetime import datetime
 
 # Configuration
-BASE_URL = "https://track-delivery-5.preview.emergentagent.com/api"
-HEADERS = {"Content-Type": "application/json"}
+BACKEND_URL = "https://track-delivery-5.preview.emergentagent.com/api"
 
-class LiveTrackingTester:
+class SessionLossInvestigator:
     def __init__(self):
         self.customer_token = None
         self.rider_token = None
