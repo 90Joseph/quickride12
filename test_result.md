@@ -640,6 +640,40 @@ test_plan:
 agent_communication:
   - agent: "main"
     message: |
+      URGENT: Persistent 403 Forbidden Errors on Rider Screens - Need Testing Agent Analysis
+      
+      PROBLEM:
+      - Customer user accessing rider screens continues to see 403 errors despite multiple fixes
+      - Race condition fix implemented (auth loading checks + useEffect dependencies) but errors persist
+      
+      FIX ATTEMPTS MADE:
+      1. Added early return guards in components  
+      2. Added function-level role guards
+      3. Added authLoading state checks
+      4. Updated useEffect dependencies to include [user, authLoading]
+      5. Prevented API calls when authLoading=true or user.role !== 'rider'
+      
+      FILES MODIFIED:
+      - /app/frontend/app/(rider)/index.tsx (Available Orders screen)
+      - /app/frontend/app/(rider)/navigation.tsx (Navigation screen)
+      
+      CONSOLE ERRORS STILL APPEARING:
+      - Error fetching rider availability: AxiosError (403)
+      - Error fetching nearby orders: AxiosError (403)
+      - GET /api/riders/me - 403 Forbidden
+      - GET /api/riders/location - 403 Forbidden
+      - GET /api/riders/nearby-orders?radius=10 - 403 Forbidden
+      
+      TESTING NEEDED:
+      - Verify if guards are actually executing (check console for warning messages)
+      - Test with actual rider account vs customer account
+      - Verify auth store initialization timing
+      - Check if there are other rider screens making calls (active.tsx, earnings.tsx, profile.tsx)
+      - Identify WHY guards are not preventing API calls
+      - Provide comprehensive solution that ACTUALLY works
+      
+  - agent: "main"
+    message: |
       LATEST UPDATE: Fixed rider navigation map refresh performance issue
       
       PROBLEM IDENTIFIED:
