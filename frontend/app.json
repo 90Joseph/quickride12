@@ -55,7 +55,8 @@
       "typedRoutes": true
     },
     "extra": {
-      "EXPO_PUBLIC_GOOGLE_MAPS_API_KEY": "AIzaSyA0m1oRlXLQWjxacqjEJ6zJW3WvmOWvQkQ"
+      "EXPO_PUBLIC_GOOGLE_MAPS_API_KEY": "AIzaSyA0m1oRlXLQWjxacqjEJ6zJW3WvmOWvQkQ",
+      "EXPO_PUBLIC_MAPBOX_ACCESS_TOKEN": "pk.eyJ1Ijoiam9zZXBoMTE5OCIsImEiOiJjbWhzbmtsa2QxbGh1MmlxNjVwOTJ0ZTdmIn0.HAhJGAQCJhH8VcLJJpCpvQ"
     }
   }
 }
