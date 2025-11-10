@@ -399,7 +399,7 @@ frontend:
     implemented: true
     working: true
     file: "/app/frontend/app/live-order-tracking.tsx"
-    stuck_count: 1
+    stuck_count: 0
     priority: "high"
     needs_retesting: false
     status_history:
