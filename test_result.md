@@ -159,9 +159,9 @@ frontend:
     implemented: true
     working: false
     file: "/app/frontend/app/(rider)/navigation.tsx"
-    stuck_count: 2
+    stuck_count: 3
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
       - working: "NA"
         agent: "main"
