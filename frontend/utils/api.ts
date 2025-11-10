@@ -18,14 +18,49 @@ export const setAuthToken = (token: string | null) => {
   authToken = token;
   if (token) {
     api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+    console.log('✅ Auth token set in API headers');
   } else {
     delete api.defaults.headers.common['Authorization'];
+    console.log('🔓 Auth token removed from API headers');
   }
 };
 
-// Initialize token if exists
-if (authToken) {
-  api.defaults.headers.common['Authorization'] = `Bearer ${authToken}`;
+// Function to restore token from localStorage
+const restoreAuthToken = () => {
+  if (typeof window !== 'undefined' && window.localStorage) {
+    const storedToken = localStorage.getItem('sessionToken');
+    if (storedToken && !authToken) {
+      setAuthToken(storedToken);
+      console.log('🔄 Auth token restored from localStorage');
+    }
+  }
+};
+
+// Restore token on module load
+restoreAuthToken();
+
+// Add request interceptor to ensure token is always present
+api.interceptors.request.use(
+  (config) => {
+    // If no auth header but we have token in localStorage, restore it
+    if (!config.headers.Authorization) {
+      restoreAuthToken();
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
+// Handle visibility change to restore auth on tab focus
+if (typeof document !== 'undefined') {
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) {
+      restoreAuthToken();
+      console.log('👁️ Tab visible - auth token checked');
+    }
+  });
 }
 
 export default api;
