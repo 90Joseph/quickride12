@@ -703,6 +703,31 @@ test_plan:
 agent_communication:
   - agent: "main"
     message: |
+      URGENT: Live Order Tracking - Route Line Not Displaying from Rider to Customer
+      
+      USER REPORT: Customer's live order tracking screen shows rider marker and customer marker but NO route line between them.
+      
+      PREVIOUS FIX ATTEMPTED:
+      - Updated updateMapMarkers function to properly store and update routePolylineRef
+      - Added logic to remove old polyline before drawing new one
+      - Fixed marker position updates
+      
+      ISSUE PERSISTS: Route line still not visible on customer tracking screen
+      
+      FILES TO TEST:
+      - /app/frontend/app/live-order-tracking.tsx
+      
+      TESTING NEEDED:
+      1. Verify route drawing logic is executing
+      2. Check Google Maps Routes API calls
+      3. Verify polyline is being added to map
+      4. Check console for any errors during route fetching/drawing
+      5. Test with real rider location updates
+      
+      Screenshot provided shows: Rider marker visible, customer marker visible, but NO blue route line connecting them.
+      
+  - agent: "main"
+    message: |
       URGENT: Persistent 403 Forbidden Errors on Rider Screens - Need Testing Agent Analysis
       
       PROBLEM:
