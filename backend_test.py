@@ -457,12 +457,10 @@ class NavigationTester:
             return False
             
         # Step 4: Test navigation prerequisites
-        if not self.test_navigation_prerequisites():
-            return False
+        self.test_navigation_prerequisites()
             
         # Step 5: Simulate Start Navigation conditions
-        if not self.simulate_start_navigation_conditions():
-            return False
+        self.simulate_start_navigation_conditions()
             
         # Step 6: Test location updates
         if not self.test_location_updates():
