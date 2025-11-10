@@ -1,18 +1,51 @@
 #!/usr/bin/env python3
 """
-Backend API Testing for Live Navigation and Tracking Features
-Tests the new rider navigation and customer tracking endpoints
+Comprehensive Backend API Testing for Rider 403 Forbidden Errors
+Testing all rider endpoints with different authentication states to diagnose
+persistent 403 errors when customers access rider screens
 """
 
 import requests
 import json
 import sys
+import time
 from datetime import datetime
 import uuid
 
 # Configuration
 BASE_URL = "https://track-delivery-5.preview.emergentagent.com/api"
 HEADERS = {"Content-Type": "application/json"}
+
+class Colors:
+    GREEN = '\033[92m'
+    RED = '\033[91m'
+    YELLOW = '\033[93m'
+    BLUE = '\033[94m'
+    PURPLE = '\033[95m'
+    CYAN = '\033[96m'
+    WHITE = '\033[97m'
+    BOLD = '\033[1m'
+    END = '\033[0m'
+
+def print_header(text):
+    print(f"\n{Colors.BOLD}{Colors.BLUE}{'='*60}{Colors.END}")
+    print(f"{Colors.BOLD}{Colors.BLUE}{text.center(60)}{Colors.END}")
+    print(f"{Colors.BOLD}{Colors.BLUE}{'='*60}{Colors.END}")
+
+def print_test(test_name):
+    print(f"\n{Colors.CYAN}🧪 {test_name}{Colors.END}")
+
+def print_success(message):
+    print(f"{Colors.GREEN}✅ {message}{Colors.END}")
+
+def print_error(message):
+    print(f"{Colors.RED}❌ {message}{Colors.END}")
+
+def print_warning(message):
+    print(f"{Colors.YELLOW}⚠️  {message}{Colors.END}")
+
+def print_info(message):
+    print(f"{Colors.WHITE}ℹ️  {message}{Colors.END}")
 
 class TestResults:
     def __init__(self):
