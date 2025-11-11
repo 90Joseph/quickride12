@@ -32,403 +32,426 @@ class BackendTester:
         timestamp = datetime.now().strftime("%H:%M:%S")
         print(f"[{timestamp}] {level}: {message}")
         
-    def create_test_rider_account(self):
-        """Create a test rider account for authentication testing"""
-        print("\n🔧 SETUP: Creating test rider account...")
-        
-        # Create unique test account
-        timestamp = int(time.time())
-        test_email = f"test.rider.{timestamp}@example.com"
-        test_password = "TestRider123!"
-        
-        register_data = {
-            "email": test_email,
-            "password": test_password,
-            "name": "Test Session Rider",
-            "role": "rider",
-            "phone": "+63 912 345 6789"
-        }
-        
+    def register_user(self, email, password, name, role="customer"):
+        """Register a new user"""
         try:
-            response = requests.post(f"{BACKEND_URL}/auth/register", json=register_data)
+            response = self.session.post(f"{BACKEND_URL}/auth/register", json={
+                "email": email,
+                "password": password,
+                "name": name,
+                "role": role,
+                "phone": "+63 912 345 6789"
+            })
             
             if response.status_code == 200:
                 data = response.json()
-                self.session_token = data.get("session_token")
-                self.user_data = data.get("user")
-                
-                self.log_result("Account Creation", "PASS", 
-                              f"Created rider account: {test_email}")
-                self.log_result("Session Token Received", "PASS", 
-                              f"Token: {self.session_token[:20]}...")
-                return True
+                self.log(f"✅ Registered {role}: {name} ({email})")
+                return data["session_token"], data["user"]["id"]
             else:
-                self.log_result("Account Creation", "FAIL", 
-                              f"HTTP {response.status_code}: {response.text}")
-                return False
+                self.log(f"❌ Registration failed: {response.status_code} - {response.text}", "ERROR")
+                return None, None
                 
         except Exception as e:
-            self.log_result("Account Creation", "FAIL", f"Exception: {str(e)}")
-            return False
+            self.log(f"❌ Registration error: {str(e)}", "ERROR")
+            return None, None
     
-    def test_backend_session_validation(self):
-        """Test 7: Backend Session Validation"""
-        print("\n🔍 TEST 7: Backend Session Validation")
-        
-        if not self.session_token:
-            self.log_result("Backend Session Validation", "FAIL", 
-                          "No session token available for testing")
-            return False
-        
-        # Test various endpoints with the session token
-        test_endpoints = [
-            ("/auth/me", "GET", "Authentication check"),
-            ("/riders/me", "GET", "Rider profile access"),
-            ("/riders/nearby-orders", "GET", "Nearby orders access"),
-            ("/rider/current-order", "GET", "Current order access")
-        ]
-        
-        headers = {"Authorization": f"Bearer {self.session_token}"}
-        
-        for endpoint, method, description in test_endpoints:
-            try:
-                if method == "GET":
-                    response = requests.get(f"{BACKEND_URL}{endpoint}", headers=headers)
-                
-                if response.status_code == 200:
-                    self.log_result(f"Backend Validation - {description}", "PASS", 
-                                  f"HTTP 200: {endpoint}")
-                elif response.status_code == 401:
-                    self.log_result(f"Backend Validation - {description}", "FAIL", 
-                                  f"HTTP 401 Unauthorized: Token rejected by backend")
-                elif response.status_code == 403:
-                    self.log_result(f"Backend Validation - {description}", "PASS", 
-                                  f"HTTP 403 Forbidden: Token valid but access denied (expected for some endpoints)")
-                else:
-                    self.log_result(f"Backend Validation - {description}", "WARN", 
-                                  f"HTTP {response.status_code}: {response.text[:100]}")
-                    
-            except Exception as e:
-                self.log_result(f"Backend Validation - {description}", "FAIL", 
-                              f"Exception: {str(e)}")
-        
-        return True
-    
-    def test_session_token_persistence(self):
-        """Test session token persistence over time"""
-        print("\n⏰ Testing Session Token Persistence Over Time...")
-        
-        if not self.session_token:
-            self.log_result("Session Persistence", "FAIL", "No session token to test")
-            return False
-        
-        # Test immediately
-        headers = {"Authorization": f"Bearer {self.session_token}"}
-        
+    def login_user(self, email, password):
+        """Login existing user"""
         try:
-            response = requests.get(f"{BACKEND_URL}/auth/me", headers=headers)
-            if response.status_code == 200:
-                self.log_result("Immediate Token Validation", "PASS", 
-                              "Token works immediately after creation")
-            else:
-                self.log_result("Immediate Token Validation", "FAIL", 
-                              f"HTTP {response.status_code}")
-                return False
-        except Exception as e:
-            self.log_result("Immediate Token Validation", "FAIL", f"Exception: {str(e)}")
-            return False
-        
-        # Test after a short delay (simulating tab switch)
-        print("⏳ Waiting 5 seconds to simulate tab switch delay...")
-        time.sleep(5)
-        
-        try:
-            response = requests.get(f"{BACKEND_URL}/auth/me", headers=headers)
-            if response.status_code == 200:
-                self.log_result("Delayed Token Validation", "PASS", 
-                              "Token still valid after 5 second delay")
-            else:
-                self.log_result("Delayed Token Validation", "FAIL", 
-                              f"HTTP {response.status_code} - Token expired or invalid")
-        except Exception as e:
-            self.log_result("Delayed Token Validation", "FAIL", f"Exception: {str(e)}")
-        
-        return True
-    
-    def test_rider_endpoints_authentication(self):
-        """Test rider-specific endpoints that are failing in the frontend"""
-        print("\n🏍️ Testing Rider-Specific Endpoints...")
-        
-        if not self.session_token:
-            self.log_result("Rider Endpoints", "FAIL", "No session token available")
-            return False
-        
-        headers = {"Authorization": f"Bearer {self.session_token}"}
-        
-        # Test the specific endpoints mentioned in the issue
-        rider_endpoints = [
-            ("/riders/me", "GET", "Rider profile - should auto-create if not exists"),
-            ("/riders/location", "PUT", "Update location - requires rider profile", {
-                "latitude": 14.5995,
-                "longitude": 120.9842,
-                "address": "Test Location, Manila"
-            }),
-            ("/riders/nearby-orders?radius=10", "GET", "Nearby orders - requires location"),
-            ("/rider/current-order", "GET", "Current order - should return null if no active order"),
-        ]
-        
-        for endpoint, method, description, *data in rider_endpoints:
-            try:
-                if method == "GET":
-                    response = requests.get(f"{BACKEND_URL}{endpoint}", headers=headers)
-                elif method == "PUT":
-                    payload = data[0] if data else {}
-                    response = requests.put(f"{BACKEND_URL}{endpoint}", 
-                                          headers=headers, json=payload)
-                
-                if response.status_code in [200, 201]:
-                    self.log_result(f"Rider Endpoint - {description}", "PASS", 
-                                  f"HTTP {response.status_code}: Success")
-                elif response.status_code == 403:
-                    self.log_result(f"Rider Endpoint - {description}", "FAIL", 
-                                  f"HTTP 403 Forbidden: User does not have rider access")
-                elif response.status_code == 401:
-                    self.log_result(f"Rider Endpoint - {description}", "FAIL", 
-                                  f"HTTP 401 Unauthorized: Authentication failed")
-                else:
-                    self.log_result(f"Rider Endpoint - {description}", "WARN", 
-                                  f"HTTP {response.status_code}: {response.text[:100]}")
-                    
-            except Exception as e:
-                self.log_result(f"Rider Endpoint - {description}", "FAIL", 
-                              f"Exception: {str(e)}")
-        
-        return True
-    
-    def test_token_format_and_validity(self):
-        """Test the format and validity of the session token"""
-        print("\n🔐 Testing Token Format and Validity...")
-        
-        if not self.session_token:
-            self.log_result("Token Format", "FAIL", "No session token to analyze")
-            return False
-        
-        # Check token format
-        token_length = len(self.session_token)
-        self.log_result("Token Length", "INFO", f"Token is {token_length} characters long")
-        
-        # Check if token looks like a UUID
-        import re
-        uuid_pattern = r'^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$'
-        if re.match(uuid_pattern, self.session_token):
-            self.log_result("Token Format", "PASS", "Token appears to be a valid UUID")
-        else:
-            self.log_result("Token Format", "WARN", "Token is not in UUID format")
-        
-        # Test token with different header formats
-        test_formats = [
-            ("Bearer " + self.session_token, "Bearer format"),
-            (self.session_token, "Raw token format")
-        ]
-        
-        for auth_header, format_name in test_formats:
-            try:
-                headers = {"Authorization": auth_header}
-                response = requests.get(f"{BACKEND_URL}/auth/me", headers=headers)
-                
-                if response.status_code == 200:
-                    self.log_result(f"Token Format - {format_name}", "PASS", 
-                                  "Authentication successful")
-                else:
-                    self.log_result(f"Token Format - {format_name}", "FAIL", 
-                                  f"HTTP {response.status_code}")
-            except Exception as e:
-                self.log_result(f"Token Format - {format_name}", "FAIL", 
-                              f"Exception: {str(e)}")
-        
-        return True
-    
-    def simulate_frontend_auth_flow(self):
-        """Simulate the frontend authentication flow"""
-        print("\n🌐 Simulating Frontend Authentication Flow...")
-        
-        if not self.session_token or not self.user_data:
-            self.log_result("Frontend Simulation", "FAIL", "No auth data to simulate")
-            return False
-        
-        # Simulate what frontend should do:
-        # 1. Store token and user in localStorage (simulated)
-        print("📱 Simulating localStorage storage...")
-        simulated_storage = {
-            "sessionToken": self.session_token,
-            "user": json.dumps(self.user_data)
-        }
-        
-        self.log_result("localStorage Simulation", "PASS", 
-                      "Token and user data stored in simulated localStorage")
-        
-        # 2. Test API call with stored token
-        print("🔄 Simulating API call with stored token...")
-        headers = {"Authorization": f"Bearer {simulated_storage['sessionToken']}"}
-        
-        try:
-            response = requests.get(f"{BACKEND_URL}/auth/me", headers=headers)
-            if response.status_code == 200:
-                returned_user = response.json()
-                if returned_user.get("id") == self.user_data.get("id"):
-                    self.log_result("Token Restoration Simulation", "PASS", 
-                                  "Token successfully restored user session")
-                else:
-                    self.log_result("Token Restoration Simulation", "FAIL", 
-                                  "Token returned different user data")
-            else:
-                self.log_result("Token Restoration Simulation", "FAIL", 
-                              f"HTTP {response.status_code}: Token restoration failed")
-        except Exception as e:
-            self.log_result("Token Restoration Simulation", "FAIL", 
-                          f"Exception during restoration: {str(e)}")
-        
-        return True
-    
-    def test_frontend_auth_implementation(self):
-        """Test the specific frontend auth implementation issues"""
-        print("\n🔍 Testing Frontend Auth Implementation Issues...")
-        
-        # Test the specific console messages that should appear
-        expected_messages = [
-            "🔄 Auth token restored from localStorage",
-            "👁️ Tab visible - auth token checked", 
-            "✅ Auth token set in API headers",
-            "✅ Session token loaded and set in API"
-        ]
-        
-        self.log_result("Expected Console Messages", "INFO", 
-                      f"Frontend should show: {', '.join(expected_messages)}")
-        
-        # Test localStorage persistence simulation
-        if self.session_token:
-            # Simulate the restoreAuthToken function
-            print("🔄 Simulating restoreAuthToken() function...")
+            response = self.session.post(f"{BACKEND_URL}/auth/login", json={
+                "email": email,
+                "password": password
+            })
             
-            # Check if token exists (simulated localStorage check)
-            stored_token = self.session_token  # Simulating localStorage.getItem('sessionToken')
-            
-            if stored_token:
-                self.log_result("localStorage Token Check", "PASS", 
-                              "sessionToken found in localStorage (simulated)")
+            if response.status_code == 200:
+                data = response.json()
+                self.log(f"✅ Logged in: {email}")
+                return data["session_token"], data["user"]["id"]
+            else:
+                self.log(f"❌ Login failed: {response.status_code} - {response.text}", "ERROR")
+                return None, None
                 
-                # Test if token would be set in API headers
-                headers = {"Authorization": f"Bearer {stored_token}"}
-                try:
-                    response = requests.get(f"{BACKEND_URL}/auth/me", headers=headers)
-                    if response.status_code == 200:
-                        self.log_result("Token Restoration Test", "PASS", 
-                                      "Token would successfully restore authentication")
+        except Exception as e:
+            self.log(f"❌ Login error: {str(e)}", "ERROR")
+            return None, None
+    
+    def get_current_user(self, token):
+        """Get current user info using token"""
+        try:
+            headers = {"Authorization": f"Bearer {token}"}
+            response = self.session.get(f"{BACKEND_URL}/auth/me", headers=headers)
+            
+            if response.status_code == 200:
+                user = response.json()
+                self.log(f"✅ Current user: {user['name']} (ID: {user['id']}, Role: {user['role']})")
+                return user
+            else:
+                self.log(f"❌ Get user failed: {response.status_code} - {response.text}", "ERROR")
+                return None
+                
+        except Exception as e:
+            self.log(f"❌ Get user error: {str(e)}", "ERROR")
+            return None
+    
+    def create_test_order(self, customer_token, customer_id):
+        """Create a test order for testing"""
+        try:
+            headers = {"Authorization": f"Bearer {customer_token}"}
+            
+            # First get restaurants
+            restaurants_response = self.session.get(f"{BACKEND_URL}/restaurants")
+            if restaurants_response.status_code != 200:
+                self.log("❌ Failed to get restaurants", "ERROR")
+                return None
+                
+            restaurants = restaurants_response.json()
+            if not restaurants:
+                self.log("❌ No restaurants available", "ERROR")
+                return None
+                
+            restaurant = restaurants[0]
+            
+            order_data = {
+                "restaurant_id": restaurant["id"],
+                "items": [
+                    {
+                        "menu_item_id": "test-item-1",
+                        "name": "Test Burger",
+                        "price": 150.0,
+                        "quantity": 1
+                    }
+                ],
+                "total_amount": 200.0,
+                "subtotal": 150.0,
+                "delivery_fee": 50.0,
+                "delivery_address": {
+                    "latitude": 14.5995,
+                    "longitude": 120.9842,
+                    "address": "Test Customer Address, Makati City"
+                },
+                "customer_phone": "+63 912 345 6789",
+                "special_instructions": "Test order for route line investigation"
+            }
+            
+            response = self.session.post(f"{BACKEND_URL}/orders", json=order_data, headers=headers)
+            
+            if response.status_code == 200:
+                order = response.json()
+                self.log(f"✅ Created test order: {order['id']}")
+                return order["id"]
+            else:
+                self.log(f"❌ Order creation failed: {response.status_code} - {response.text}", "ERROR")
+                return None
+                
+        except Exception as e:
+            self.log(f"❌ Order creation error: {str(e)}", "ERROR")
+            return None
+    
+    def get_order_details(self, order_id, token):
+        """Get order details"""
+        try:
+            headers = {"Authorization": f"Bearer {token}"}
+            response = self.session.get(f"{BACKEND_URL}/orders/{order_id}", headers=headers)
+            
+            if response.status_code == 200:
+                order = response.json()
+                self.log(f"✅ Order details retrieved: {order_id}")
+                self.log(f"   Customer ID in order: {order.get('customer_id')}")
+                self.log(f"   Order status: {order.get('status')}")
+                self.log(f"   Rider ID: {order.get('rider_id', 'None')}")
+                return order
+            else:
+                self.log(f"❌ Get order failed: {response.status_code} - {response.text}", "ERROR")
+                return None
+                
+        except Exception as e:
+            self.log(f"❌ Get order error: {str(e)}", "ERROR")
+            return None
+    
+    def test_rider_location_endpoint(self, order_id, token, user_type="customer"):
+        """Test the rider location endpoint that's causing 403 errors"""
+        try:
+            headers = {"Authorization": f"Bearer {token}"}
+            response = self.session.get(f"{BACKEND_URL}/orders/{order_id}/rider-location", headers=headers)
+            
+            self.log(f"🔍 Testing rider location endpoint as {user_type}")
+            self.log(f"   URL: GET {BACKEND_URL}/orders/{order_id}/rider-location")
+            self.log(f"   Status: {response.status_code}")
+            
+            if response.status_code == 200:
+                data = response.json()
+                self.log(f"✅ Rider location response: {json.dumps(data, indent=2)}")
+                return data
+            elif response.status_code == 403:
+                self.log(f"❌ 403 FORBIDDEN - This is the reported issue!")
+                self.log(f"   Response: {response.text}")
+                return None
+            else:
+                self.log(f"❌ Unexpected status: {response.status_code} - {response.text}", "ERROR")
+                return None
+                
+        except Exception as e:
+            self.log(f"❌ Rider location test error: {str(e)}", "ERROR")
+            return None
+    
+    def assign_rider_to_order(self, order_id, rider_token):
+        """Assign rider to order and update rider location"""
+        try:
+            # First create rider profile
+            headers = {"Authorization": f"Bearer {rider_token}"}
+            rider_response = self.session.get(f"{BACKEND_URL}/riders/me", headers=headers)
+            
+            if rider_response.status_code == 200:
+                rider = rider_response.json()
+                self.log(f"✅ Rider profile: {rider['name']} (ID: {rider['id']})")
+                
+                # Update rider location
+                location_data = {
+                    "latitude": 14.5555,
+                    "longitude": 121.026,
+                    "address": "Approaching restaurant"
+                }
+                
+                location_response = self.session.put(
+                    f"{BACKEND_URL}/riders/location", 
+                    json=location_data, 
+                    headers=headers
+                )
+                
+                if location_response.status_code == 200:
+                    self.log("✅ Rider location updated")
+                    
+                    # Manually assign rider to order (simulate auto-assignment)
+                    # Update order status to ready_for_pickup to trigger auto-assignment
+                    status_response = self.session.put(
+                        f"{BACKEND_URL}/orders/{order_id}/status",
+                        json={"status": "ready_for_pickup"},
+                        headers=headers
+                    )
+                    
+                    if status_response.status_code == 200:
+                        self.log("✅ Order status updated to ready_for_pickup (should trigger auto-assignment)")
+                        return True
                     else:
-                        self.log_result("Token Restoration Test", "FAIL", 
-                                      f"Token restoration would fail: HTTP {response.status_code}")
-                except Exception as e:
-                    self.log_result("Token Restoration Test", "FAIL", 
-                                  f"Token restoration would fail: {str(e)}")
+                        self.log(f"❌ Status update failed: {status_response.status_code} - {status_response.text}")
+                        return False
+                else:
+                    self.log(f"❌ Location update failed: {location_response.status_code}")
+                    return False
             else:
-                self.log_result("localStorage Token Check", "FAIL", 
-                              "No sessionToken in localStorage (simulated)")
-        
-        return True
+                self.log(f"❌ Rider profile failed: {rider_response.status_code}")
+                return False
+                
+        except Exception as e:
+            self.log(f"❌ Rider assignment error: {str(e)}", "ERROR")
+            return False
     
-    def run_comprehensive_investigation(self):
-        """Run all tests to investigate session loss issue"""
-        print("🔍 COMPREHENSIVE SESSION LOSS INVESTIGATION")
-        print("=" * 60)
+    def run_comprehensive_test(self):
+        """Run comprehensive test to identify the 403 error root cause"""
+        self.log("🚀 STARTING COMPREHENSIVE LIVE ORDER TRACKING TEST")
+        self.log("=" * 60)
         
-        # Setup
-        if not self.create_test_rider_account():
-            print("❌ Cannot proceed without test account")
+        # Test 1: Create test accounts
+        self.log("\n📋 TEST 1: Creating Test Accounts")
+        
+        # Create customer account
+        customer_email = f"test-customer-{uuid.uuid4().hex[:8]}@test.com"
+        self.customer_token, self.customer_id = self.register_user(
+            customer_email, "password123", "Test Customer", "customer"
+        )
+        
+        if not self.customer_token:
+            self.log("❌ CRITICAL: Cannot create customer account", "ERROR")
             return False
         
-        # Run all tests
-        self.test_token_format_and_validity()
-        self.test_backend_session_validation()
-        self.test_session_token_persistence()
-        self.test_rider_endpoints_authentication()
-        self.simulate_frontend_auth_flow()
-        self.test_frontend_auth_implementation()
-        
-        # Summary
-        print("\n" + "=" * 60)
-        print("📊 INVESTIGATION SUMMARY")
-        print("=" * 60)
-        
-        pass_count = sum(1 for r in self.test_results if r["status"] == "PASS")
-        fail_count = sum(1 for r in self.test_results if r["status"] == "FAIL")
-        warn_count = sum(1 for r in self.test_results if r["status"] == "WARN")
-        info_count = sum(1 for r in self.test_results if r["status"] == "INFO")
-        
-        print(f"✅ PASSED: {pass_count}")
-        print(f"❌ FAILED: {fail_count}")
-        print(f"⚠️  WARNINGS: {warn_count}")
-        print(f"ℹ️  INFO: {info_count}")
-        
-        if fail_count > 0:
-            print("\n🚨 CRITICAL ISSUES FOUND:")
-            for result in self.test_results:
-                if result["status"] == "FAIL":
-                    print(f"   • {result['test']}: {result['details']}")
-        
-        # Key findings for session loss investigation
-        print("\n🔍 KEY FINDINGS FOR SESSION LOSS ISSUE:")
-        
-        backend_auth_working = any(
-            r["status"] == "PASS" and "Backend Validation" in r["test"] 
-            for r in self.test_results
+        # Create rider account
+        rider_email = f"test-rider-{uuid.uuid4().hex[:8]}@test.com"
+        self.rider_token, self.rider_id = self.register_user(
+            rider_email, "password123", "Test Navigation Rider", "rider"
         )
         
-        token_restoration_working = any(
-            r["status"] == "PASS" and "Token Restoration" in r["test"]
-            for r in self.test_results
-        )
+        if not self.rider_token:
+            self.log("❌ CRITICAL: Cannot create rider account", "ERROR")
+            return False
         
-        if backend_auth_working and token_restoration_working:
-            print("   ✅ Backend session validation is WORKING correctly")
-            print("   ✅ Token restoration mechanism would work")
-            print("   ➡️  Issue is likely in FRONTEND event handling or timing")
-            print("   🔧 Recommended investigation areas:")
-            print("      1. Check if visibilitychange event listener actually fires")
-            print("      2. Verify timing of authStore.initializeAuth() vs component mounting")
-            print("      3. Check if localStorage is being cleared by browser security")
-            print("      4. Verify React component lifecycle during tab switches")
-            print("      5. Test if request interceptor is actually being called")
-        elif backend_auth_working:
-            print("   ✅ Backend session validation is WORKING correctly")
-            print("   ❌ Token restoration has issues")
-            print("   ➡️  Problem is in frontend token restoration logic")
+        # Test 2: Verify logged-in customer ID
+        self.log("\n📋 TEST 2: Get Current Logged-In Customer ID")
+        customer_user = self.get_current_user(self.customer_token)
+        if not customer_user:
+            self.log("❌ CRITICAL: Cannot get customer user info", "ERROR")
+            return False
+        
+        logged_in_customer_id = customer_user["id"]
+        self.log(f"🔍 Logged-in customer ID: {logged_in_customer_id}")
+        
+        # Test 3: Create test order
+        self.log("\n📋 TEST 3: Create Test Order")
+        self.test_order_id = self.create_test_order(self.customer_token, self.customer_id)
+        
+        if not self.test_order_id:
+            self.log("❌ CRITICAL: Cannot create test order", "ERROR")
+            return False
+        
+        # Test 4: Verify order ownership
+        self.log("\n📋 TEST 4: Verify Order Ownership")
+        order_details = self.get_order_details(self.test_order_id, self.customer_token)
+        
+        if not order_details:
+            self.log("❌ CRITICAL: Cannot get order details", "ERROR")
+            return False
+        
+        order_customer_id = order_details.get("customer_id")
+        self.log(f"🔍 Customer ID in order: {order_customer_id}")
+        self.log(f"🔍 Logged-in customer ID: {logged_in_customer_id}")
+        
+        if order_customer_id == logged_in_customer_id:
+            self.log("✅ OWNERSHIP MATCH: Customer owns the order")
         else:
-            print("   ❌ Backend session validation has ISSUES")
-            print("   ➡️  Backend authentication system needs investigation")
+            self.log("❌ OWNERSHIP MISMATCH: Customer does NOT own the order", "ERROR")
+            return False
         
-        # Specific recommendations based on the review request
-        print("\n📋 SPECIFIC RECOMMENDATIONS FOR REVIEW REQUEST:")
-        print("   1. Test localStorage persistence manually in browser dev tools")
-        print("   2. Add console.log to visibilitychange event to verify it fires")
-        print("   3. Check browser Network tab for Authorization headers after tab switch")
-        print("   4. Verify authStore state after tab switch using React dev tools")
-        print("   5. Test if React components are unmounting/remounting on tab switch")
+        # Test 5: Test rider location endpoint WITHOUT rider assigned
+        self.log("\n📋 TEST 5: Test Rider Location Endpoint (No Rider Assigned)")
+        result = self.test_rider_location_endpoint(self.test_order_id, self.customer_token, "customer")
         
-        return True
+        if result is not None:
+            self.log("✅ Endpoint accessible when no rider assigned")
+        else:
+            self.log("❌ 403 ERROR CONFIRMED: Customer cannot access their own order's rider location")
+        
+        # Test 6: Assign rider and test again
+        self.log("\n📋 TEST 6: Assign Rider and Test Rider Location Endpoint")
+        rider_assigned = self.assign_rider_to_order(self.test_order_id, self.rider_token)
+        
+        if rider_assigned:
+            # Wait a moment for assignment to process
+            import time
+            time.sleep(2)
+            
+            # Get updated order details
+            updated_order = self.get_order_details(self.test_order_id, self.customer_token)
+            if updated_order and updated_order.get("rider_id"):
+                self.log(f"✅ Rider assigned: {updated_order.get('rider_name')} (ID: {updated_order.get('rider_id')})")
+                
+                # Test rider location endpoint again
+                result = self.test_rider_location_endpoint(self.test_order_id, self.customer_token, "customer")
+                
+                if result is not None:
+                    self.log("✅ SUCCESS: Customer can now access rider location")
+                    return True
+                else:
+                    self.log("❌ STILL FAILING: 403 error persists even with rider assigned")
+            else:
+                self.log("❌ Rider assignment may have failed")
+        
+        # Test 7: Test with different customer (wrong ownership)
+        self.log("\n📋 TEST 7: Test with Different Customer (Wrong Ownership)")
+        
+        # Create another customer
+        other_customer_email = f"test-other-customer-{uuid.uuid4().hex[:8]}@test.com"
+        other_customer_token, other_customer_id = self.register_user(
+            other_customer_email, "password123", "Other Customer", "customer"
+        )
+        
+        if other_customer_token:
+            result = self.test_rider_location_endpoint(self.test_order_id, other_customer_token, "other customer")
+            
+            if result is None:
+                self.log("✅ CORRECT: Other customer correctly gets 403 (expected behavior)")
+            else:
+                self.log("❌ SECURITY ISSUE: Other customer can access order they don't own", "ERROR")
+        
+        # Test 8: Test the specific order ID from user report
+        self.log("\n📋 TEST 8: Test Specific Order ID from User Report")
+        reported_order_id = "5b0483fd-3ab8-4750-b392-8987185975fa"
+        
+        # Try to get order details first
+        reported_order = self.get_order_details(reported_order_id, self.customer_token)
+        if reported_order:
+            self.log(f"✅ Found reported order: {reported_order_id}")
+            self.log(f"   Order customer ID: {reported_order.get('customer_id')}")
+            self.log(f"   Current customer ID: {logged_in_customer_id}")
+            
+            # Test rider location for reported order
+            result = self.test_rider_location_endpoint(reported_order_id, self.customer_token, "customer")
+            
+            if result is None:
+                if reported_order.get('customer_id') != logged_in_customer_id:
+                    self.log("✅ DIAGNOSIS: Customer is trying to access order that belongs to different customer")
+                    self.log("🔍 ROOT CAUSE: Customer logged in as wrong user or viewing wrong order")
+                else:
+                    self.log("❌ BACKEND BUG: Customer owns order but still gets 403")
+        else:
+            self.log(f"❌ Reported order {reported_order_id} not found or not accessible")
+        
+        return False
+    
+    def run_database_investigation(self):
+        """Additional database-level investigation"""
+        self.log("\n📋 DATABASE INVESTIGATION")
+        
+        # This would require direct MongoDB access, which we don't have in this test
+        # But we can make API calls to understand the data structure
+        
+        # Get all orders for current customer
+        try:
+            headers = {"Authorization": f"Bearer {self.customer_token}"}
+            response = self.session.get(f"{BACKEND_URL}/orders", headers=headers)
+            
+            if response.status_code == 200:
+                orders = response.json()
+                self.log(f"✅ Customer has {len(orders)} total orders")
+                
+                for order in orders[:3]:  # Show first 3 orders
+                    self.log(f"   Order {order['id'][:8]}... - Customer: {order.get('customer_id')[:8]}... - Status: {order.get('status')}")
+            else:
+                self.log(f"❌ Cannot get customer orders: {response.status_code}")
+                
+        except Exception as e:
+            self.log(f"❌ Database investigation error: {str(e)}", "ERROR")
 
 def main():
-    """Main function to run the investigation"""
-    investigator = SessionLossInvestigator()
+    """Main test execution"""
+    print("🔍 LIVE ORDER TRACKING ROUTE LINE INVESTIGATION")
+    print("=" * 60)
+    print("Issue: Customer gets 403 Forbidden on /api/orders/{order_id}/rider-location")
+    print("Goal: Identify root cause and provide solution")
+    print("=" * 60)
+    
+    tester = BackendTester()
     
     try:
-        investigator.run_comprehensive_investigation()
+        success = tester.run_comprehensive_test()
+        tester.run_database_investigation()
+        
+        print("\n" + "=" * 60)
+        print("🎯 INVESTIGATION SUMMARY")
+        print("=" * 60)
+        
+        if success:
+            print("✅ ISSUE RESOLVED: Route line should now work correctly")
+        else:
+            print("❌ ISSUE PERSISTS: Further investigation needed")
+            print("\n🔍 POSSIBLE ROOT CAUSES:")
+            print("1. Customer viewing order that belongs to different customer")
+            print("2. Backend authorization logic bug in rider-location endpoint")
+            print("3. Session token not properly attached to requests")
+            print("4. Customer account vs order ownership mismatch")
+            print("5. Database inconsistency in customer_id fields")
+            
+            print("\n💡 RECOMMENDED SOLUTIONS:")
+            print("1. Verify customer is logged in as correct account")
+            print("2. Check if order belongs to currently logged-in customer")
+            print("3. Create fresh test: Customer places order → Same customer tracks it")
+            print("4. Review backend authorization logic in server.py line 2275")
+            print("5. Ensure frontend sends proper Authorization headers")
+        
     except KeyboardInterrupt:
-        print("\n⏹️  Investigation interrupted by user")
+        print("\n⚠️ Test interrupted by user")
     except Exception as e:
-        print(f"\n💥 Investigation failed with exception: {str(e)}")
-        return 1
-    
-    return 0
+        print(f"\n❌ CRITICAL ERROR: {str(e)}")
+        import traceback
+        traceback.print_exc()
 
 if __name__ == "__main__":
-    sys.exit(main())
+    main()
