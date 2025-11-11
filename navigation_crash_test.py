@@ -105,6 +105,19 @@ class NavigationCrashTester:
         
         headers = {"Authorization": f"Bearer {self.rider_token}"}
         
+        # First check user role
+        try:
+            response = self.session.get(f"{BACKEND_URL}/auth/me", headers=headers)
+            if response.status_code == 200:
+                user_data = response.json()
+                self.log_result("Check User Role", True, 
+                               f"User role: {user_data.get('role')}, Name: {user_data.get('name')}")
+            else:
+                self.log_result("Check User Role", False, 
+                               error=f"Status: {response.status_code}, Response: {response.text}")
+        except Exception as e:
+            self.log_result("Check User Role", False, error=str(e))
+
         # Test /riders/me (auto-creates profile)
         try:
             response = self.session.get(f"{BACKEND_URL}/riders/me", headers=headers)
