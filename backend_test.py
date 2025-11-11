@@ -284,6 +284,11 @@ class BackendTester:
         logged_in_customer_id = customer_user["id"]
         self.log(f"🔍 Logged-in customer ID: {logged_in_customer_id}")
         
+        # Also verify rider user
+        rider_user = self.get_current_user(self.rider_token)
+        if rider_user:
+            self.log(f"🔍 Rider user ID: {rider_user['id']} (Role: {rider_user['role']})")
+        
         # Test 3: Create test order
         self.log("\n📋 TEST 3: Create Test Order")
         self.test_order_id = self.create_test_order(self.customer_token, self.customer_id)
