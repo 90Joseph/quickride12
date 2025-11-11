@@ -1095,6 +1095,42 @@ const fetchRouteFromRoutesAPI = async (origin: any, destination: any, map: any) 
     }
   }, [userLocation, isNavigating]);
 
+  // Initialize idle map (no active job) - MOVED TO TOP TO FIX HOOKS ERROR
+  useEffect(() => {
+    // Only initialize if no current job and conditions are met
+    if (!currentJob && Platform.OS === 'web' && mapRef.current && userLocation) {
+      const google = (window as any).google;
+      if (google && google.maps && !mapInstanceRef.current) {
+        const map = new google.maps.Map(mapRef.current, {
+          center: { lat: userLocation.latitude, lng: userLocation.longitude },
+          zoom: 15,
+          disableDefaultUI: false,
+          zoomControl: true,
+          mapTypeControl: false,
+          streetViewControl: false,
+          fullscreenControl: false,
+        });
+        
+        // Add rider marker
+        new google.maps.Marker({
+          position: { lat: userLocation.latitude, lng: userLocation.longitude },
+          map: map,
+          icon: {
+            path: google.maps.SymbolPath.CIRCLE,
+            scale: 10,
+            fillColor: '#FF6B6B',
+            fillOpacity: 1,
+            strokeColor: '#FFF',
+            strokeWeight: 3,
+          },
+          title: 'Your Location'
+        });
+        
+        mapInstanceRef.current = map;
+      }
+    }
+  }, [currentJob, userLocation]);
+
   const getNextAction = () => {
     if (!currentJob) return null;
 
