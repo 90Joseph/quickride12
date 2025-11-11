@@ -57,7 +57,7 @@ class BackendTester:
     def login_user(self, email, password):
         """Login existing user"""
         try:
-            response = self.session.post(f"{BACKEND_URL}/auth/login", json={
+            response = requests.post(f"{BACKEND_URL}/auth/login", json={
                 "email": email,
                 "password": password
             })
