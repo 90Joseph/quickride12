@@ -775,6 +775,37 @@ test_plan:
 agent_communication:
   - agent: "main"
     message: |
+      CRITICAL: Navigation Screen Crash - getZoom Error on Null Map Instance
+      
+      ERROR: Uncaught TypeError: Cannot read properties of null (reading 'getZoom')
+      Location: navigation.tsx:798:54
+      
+      CONTEXT:
+      - Error occurs in rider navigation screen
+      - Map instance is null when code tries to call .getZoom()
+      - Likely race condition or cleanup issue
+      
+      POSSIBLE CAUSES:
+      1. Map instance cleared/destroyed but code still trying to use it
+      2. startNavigation function accessing map before initialization
+      3. State transition clearing mapInstanceRef.current
+      4. Animation or transition code accessing null map
+      
+      FILES TO INVESTIGATE:
+      - /app/frontend/app/(rider)/navigation.tsx (line 798 and surrounding code)
+      - Map initialization logic
+      - startNavigation function
+      - Map cleanup on state transitions
+      
+      TESTING NEEDED:
+      1. Identify exact line causing error (line 798)
+      2. Check when mapInstanceRef.current becomes null
+      3. Verify map initialization sequence
+      4. Test navigation state transitions
+      5. Add null checks before map operations
+      
+  - agent: "main"
+    message: |
       CRITICAL: Active Deliveries Tab Shows No Deliveries Despite Navigation Tab Showing Details
       
       USER REPORT: 
