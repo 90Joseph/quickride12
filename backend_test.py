@@ -291,7 +291,7 @@ class BackendTester:
         
         # Test 3: Create test order
         self.log("\n📋 TEST 3: Create Test Order")
-        self.test_order_id = self.create_test_order(self.customer_token, self.customer_id)
+        self.test_order_id = self.create_test_order(self.customer_token, logged_in_customer_id)
         
         if not self.test_order_id:
             self.log("❌ CRITICAL: Cannot create test order", "ERROR")
