@@ -676,8 +676,13 @@ const fetchRouteFromRoutesAPI = async (origin: any, destination: any, map: any) 
 
   // Start turn-by-turn navigation
   const startNavigation = async () => {
-    if (!userLocation || !currentJob || !mapInstanceRef.current) {
-      Alert.alert('Error', 'Cannot start navigation. Location or job data missing.');
+    if (!mapInstanceRef.current) {
+      Alert.alert('Error', 'Map not ready. Please wait a moment and try again.');
+      return;
+    }
+    
+    if (!currentJob || !userLocation) {
+      Alert.alert('Error', 'Missing job information or location data.');
       return;
     }
 
