@@ -282,23 +282,30 @@ class BackendTester:
         
         # Test 2: Verify logged-in customer ID
         self.log("\n📋 TEST 2: Get Current Logged-In Customer ID")
+        
+        # Debug: Check both tokens
+        self.log(f"🔍 DEBUG: Using customer token: {self.customer_token[:20]}...")
         customer_user = self.get_current_user(self.customer_token)
         if not customer_user:
             self.log("❌ CRITICAL: Cannot get customer user info", "ERROR")
+            return False
+        
+        # Verify we have the correct customer token
+        if customer_user["role"] != "customer":
+            self.log(f"❌ CRITICAL: Customer token returned {customer_user['role']} instead of customer", "ERROR")
+            self.log(f"   This suggests the tokens got mixed up during registration")
             return False
         
         logged_in_customer_id = customer_user["id"]
         self.log(f"🔍 Logged-in customer ID: {logged_in_customer_id}")
         
         # Also verify rider user
+        self.log(f"🔍 DEBUG: Using rider token: {self.rider_token[:20]}...")
         rider_user = self.get_current_user(self.rider_token)
         if rider_user:
             self.log(f"🔍 Rider user ID: {rider_user['id']} (Role: {rider_user['role']})")
-        
-        # Verify we have the correct customer token
-        if customer_user["role"] != "customer":
-            self.log(f"❌ CRITICAL: Expected customer role but got {customer_user['role']}", "ERROR")
-            return False
+            if rider_user["role"] != "rider":
+                self.log(f"❌ WARNING: Rider token returned {rider_user['role']} instead of rider", "ERROR")
         
         # Test 3: Create test order
         self.log("\n📋 TEST 3: Create Test Order")
