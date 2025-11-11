@@ -34,7 +34,7 @@ class BackendTester:
     def register_user(self, email, password, name, role="customer"):
         """Register a new user"""
         try:
-            response = self.session.post(f"{BACKEND_URL}/auth/register", json={
+            response = requests.post(f"{BACKEND_URL}/auth/register", json={
                 "email": email,
                 "password": password,
                 "name": name,
