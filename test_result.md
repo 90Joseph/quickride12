@@ -1271,33 +1271,94 @@ agent_communication:
 
   - agent: "testing"
     message: |
-      ❌ CRITICAL ISSUE FOUND: Rider Navigation Screen Authentication Failure
-      
-      PROBLEM:
-      - Cannot test rider navigation map functionality due to authentication blocking access
-      - App redirects to login page even with valid session token
-      - Frontend auth store not properly initialized with localStorage session token
-      
-      TESTING ATTEMPTED:
-      - Created test rider account and active food order
-      - Verified backend APIs work correctly with Bearer token authentication
-      - Confirmed Google Maps API can load when script is injected
-      - Multiple attempts to bypass authentication failed
-      
-      ROOT CAUSE:
-      - Auth store (/app/frontend/store/authStore.ts) starts empty on page load
-      - _layout.tsx redirects to login when no user in store
-      - Session token exists in localStorage but not loaded into auth store
-      - setAuthToken() not called during app initialization
-      
-      IMPACT ON MAP TESTING:
-      - Cannot verify if map appears after performance fix
-      - Cannot test route polylines, markers, distance, or ETA display
-      - Cannot confirm if map refresh issue is resolved
-      - All rider navigation features are inaccessible
-      
-      RECOMMENDATION:
-      - HIGH PRIORITY: Fix frontend authentication initialization
+      🔍 REACT HOOKS ERROR ANALYSIS COMPLETED - ROOT CAUSE IDENTIFIED
+
+      **CRITICAL ISSUE CONFIRMED:**
+      "Rendered more hooks than during the previous render" error at navigation.tsx:1147:12
+
+      **COMPLETE HOOKS ANALYSIS:**
+
+      **ALL HOOKS IN COMPONENT (30 total):**
+      1. Line 25: `useAuthStore()` - Custom hook
+      2. Line 26: `useRef<any>(null)` - mapRef
+      3. Line 27: `useRef<any>(null)` - mapInstanceRef  
+      4. Line 28: `useRef<string | null>(null)` - currentJobIdRef
+      5. Line 29: `useRef<BottomSheet>(null)` - bottomSheetRef
+      6. Line 32: `useSafeAreaInsets()` - Custom hook
+      7. Line 33: `useMemo(() => ['12%', '50%', '90%'], [])` - snapPoints
+      8. Line 35: `useState<any>(null)` - currentJob
+      9. Line 36: `useState(true)` - loading
+      10. Line 37: `useState(false)` - mapLoaded
+      11. Line 38: `useState<any>(null)` - userLocation
+      12. Line 39: `useState<string>('')` - distanceToDestination
+      13. Line 40: `useState<string>('')` - etaToDestination
+      14. Line 41: `useState<string>('')` - mapError
+      15. Line 42: `useState(false)` - scriptLoaded
+      16. Line 45: `useState(false)` - isNavigating
+      17. Line 46: `useState<any>(null)` - currentStep
+      18. Line 47: `useState<any[]>([])` - navigationSteps
+      19. Line 48: `useState<string>('')` - remainingDistance
+      20. Line 49: `useState<string>('')` - remainingTime
+      21. Line 50: `useState<number>(0)` - currentBearing
+      22. Line 51: `useRef<any>(null)` - directionsRendererRef
+      23. Line 52: `useRef<any>(null)` - riderMarkerRef
+      24. Line 53: `useRef<any>(null)` - directionConeRef
+      25. Line 55: `useEffect(() => {...}, [user, authLoading])` - Auth & job fetching
+      26. Line 82: `useEffect(() => {...}, [currentJob?.id])` - Location updates
+      27. Line 96: `useEffect(() => {...}, [currentJob])` - Map initialization
+      28. Line 935: `useRef<any>(null)` - previousLocationRef
+      29. Line 938: `useEffect(() => {...}, [userLocation, isNavigating])` - Navigation updates
+      30. Line 1147: `useEffect(() => {...}, [currentJob, userLocation])` - **PROBLEMATIC HOOK**
+
+      **RULES OF HOOKS VIOLATION IDENTIFIED:**
+
+      **Hook Count Per Render Path:**
+      - **Path 1 (Auth guard return at line 1118)**: Calls hooks 1-29 (29 hooks)
+      - **Path 2 (Loading return at line 1136)**: Calls hooks 1-29 (29 hooks)  
+      - **Path 3 (No job return at line 1183)**: Calls hooks 1-30 (30 hooks)
+      - **Path 4 (Main render at line 1210)**: Calls hooks 1-30 (30 hooks)
+
+      **ROOT CAUSE:**
+      ❌ The useEffect at line 1147-1180 is called CONDITIONALLY
+      ❌ Early returns at lines 1118 and 1136 happen BEFORE this useEffect
+      ❌ This creates inconsistent hook counts: 29 vs 30 hooks
+      ❌ Violates React's Rules of Hooks: "Always call hooks in the same order"
+
+      **EARLY RETURNS BEFORE HOOK #30:**
+      1. Line 1118-1134: `if (user && user.role !== 'rider') return` - BEFORE useEffect #30
+      2. Line 1136-1144: `if (loading) return` - BEFORE useEffect #30
+
+      **SOLUTION REQUIRED:**
+      ✅ Move useEffect from line 1147 to TOP of component (before line 55)
+      ✅ Ensure ALL 30 hooks are called before ANY conditional logic
+      ✅ Use conditional logic INSIDE hooks, not around them
+
+      **CORRECTED STRUCTURE NEEDED:**
+      ```typescript
+      export default function RiderNavigationScreen() {
+        // ALL 30 HOOKS HERE - ALWAYS CALLED IN SAME ORDER
+        const { user, isLoading: authLoading } = useAuthStore();
+        const mapRef = useRef<any>(null);
+        // ... all other hooks ...
+        
+        // Move this useEffect to TOP (currently at line 1147)
+        useEffect(() => {
+          if (!currentJob && Platform.OS === 'web' && mapRef.current && userLocation) {
+            // Idle map initialization logic
+          }
+        }, [currentJob, userLocation]);
+        
+        // NOW conditional returns are safe
+        if (user && user.role !== 'rider') return <AccessDenied />;
+        if (loading) return <Loading />;
+        if (!currentJob) return <NoJobView />;
+        
+        return <MainNavigationView />;
+      }
+      ```
+
+      **IMMEDIATE ACTION REQUIRED:**
+      This is a CRITICAL React error that breaks the component. The useEffect at line 1147 must be moved to the top of the component before any conditional returns.
       - Load session token from localStorage into auth store on app startup
       - Ensure axios auth headers are set when session token exists
       - After auth fix, re-test rider navigation map functionality
