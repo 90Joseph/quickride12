@@ -132,7 +132,10 @@ export default function RiderActiveScreen() {
 
       <View style={styles.statusBadge}>
         <Text style={styles.statusText}>
-          {item.status === 'out_for_delivery' ? '🚴 ON THE WAY' : '📦 AT RESTAURANT'}
+          {item.status === 'out_for_delivery' ? '🚴 ON THE WAY' : 
+           item.status === 'picked_up' ? '📦 PICKED UP' :
+           item.status === 'ready_for_pickup' ? '🏪 READY FOR PICKUP' :
+           '📦 AT RESTAURANT'}
         </Text>
       </View>
 
