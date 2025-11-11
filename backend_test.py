@@ -264,6 +264,9 @@ class BackendTester:
             self.log("❌ CRITICAL: Cannot create customer account", "ERROR")
             return False
         
+        self.log(f"🔍 Customer token: {self.customer_token[:20]}...")
+        self.log(f"🔍 Customer ID: {self.customer_id}")
+        
         # Create rider account
         rider_email = f"test-rider-{uuid.uuid4().hex[:8]}@test.com"
         self.rider_token, self.rider_id = self.register_user(
@@ -273,6 +276,9 @@ class BackendTester:
         if not self.rider_token:
             self.log("❌ CRITICAL: Cannot create rider account", "ERROR")
             return False
+        
+        self.log(f"🔍 Rider token: {self.rider_token[:20]}...")
+        self.log(f"🔍 Rider ID: {self.rider_id}")
         
         # Test 2: Verify logged-in customer ID
         self.log("\n📋 TEST 2: Get Current Logged-In Customer ID")
