@@ -1940,4 +1940,32 @@ const styles = StyleSheet.create({
     marginTop: 4,
     lineHeight: 22,
   },
+  idleSheetHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    gap: 12,
+  },
+  idleSheetTitle: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    color: '#333',
+  },
+  idleSheetBody: {
+    paddingHorizontal: 20,
+    paddingBottom: 20,
+    gap: 16,
+  },
+  idleInfoRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 12,
+  },
+  idleInfoText: {
+    flex: 1,
+    fontSize: 15,
+    color: '#666',
+    lineHeight: 22,
+  },
 });
