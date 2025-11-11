@@ -743,6 +743,48 @@ test_plan:
 agent_communication:
   - agent: "main"
     message: |
+      CRITICAL: Live Order Tracking Route Line Not Displaying - Customer Logged In
+      
+      ISSUE: Customer is logged in but live order tracking does not show route line from rider to delivery location.
+      
+      USER STATUS:
+      - User is logged in as CUSTOMER
+      - Viewing live order tracking screen
+      - Can see customer/delivery marker
+      - Cannot see rider marker or route line
+      
+      BACKEND LOGS SHOW:
+      - Continuous 403 Forbidden errors for /api/orders/{order_id}/rider-location
+      - Multiple requests failing authentication
+      
+      POSSIBLE CAUSES:
+      1. Customer viewing order that belongs to different customer
+      2. Order customer_id doesn't match logged-in customer's ID
+      3. Backend authorization logic issue
+      4. Session token not properly attached to requests
+      5. Customer account vs order ownership mismatch
+      
+      TESTING NEEDED:
+      1. Verify which customer ID is logged in
+      2. Check which customer owns the order being tracked
+      3. Test if customer can fetch their OWN order's rider location
+      4. Create fresh test: Customer places order → Same customer tracks it
+      5. Verify authorization headers are correct in API requests
+      6. Test with admin account to bypass authorization
+      
+      FILES TO TEST:
+      - /app/backend/server.py (rider-location endpoint, line 2270-2290)
+      - /app/frontend/app/live-order-tracking.tsx (rider location fetching)
+      - Authorization logic in backend
+      
+      DELIVERABLES:
+      1. Identify exact cause of 403 errors
+      2. Verify customer ID vs order ownership
+      3. Test complete flow: place order → track order → see route
+      4. Provide solution to show route line
+      
+  - agent: "main"
+    message: |
       CRITICAL: Session Loss on Tab Switch - Auth Token Not Persisting
       
       ISSUE: User loses authentication when switching browser tabs and returning to the app.
