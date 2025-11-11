@@ -641,21 +641,30 @@ const fetchRouteFromRoutesAPI = async (origin: any, destination: any, map: any) 
       
       // Check if order/ride is completed
       if (newStatus === 'delivered' || newStatus === 'completed') {
-        Alert.alert(
-          'Success', 
-          'Order completed successfully! Great job!',
-          [
-            {
-              text: 'OK',
-              onPress: () => {
-                // Clear navigation state and redirect to rider home
-                setIsNavigating(false);
-                setCurrentJob(null);
-                router.replace('/(rider)');
+        // Clear navigation state immediately
+        setIsNavigating(false);
+        setCurrentJob(null);
+        
+        // Show success message and redirect
+        if (Platform.OS === 'web') {
+          // For web, use window.confirm or just redirect immediately
+          const confirmed = window.confirm('Order completed successfully! Great job! Redirecting to home...');
+          router.replace('/(rider)');
+        } else {
+          // For mobile, use Alert with callback
+          Alert.alert(
+            'Success', 
+            'Order completed successfully! Great job!',
+            [
+              {
+                text: 'OK',
+                onPress: () => {
+                  router.replace('/(rider)');
+                }
               }
-            }
-          ]
-        );
+            ]
+          );
+        }
       } else {
         Alert.alert('Success', 'Status updated successfully');
         fetchCurrentJob();
