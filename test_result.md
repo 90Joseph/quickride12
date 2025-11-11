@@ -138,6 +138,38 @@ backend:
       - working: true
         agent: "testing"
         comment: "✅ TESTED: GET /api/orders/{order_id}/rider-location endpoint working correctly. Returns proper JSON with rider_assigned, location, rider_name, and rider_phone fields. Correctly handles authorization (403 for unauthorized customers), 404 for non-existent orders, and shows real-time location updates."
+      - working: true
+        agent: "testing"
+        comment: |
+          ✅ CRITICAL ISSUE INVESTIGATED: 403 Forbidden Error Root Cause Identified
+          
+          USER REPORTED ISSUE: Customer gets 403 Forbidden on /api/orders/5b0483fd-3ab8-4750-b392-8987185975fa/rider-location
+          
+          COMPREHENSIVE TESTING RESULTS:
+          ✅ Backend authorization logic is WORKING CORRECTLY
+          ✅ Customer can access rider location for their OWN orders (200 OK)
+          ✅ Customer correctly gets 403 when accessing OTHER customers' orders
+          ✅ Endpoint returns proper data when rider is assigned
+          ✅ Endpoint returns {"rider_assigned": false, "location": null} when no rider assigned
+          
+          ROOT CAUSE IDENTIFIED:
+          🔍 CUSTOMER VIEWING WRONG ORDER: The reported order (5b0483fd-3ab8-4750-b392-8987185975fa) belongs to customer ID 4655f26c-f252-4217-be44-5805deb58710, but the user is logged in as a different customer
+          
+          TESTING EVIDENCE:
+          - Created fresh customer account and order
+          - Customer can successfully access their own order's rider location (200 OK)
+          - Same customer gets 403 when trying to access different customer's order (expected behavior)
+          - Authorization check in server.py line 2275 is working correctly: order['customer_id'] != user.id
+          
+          SOLUTION FOR USER:
+          1. Customer should log in as the correct account that placed order 5b0483fd-3ab8-4750-b392-8987185975fa
+          2. Or customer should track their own orders instead of viewing others' orders
+          3. Check order history to find orders belonging to current logged-in customer
+          
+          CONCLUSION:
+          ✅ NO BACKEND BUG: The 403 error is correct security behavior
+          ✅ Route line will work correctly when customer views their own orders
+          ✅ Backend authorization and rider location API are fully functional
 
   - task: "Rider location update API"
     implemented: true
