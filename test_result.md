@@ -804,6 +804,64 @@ agent_communication:
       4. Test navigation state transitions
       5. Add null checks before map operations
       
+  - agent: "testing"
+    message: |
+      🎯 NAVIGATION SCREEN CRASH ROOT CAUSE IDENTIFIED - BACKEND TESTING COMPLETE
+      
+      CRITICAL ISSUE INVESTIGATED: Navigation Screen Crash - getZoom Error on Null Map Instance
+      ERROR: Uncaught TypeError: Cannot read properties of null (reading 'getZoom')
+      LOCATION: navigation.tsx:798:54
+      
+      ROOT CAUSE ANALYSIS COMPLETED:
+      ✅ EXACT LINE IDENTIFIED: Line 798: const startZoom = mapInstanceRef.current.getZoom() || 14;
+      ✅ FUNCTION IDENTIFIED: startNavigation() function (lines 678-837)
+      ✅ RACE CONDITION FOUND: useEffect clears map when currentJob exists (line 1102)
+      
+      TECHNICAL ANALYSIS:
+      🔍 Line 1102: mapInstanceRef.current = null; (when currentJob exists)
+      🔍 Line 798: mapInstanceRef.current.getZoom() (assumes map exists)
+      🔍 Race condition: Map cleared when job exists, but startNavigation expects map
+      
+      CRASH SEQUENCE:
+      1. Rider gets assigned an order (currentJob becomes truthy)
+      2. useEffect (line 1099-1104) detects currentJob exists  
+      3. useEffect sets mapInstanceRef.current = null (line 1102)
+      4. User clicks 'Start Navigation' button
+      5. startNavigation() calls mapInstanceRef.current.getZoom() on null
+      6. TypeError: Cannot read properties of null (reading 'getZoom')
+      
+      BACKEND TESTING RESULTS:
+      ✅ All navigation APIs working correctly:
+      - GET /rider/current-order → Returns order data with navigation fields
+      - PUT /riders/location → Updates rider location successfully
+      - GET /riders/me → Creates and returns rider profile
+      - Order status updates → Working for navigation flow
+      - Authentication and authorization → Working correctly
+      
+      NAVIGATION DATA VERIFICATION:
+      ✅ Order data includes required navigation fields:
+      - restaurant_location (coordinates for pickup)
+      - delivery_address (coordinates for delivery)
+      - status (for navigation flow)
+      - restaurant_name, customer_name (for display)
+      
+      CONCLUSION:
+      ✅ BACKEND IS FULLY FUNCTIONAL FOR NAVIGATION
+      ❌ ISSUE IS FRONTEND RACE CONDITION IN MAP INITIALIZATION
+      🛠️  FIX REQUIRED: Add null check at line 798 in startNavigation()
+      
+      RECOMMENDED FIX:
+      ```typescript
+      // Line 798 - Add null check before calling .getZoom()
+      if (!mapInstanceRef.current) {
+        Alert.alert('Error', 'Map not ready. Please wait...');
+        return;
+      }
+      const startZoom = mapInstanceRef.current.getZoom() || 14;
+      ```
+      
+      OR: Fix useEffect logic to not clear map when job exists (line 1102)
+      
   - agent: "main"
     message: |
       CRITICAL: Active Deliveries Tab Shows No Deliveries Despite Navigation Tab Showing Details
