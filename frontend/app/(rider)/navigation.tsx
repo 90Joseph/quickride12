@@ -1097,10 +1097,35 @@ const fetchRouteFromRoutesAPI = async (origin: any, destination: any, map: any) 
 
   // Initialize idle map (no active job) - MOVED TO TOP TO FIX HOOKS ERROR
   useEffect(() => {
+    // Clear map instance when transitioning states
+    if (currentJob && mapInstanceRef.current) {
+      mapInstanceRef.current = null;
+      return;
+    }
+
     // Only initialize if no current job and conditions are met
-    if (!currentJob && Platform.OS === 'web' && mapRef.current && userLocation) {
-      const google = (window as any).google;
-      if (google && google.maps && !mapInstanceRef.current) {
+    if (!currentJob && Platform.OS === 'web' && userLocation) {
+      // Wait a bit for mapRef to be available
+      const initMap = () => {
+        if (!mapRef.current) {
+          console.log('⏳ Waiting for mapRef...');
+          setTimeout(initMap, 100);
+          return;
+        }
+
+        const google = (window as any).google;
+        if (!google || !google.maps) {
+          console.log('⏳ Waiting for Google Maps...');
+          setTimeout(initMap, 100);
+          return;
+        }
+
+        if (mapInstanceRef.current) {
+          console.log('✅ Idle map already initialized');
+          return;
+        }
+
+        console.log('🗺️ Initializing idle map...');
         const map = new google.maps.Map(mapRef.current, {
           center: { lat: userLocation.latitude, lng: userLocation.longitude },
           zoom: 15,
@@ -1127,7 +1152,10 @@ const fetchRouteFromRoutesAPI = async (origin: any, destination: any, map: any) 
         });
         
         mapInstanceRef.current = map;
-      }
+        console.log('✅ Idle map initialized successfully');
+      };
+
+      initMap();
     }
   }, [currentJob, userLocation]);
 
