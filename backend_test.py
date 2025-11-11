@@ -21,10 +21,7 @@ class BackendTester:
     def __init__(self):
         self.customer_token = None
         self.rider_token = None
-        self.admin_token = None
         self.test_order_id = None
-        self.customer_id = None
-        self.rider_id = None
         
     def log(self, message, level="INFO"):
         """Log test messages with timestamp"""
@@ -54,31 +51,11 @@ class BackendTester:
             self.log(f"❌ Registration error: {str(e)}", "ERROR")
             return None, None
     
-    def login_user(self, email, password):
-        """Login existing user"""
-        try:
-            response = requests.post(f"{BACKEND_URL}/auth/login", json={
-                "email": email,
-                "password": password
-            })
-            
-            if response.status_code == 200:
-                data = response.json()
-                self.log(f"✅ Logged in: {email}")
-                return data["session_token"], data["user"]["id"]
-            else:
-                self.log(f"❌ Login failed: {response.status_code} - {response.text}", "ERROR")
-                return None, None
-                
-        except Exception as e:
-            self.log(f"❌ Login error: {str(e)}", "ERROR")
-            return None, None
-    
     def get_current_user(self, token):
         """Get current user info using token"""
         try:
             headers = {"Authorization": f"Bearer {token}"}
-            response = self.session.get(f"{BACKEND_URL}/auth/me", headers=headers)
+            response = requests.get(f"{BACKEND_URL}/auth/me", headers=headers)
             
             if response.status_code == 200:
                 user = response.json()
@@ -92,13 +69,13 @@ class BackendTester:
             self.log(f"❌ Get user error: {str(e)}", "ERROR")
             return None
     
-    def create_test_order(self, customer_token, customer_id):
+    def create_test_order(self, customer_token):
         """Create a test order for testing"""
         try:
             headers = {"Authorization": f"Bearer {customer_token}"}
             
             # First get restaurants
-            restaurants_response = self.session.get(f"{BACKEND_URL}/restaurants")
+            restaurants_response = requests.get(f"{BACKEND_URL}/restaurants")
             if restaurants_response.status_code != 200:
                 self.log("❌ Failed to get restaurants", "ERROR")
                 return None
@@ -132,7 +109,7 @@ class BackendTester:
                 "special_instructions": "Test order for route line investigation"
             }
             
-            response = self.session.post(f"{BACKEND_URL}/orders", json=order_data, headers=headers)
+            response = requests.post(f"{BACKEND_URL}/orders", json=order_data, headers=headers)
             
             if response.status_code == 200:
                 order = response.json()
@@ -150,7 +127,7 @@ class BackendTester:
         """Get order details"""
         try:
             headers = {"Authorization": f"Bearer {token}"}
-            response = self.session.get(f"{BACKEND_URL}/orders/{order_id}", headers=headers)
+            response = requests.get(f"{BACKEND_URL}/orders/{order_id}", headers=headers)
             
             if response.status_code == 200:
                 order = response.json()
@@ -171,7 +148,7 @@ class BackendTester:
         """Test the rider location endpoint that's causing 403 errors"""
         try:
             headers = {"Authorization": f"Bearer {token}"}
-            response = self.session.get(f"{BACKEND_URL}/orders/{order_id}/rider-location", headers=headers)
+            response = requests.get(f"{BACKEND_URL}/orders/{order_id}/rider-location", headers=headers)
             
             self.log(f"🔍 Testing rider location endpoint as {user_type}")
             self.log(f"   URL: GET {BACKEND_URL}/orders/{order_id}/rider-location")
@@ -198,7 +175,7 @@ class BackendTester:
         try:
             # First create rider profile
             headers = {"Authorization": f"Bearer {rider_token}"}
-            rider_response = self.session.get(f"{BACKEND_URL}/riders/me", headers=headers)
+            rider_response = requests.get(f"{BACKEND_URL}/riders/me", headers=headers)
             
             if rider_response.status_code == 200:
                 rider = rider_response.json()
@@ -211,7 +188,7 @@ class BackendTester:
                     "address": "Approaching restaurant"
                 }
                 
-                location_response = self.session.put(
+                location_response = requests.put(
                     f"{BACKEND_URL}/riders/location", 
                     json=location_data, 
                     headers=headers
@@ -220,9 +197,8 @@ class BackendTester:
                 if location_response.status_code == 200:
                     self.log("✅ Rider location updated")
                     
-                    # Manually assign rider to order (simulate auto-assignment)
                     # Update order status to ready_for_pickup to trigger auto-assignment
-                    status_response = self.session.put(
+                    status_response = requests.put(
                         f"{BACKEND_URL}/orders/{order_id}/status",
                         json={"status": "ready_for_pickup"},
                         headers=headers
@@ -245,6 +221,52 @@ class BackendTester:
             self.log(f"❌ Rider assignment error: {str(e)}", "ERROR")
             return False
     
+    def test_specific_order_from_report(self):
+        """Test the specific order ID mentioned in the user report"""
+        self.log("🔍 TESTING SPECIFIC ORDER FROM USER REPORT")
+        reported_order_id = "5b0483fd-3ab8-4750-b392-8987185975fa"
+        
+        # Create a customer to test with
+        customer_email = f"test-customer-{uuid.uuid4().hex[:8]}@test.com"
+        customer_token, customer_id = self.register_user(
+            customer_email, "password123", "Test Customer", "customer"
+        )
+        
+        if not customer_token:
+            self.log("❌ Cannot create test customer", "ERROR")
+            return False
+        
+        # Verify customer user
+        customer_user = self.get_current_user(customer_token)
+        if not customer_user or customer_user["role"] != "customer":
+            self.log("❌ Customer authentication failed", "ERROR")
+            return False
+        
+        # Try to get the reported order details
+        self.log(f"🔍 Attempting to get order details for: {reported_order_id}")
+        order_details = self.get_order_details(reported_order_id, customer_token)
+        
+        if order_details:
+            self.log(f"✅ Found reported order: {reported_order_id}")
+            self.log(f"   Order customer ID: {order_details.get('customer_id')}")
+            self.log(f"   Test customer ID: {customer_id}")
+            
+            if order_details.get('customer_id') != customer_id:
+                self.log("✅ DIAGNOSIS: Order belongs to different customer (expected 403)")
+            
+            # Test rider location endpoint
+            result = self.test_rider_location_endpoint(reported_order_id, customer_token, "test customer")
+            
+            if result is None:
+                self.log("✅ CONFIRMED: 403 error occurs when customer tries to access order they don't own")
+                return True
+            else:
+                self.log("❌ SECURITY ISSUE: Customer can access order they don't own", "ERROR")
+                return False
+        else:
+            self.log(f"❌ Reported order {reported_order_id} not found or not accessible")
+            return False
+    
     def run_comprehensive_test(self):
         """Run comprehensive test to identify the 403 error root cause"""
         self.log("🚀 STARTING COMPREHENSIVE LIVE ORDER TRACKING TEST")
@@ -255,7 +277,7 @@ class BackendTester:
         
         # Create customer account
         customer_email = f"test-customer-{uuid.uuid4().hex[:8]}@test.com"
-        self.customer_token, self.customer_id = self.register_user(
+        self.customer_token, customer_id = self.register_user(
             customer_email, "password123", "Test Customer", "customer"
         )
         
@@ -263,12 +285,9 @@ class BackendTester:
             self.log("❌ CRITICAL: Cannot create customer account", "ERROR")
             return False
         
-        self.log(f"🔍 Customer token: {self.customer_token[:20]}...")
-        self.log(f"🔍 Customer ID: {self.customer_id}")
-        
         # Create rider account
         rider_email = f"test-rider-{uuid.uuid4().hex[:8]}@test.com"
-        self.rider_token, self.rider_id = self.register_user(
+        self.rider_token, rider_id = self.register_user(
             rider_email, "password123", "Test Navigation Rider", "rider"
         )
         
@@ -276,39 +295,24 @@ class BackendTester:
             self.log("❌ CRITICAL: Cannot create rider account", "ERROR")
             return False
         
-        self.log(f"🔍 Rider token: {self.rider_token[:20]}...")
-        self.log(f"🔍 Rider ID: {self.rider_id}")
-        
         # Test 2: Verify logged-in customer ID
-        self.log("\n📋 TEST 2: Get Current Logged-In Customer ID")
-        
-        # Debug: Check both tokens
-        self.log(f"🔍 DEBUG: Using customer token: {self.customer_token[:20]}...")
+        self.log("\n📋 TEST 2: Verify Customer Authentication")
         customer_user = self.get_current_user(self.customer_token)
-        if not customer_user:
-            self.log("❌ CRITICAL: Cannot get customer user info", "ERROR")
+        if not customer_user or customer_user["role"] != "customer":
+            self.log("❌ CRITICAL: Customer authentication failed", "ERROR")
             return False
         
-        # Verify we have the correct customer token
-        if customer_user["role"] != "customer":
-            self.log(f"❌ CRITICAL: Customer token returned {customer_user['role']} instead of customer", "ERROR")
-            self.log(f"   This suggests the tokens got mixed up during registration")
+        rider_user = self.get_current_user(self.rider_token)
+        if not rider_user or rider_user["role"] != "rider":
+            self.log("❌ CRITICAL: Rider authentication failed", "ERROR")
             return False
         
         logged_in_customer_id = customer_user["id"]
         self.log(f"🔍 Logged-in customer ID: {logged_in_customer_id}")
         
-        # Also verify rider user
-        self.log(f"🔍 DEBUG: Using rider token: {self.rider_token[:20]}...")
-        rider_user = self.get_current_user(self.rider_token)
-        if rider_user:
-            self.log(f"🔍 Rider user ID: {rider_user['id']} (Role: {rider_user['role']})")
-            if rider_user["role"] != "rider":
-                self.log(f"❌ WARNING: Rider token returned {rider_user['role']} instead of rider", "ERROR")
-        
         # Test 3: Create test order
         self.log("\n📋 TEST 3: Create Test Order")
-        self.test_order_id = self.create_test_order(self.customer_token, logged_in_customer_id)
+        self.test_order_id = self.create_test_order(self.customer_token)
         
         if not self.test_order_id:
             self.log("❌ CRITICAL: Cannot create test order", "ERROR")
@@ -338,8 +342,11 @@ class BackendTester:
         
         if result is not None:
             self.log("✅ Endpoint accessible when no rider assigned")
+            self.log(f"   Response: {json.dumps(result, indent=2)}")
         else:
-            self.log("❌ 403 ERROR CONFIRMED: Customer cannot access their own order's rider location")
+            self.log("❌ 403 ERROR: Customer cannot access their own order's rider location")
+            self.log("   This suggests a backend authorization bug")
+            return False
         
         # Test 6: Assign rider and test again
         self.log("\n📋 TEST 6: Assign Rider and Test Rider Location Endpoint")
@@ -359,78 +366,20 @@ class BackendTester:
                 result = self.test_rider_location_endpoint(self.test_order_id, self.customer_token, "customer")
                 
                 if result is not None:
-                    self.log("✅ SUCCESS: Customer can now access rider location")
+                    self.log("✅ SUCCESS: Customer can access rider location after assignment")
+                    self.log(f"   Response: {json.dumps(result, indent=2)}")
                     return True
                 else:
                     self.log("❌ STILL FAILING: 403 error persists even with rider assigned")
+                    return False
             else:
                 self.log("❌ Rider assignment may have failed")
-        
-        # Test 7: Test with different customer (wrong ownership)
-        self.log("\n📋 TEST 7: Test with Different Customer (Wrong Ownership)")
-        
-        # Create another customer
-        other_customer_email = f"test-other-customer-{uuid.uuid4().hex[:8]}@test.com"
-        other_customer_token, other_customer_id = self.register_user(
-            other_customer_email, "password123", "Other Customer", "customer"
-        )
-        
-        if other_customer_token:
-            result = self.test_rider_location_endpoint(self.test_order_id, other_customer_token, "other customer")
-            
-            if result is None:
-                self.log("✅ CORRECT: Other customer correctly gets 403 (expected behavior)")
-            else:
-                self.log("❌ SECURITY ISSUE: Other customer can access order they don't own", "ERROR")
-        
-        # Test 8: Test the specific order ID from user report
-        self.log("\n📋 TEST 8: Test Specific Order ID from User Report")
-        reported_order_id = "5b0483fd-3ab8-4750-b392-8987185975fa"
-        
-        # Try to get order details first
-        reported_order = self.get_order_details(reported_order_id, self.customer_token)
-        if reported_order:
-            self.log(f"✅ Found reported order: {reported_order_id}")
-            self.log(f"   Order customer ID: {reported_order.get('customer_id')}")
-            self.log(f"   Current customer ID: {logged_in_customer_id}")
-            
-            # Test rider location for reported order
-            result = self.test_rider_location_endpoint(reported_order_id, self.customer_token, "customer")
-            
-            if result is None:
-                if reported_order.get('customer_id') != logged_in_customer_id:
-                    self.log("✅ DIAGNOSIS: Customer is trying to access order that belongs to different customer")
-                    self.log("🔍 ROOT CAUSE: Customer logged in as wrong user or viewing wrong order")
-                else:
-                    self.log("❌ BACKEND BUG: Customer owns order but still gets 403")
+                return False
         else:
-            self.log(f"❌ Reported order {reported_order_id} not found or not accessible")
+            self.log("❌ Rider assignment failed")
+            return False
         
         return False
-    
-    def run_database_investigation(self):
-        """Additional database-level investigation"""
-        self.log("\n📋 DATABASE INVESTIGATION")
-        
-        # This would require direct MongoDB access, which we don't have in this test
-        # But we can make API calls to understand the data structure
-        
-        # Get all orders for current customer
-        try:
-            headers = {"Authorization": f"Bearer {self.customer_token}"}
-            response = self.session.get(f"{BACKEND_URL}/orders", headers=headers)
-            
-            if response.status_code == 200:
-                orders = response.json()
-                self.log(f"✅ Customer has {len(orders)} total orders")
-                
-                for order in orders[:3]:  # Show first 3 orders
-                    self.log(f"   Order {order['id'][:8]}... - Customer: {order.get('customer_id')[:8]}... - Status: {order.get('status')}")
-            else:
-                self.log(f"❌ Cannot get customer orders: {response.status_code}")
-                
-        except Exception as e:
-            self.log(f"❌ Database investigation error: {str(e)}", "ERROR")
 
 def main():
     """Main test execution"""
@@ -443,30 +392,44 @@ def main():
     tester = BackendTester()
     
     try:
-        success = tester.run_comprehensive_test()
-        tester.run_database_investigation()
+        # First test the specific order from the user report
+        specific_order_test = tester.test_specific_order_from_report()
+        
+        # Then run comprehensive test with fresh data
+        comprehensive_test = tester.run_comprehensive_test()
         
         print("\n" + "=" * 60)
         print("🎯 INVESTIGATION SUMMARY")
         print("=" * 60)
         
-        if success:
+        if comprehensive_test:
             print("✅ ISSUE RESOLVED: Route line should now work correctly")
+            print("\n💡 FINDINGS:")
+            print("- Backend authorization logic is working correctly")
+            print("- Customer can access rider location for their own orders")
+            print("- The 403 error was likely due to customer viewing wrong order")
         else:
-            print("❌ ISSUE PERSISTS: Further investigation needed")
-            print("\n🔍 POSSIBLE ROOT CAUSES:")
-            print("1. Customer viewing order that belongs to different customer")
-            print("2. Backend authorization logic bug in rider-location endpoint")
-            print("3. Session token not properly attached to requests")
-            print("4. Customer account vs order ownership mismatch")
-            print("5. Database inconsistency in customer_id fields")
+            print("❌ ISSUE PERSISTS: Backend authorization problem confirmed")
+            print("\n🔍 ROOT CAUSE ANALYSIS:")
             
-            print("\n💡 RECOMMENDED SOLUTIONS:")
-            print("1. Verify customer is logged in as correct account")
-            print("2. Check if order belongs to currently logged-in customer")
-            print("3. Create fresh test: Customer places order → Same customer tracks it")
-            print("4. Review backend authorization logic in server.py line 2275")
-            print("5. Ensure frontend sends proper Authorization headers")
+            if specific_order_test:
+                print("✅ DIAGNOSIS: Customer is trying to access order that belongs to different customer")
+                print("\n💡 SOLUTION:")
+                print("1. Customer should log in as the correct account that placed the order")
+                print("2. Or customer should track their own orders, not others' orders")
+                print("3. Check order history to find orders belonging to current customer")
+            else:
+                print("❌ BACKEND BUG CONFIRMED: Authorization logic has issues")
+                print("\n🔍 BACKEND ISSUES FOUND:")
+                print("1. Customer cannot access rider location for their own orders")
+                print("2. Authorization check in server.py line 2275 may be incorrect")
+                print("3. Database query or ID comparison may be failing")
+                
+                print("\n💡 RECOMMENDED FIXES:")
+                print("1. Review backend authorization logic in /api/orders/{order_id}/rider-location")
+                print("2. Check if customer_id comparison is working correctly")
+                print("3. Verify database queries are returning correct data")
+                print("4. Add debug logging to authorization checks")
         
     except KeyboardInterrupt:
         print("\n⚠️ Test interrupted by user")
