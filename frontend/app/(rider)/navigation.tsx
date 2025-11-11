@@ -1105,57 +1105,89 @@ const fetchRouteFromRoutesAPI = async (origin: any, destination: any, map: any) 
 
     // Only initialize if no current job and conditions are met
     if (!currentJob && Platform.OS === 'web' && userLocation) {
-      // Wait a bit for mapRef to be available
-      const initMap = () => {
-        if (!mapRef.current) {
-          console.log('⏳ Waiting for mapRef...');
-          setTimeout(initMap, 100);
-          return;
-        }
-
-        const google = (window as any).google;
-        if (!google || !google.maps) {
-          console.log('⏳ Waiting for Google Maps...');
-          setTimeout(initMap, 100);
-          return;
-        }
-
-        if (mapInstanceRef.current) {
-          console.log('✅ Idle map already initialized');
-          return;
-        }
-
-        console.log('🗺️ Initializing idle map...');
-        const map = new google.maps.Map(mapRef.current, {
-          center: { lat: userLocation.latitude, lng: userLocation.longitude },
-          zoom: 15,
-          disableDefaultUI: false,
-          zoomControl: true,
-          mapTypeControl: false,
-          streetViewControl: false,
-          fullscreenControl: false,
-        });
+      const apiKey = 'AIzaSyA0m1oRlXLQWjxacqjEJ6zJW3WvmOWvQkQ';
+      
+      // Load Google Maps script first
+      const loadGoogleMapsAndInitMap = async () => {
+        // Check if script already exists
+        const existingScript = document.querySelector('script[src*="maps.googleapis.com"]');
         
-        // Add rider marker
-        new google.maps.Marker({
-          position: { lat: userLocation.latitude, lng: userLocation.longitude },
-          map: map,
-          icon: {
-            path: google.maps.SymbolPath.CIRCLE,
-            scale: 10,
-            fillColor: '#FF6B6B',
-            fillOpacity: 1,
-            strokeColor: '#FFF',
-            strokeWeight: 3,
-          },
-          title: 'Your Location'
-        });
+        if (!existingScript) {
+          console.log('📍 Loading Google Maps script for idle map...');
+          const script = document.createElement('script');
+          script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places,geometry`;
+          script.async = true;
+          script.defer = true;
+          
+          await new Promise((resolve, reject) => {
+            script.onload = () => {
+              console.log('✅ Google Maps script loaded');
+              resolve(true);
+            };
+            script.onerror = () => {
+              console.error('❌ Failed to load Google Maps script');
+              reject(new Error('Failed to load Google Maps'));
+            };
+            document.head.appendChild(script);
+          });
+        }
         
-        mapInstanceRef.current = map;
-        console.log('✅ Idle map initialized successfully');
+        // Wait for mapRef to be available
+        const initMap = () => {
+          if (!mapRef.current) {
+            console.log('⏳ Waiting for mapRef...');
+            setTimeout(initMap, 100);
+            return;
+          }
+
+          const google = (window as any).google;
+          if (!google || !google.maps) {
+            console.log('⏳ Waiting for Google Maps API...');
+            setTimeout(initMap, 100);
+            return;
+          }
+
+          if (mapInstanceRef.current) {
+            console.log('✅ Idle map already initialized');
+            return;
+          }
+
+          console.log('🗺️ Initializing idle map...');
+          const map = new google.maps.Map(mapRef.current, {
+            center: { lat: userLocation.latitude, lng: userLocation.longitude },
+            zoom: 15,
+            disableDefaultUI: false,
+            zoomControl: true,
+            mapTypeControl: false,
+            streetViewControl: false,
+            fullscreenControl: false,
+          });
+          
+          // Add rider marker
+          new google.maps.Marker({
+            position: { lat: userLocation.latitude, lng: userLocation.longitude },
+            map: map,
+            icon: {
+              path: google.maps.SymbolPath.CIRCLE,
+              scale: 10,
+              fillColor: '#FF6B6B',
+              fillOpacity: 1,
+              strokeColor: '#FFF',
+              strokeWeight: 3,
+            },
+            title: 'Your Location'
+          });
+          
+          mapInstanceRef.current = map;
+          console.log('✅ Idle map initialized successfully');
+        };
+
+        initMap();
       };
 
-      initMap();
+      loadGoogleMapsAndInitMap().catch(err => {
+        console.error('❌ Error loading Google Maps:', err);
+      });
     }
   }, [currentJob, userLocation]);
 
