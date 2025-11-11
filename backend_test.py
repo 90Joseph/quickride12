@@ -1,14 +1,17 @@
 #!/usr/bin/env python3
 """
-Backend Testing Script for Active Deliveries Tab Issue Investigation
+Backend Testing Script for Navigation Screen Crash Investigation
 
-CRITICAL ISSUE: 
-- Rider's Navigation tab shows active delivery with full details
-- Rider's Active tab shows "No active deliveries"
-- Data inconsistency between tabs that should show same data
+CRITICAL ISSUE: Navigation Screen Crash - getZoom Error on Null Map Instance
+ERROR: Uncaught TypeError: Cannot read properties of null (reading 'getZoom')
+Location: navigation.tsx:798:54
 
-Both tabs now fetch from /rider/current-order and /rider/current-ride endpoints.
-This script will investigate the root cause.
+ROOT CAUSE IDENTIFIED:
+- Line 798: const startZoom = mapInstanceRef.current.getZoom() || 14;
+- Line 1102: mapInstanceRef.current = null; (when currentJob exists)
+- Race condition: map cleared when job exists, but startNavigation expects map
+
+This script tests all backend APIs required for navigation functionality.
 """
 
 import requests
