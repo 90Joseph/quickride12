@@ -383,6 +383,23 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#F5F5F5',
   },
+  timeCard: {
+    backgroundColor: '#FFF',
+    padding: 16,
+    borderRadius: 12,
+    marginBottom: 16,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  timeCardText: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#FF6B6B',
+  },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
