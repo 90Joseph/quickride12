@@ -667,6 +667,115 @@ const styles = StyleSheet.create({
     color: '#FF6B6B',
     fontWeight: '600',
   },
+  statusTimelineCard: {
+    backgroundColor: '#FFF',
+    borderRadius: 12,
+    padding: 20,
+    marginBottom: 16,
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.08,
+        shadowRadius: 4,
+      },
+      android: {
+        elevation: 2,
+      },
+    }),
+  },
+  statusHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  statusIconCircle: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: '#FF9800',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
+  },
+  statusHeaderText: {
+    flex: 1,
+  },
+  statusMainText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#333',
+    marginBottom: 4,
+  },
+  statusOrderId: {
+    fontSize: 12,
+    color: '#999',
+  },
+  timelineContainer: {
+    marginBottom: 20,
+  },
+  timelineTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#333',
+    marginBottom: 16,
+  },
+  timelineItem: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginBottom: 8,
+  },
+  timelineDot: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    borderWidth: 2,
+    borderColor: '#DDD',
+    backgroundColor: '#FFF',
+    marginRight: 12,
+    marginTop: 4,
+  },
+  timelineDotActive: {
+    borderColor: '#FF6B6B',
+    backgroundColor: '#FF6B6B',
+  },
+  timelineLine: {
+    position: 'absolute',
+    left: 5,
+    top: 16,
+    width: 2,
+    height: 24,
+    backgroundColor: '#DDD',
+  },
+  timelineLabel: {
+    fontSize: 14,
+    color: '#999',
+    flex: 1,
+  },
+  timelineLabelActive: {
+    color: '#333',
+    fontWeight: '500',
+  },
+  restaurantSection: {
+    borderTopWidth: 1,
+    borderTopColor: '#F0F0F0',
+    paddingTop: 16,
+  },
+  restaurantSectionTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#333',
+    marginBottom: 12,
+  },
+  restaurantInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  restaurantName: {
+    fontSize: 14,
+    color: '#333',
+    marginLeft: 8,
+  },
   restaurantName: {
     fontSize: 18,
     fontWeight: '600',
