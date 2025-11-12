@@ -565,6 +565,11 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     color: '#333',
   },
+  dividerLine: {
+    height: 1,
+    backgroundColor: '#F0F0F0',
+    marginVertical: 8,
+  },
   totalSection: {
     marginTop: 8,
   },
