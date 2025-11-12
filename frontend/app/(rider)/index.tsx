@@ -89,7 +89,6 @@ function RiderAvailableContent() {
   const fetchRiderAvailability = async () => {
     // Guard: Only fetch if user is a rider
     if (!user || user.role !== 'rider') {
-      console.log('⚠️ Skipping rider availability fetch - user is not a rider');
       return;
     }
 
