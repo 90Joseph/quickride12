@@ -495,6 +495,25 @@ const styles = StyleSheet.create({
     color: '#333',
     marginBottom: 16,
   },
+  detailRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#F0F0F0',
+  },
+  detailLabel: {
+    fontSize: 14,
+    color: '#666',
+    flex: 1,
+  },
+  detailValue: {
+    fontSize: 14,
+    color: '#333',
+    fontWeight: '500',
+    flex: 1,
+    textAlign: 'right',
+  },
   restaurantName: {
     fontSize: 18,
     fontWeight: '600',
