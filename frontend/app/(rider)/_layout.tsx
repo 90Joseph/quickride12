@@ -1,7 +1,34 @@
-import { Tabs } from 'expo-router';
+import { Tabs, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { useEffect } from 'react';
+import { useAuthStore } from '../../store/authStore';
+import { ActivityIndicator, View } from 'react-native';
 
 export default function RiderLayout() {
+  const router = useRouter();
+  const { user, isLoading } = useAuthStore();
+
+  useEffect(() => {
+    // Redirect if not a rider or not logged in
+    if (!isLoading && (!user || user.role !== 'rider')) {
+      router.replace('/login');
+    }
+  }, [user, isLoading]);
+
+  // Show loading while checking auth
+  if (isLoading) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" color="#FF6B6B" />
+      </View>
+    );
+  }
+
+  // Don't render tabs if not a rider
+  if (!user || user.role !== 'rider') {
+    return null;
+  }
+
   return (
     <Tabs
       screenOptions={{
