@@ -184,67 +184,36 @@ export default function OrderConfirmationScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        {/* Confetti overlay */}
-        <Animated.View style={[styles.confettiContainer, { opacity: confettiOpacity }]}>
-          <Text style={styles.confetti}>🎉</Text>
-          <Text style={[styles.confetti, { left: '20%' }]}>🎊</Text>
-          <Text style={[styles.confetti, { left: '40%' }]}>✨</Text>
-          <Text style={[styles.confetti, { left: '60%' }]}>🎉</Text>
-          <Text style={[styles.confetti, { left: '80%' }]}>🎊</Text>
-        </Animated.View>
-
-        {/* Success Header with Animations */}
-        <View style={styles.successHeader}>
+        {/* Top Card with Time Estimate */}
+        <View style={styles.topCard}>
           <Animated.View 
             style={[
-              styles.checkmarkCircle,
-              {
-                transform: [
-                  { scale: checkmarkScale },
-                  { 
-                    rotate: checkmarkRotate.interpolate({
-                      inputRange: [0, 1],
-                      outputRange: ['0deg', '360deg']
-                    })
-                  }
-                ]
-              }
+              styles.timeEstimateBox,
+              { transform: [{ scale: pulseAnim }] }
             ]}
           >
-            <Ionicons name="checkmark" size={60} color="#FFF" />
+            <Text style={styles.timeEstimateText}>
+              {estimatedMinutes - 5} — {estimatedMinutes + 5} mins
+            </Text>
           </Animated.View>
-          <Text style={styles.successTitle}>Order Placed!</Text>
-          <Text style={styles.successSubtitle}>
-            Thank you for your order
-          </Text>
           
-          {/* Animated delivery scooter icon */}
-          <Animated.View 
-            style={[
-              styles.deliveryIconContainer,
-              {
-                opacity: deliveryIconOpacity,
-                transform: [{ translateY: deliveryIconY }]
-              }
-            ]}
-          >
-            <Ionicons name="bicycle" size={40} color="#FF6B6B" />
-            <Text style={styles.deliveryIconText}>On its way!</Text>
-          </Animated.View>
+          {/* Delivery Info with Icon */}
+          <View style={styles.deliveryInfoRow}>
+            <View style={styles.iconCircle}>
+              <Ionicons name="gift" size={24} color="#FF1493" />
+            </View>
+            <View style={styles.deliveryTextContainer}>
+              <Text style={styles.deliveryTitle}>Delivered by restaurant</Text>
+              <Text style={styles.deliverySubtext}>
+                Foodpanda has dispatched your order to {order.restaurant_name || 'the restaurant'}. They will deliver your order.
+              </Text>
+            </View>
+          </View>
         </View>
 
-        {/* Animated Estimated Time - Simple Version */}
-        <Animated.View 
-          style={[
-            styles.simpleEstimatedTime,
-            { transform: [{ scale: pulseAnim }] }
-          ]}
-        >
-          <Text style={styles.simpleEstimatedTimeText}>{estimatedMinutes} minutes</Text>
-        </Animated.View>
-
-        {/* Receipt Card */}
-        <View style={styles.receiptCard}>
+        {/* Order Details Section */}
+        <View style={styles.sectionContainer}>
+          <Text style={styles.sectionTitle}>Order Details</Text>
           {/* Order Number */}
           <View style={styles.orderNumberSection}>
             <Text style={styles.orderNumberLabel}>Order Number</Text>
