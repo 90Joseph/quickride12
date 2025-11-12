@@ -682,6 +682,13 @@ export default function LiveOrderTrackingScreen() {
           handleIndicatorStyle={styles.bottomSheetIndicator}
         >
           <BottomSheetScrollView style={styles.bottomSheetContent}>
+            {/* Estimated Time Card - At Top of Bottom Sheet */}
+            <View style={styles.bottomSheetTimeCard}>
+              <Text style={styles.bottomSheetTimeText}>
+                {estimatedMinutes - 5} — {estimatedMinutes + 5} mins
+              </Text>
+            </View>
+
             {/* Minimized View - Key Info */}
             <View style={styles.minimizedSection}>
               <View style={styles.minimizedRow}>
