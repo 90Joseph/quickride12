@@ -1219,27 +1219,7 @@ const fetchRouteFromRoutesAPI = async (origin: any, destination: any, map: any) 
   // MUST compute nextAction before any conditional returns to avoid hooks violation
   const nextAction = getNextAction();
 
-  // CONDITIONAL RENDERING - NO EARLY RETURNS TO AVOID HOOKS VIOLATION
-  // Render access restricted screen
-  if (user && user.role !== 'rider') {
-    return (
-      <SafeAreaView style={styles.container}>
-        <View style={styles.emptyContainer}>
-          <Ionicons name="lock-closed" size={80} color="#FF6B6B" />
-          <Text style={styles.emptyText}>Access Restricted</Text>
-          <Text style={styles.emptySubtext}>This screen is only accessible to riders</Text>
-          <TouchableOpacity 
-            style={styles.backButton}
-            onPress={() => router.replace('/(auth)/login')}
-          >
-            <Text style={styles.backButtonText}>Go to Login</Text>
-          </TouchableOpacity>
-        </View>
-      </SafeAreaView>
-    );
-  }
-
-  // Render loading screen
+  // Render loading screen (auth and role already checked in wrapper)
   if (loading) {
     return (
       <SafeAreaView style={styles.container}>
