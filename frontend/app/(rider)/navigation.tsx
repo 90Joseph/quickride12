@@ -629,6 +629,9 @@ const fetchRouteFromDirectionsAPI = async (origin: any, destination: any, map: a
         if (leg.steps.length > 0) {
           setCurrentStep(leg.steps[0]);
         }
+        
+        // Call completion callback
+        if (onComplete) onComplete();
       } else {
         console.error('❌ Directions request failed with status:', status);
         console.error('❌ Result:', result);
