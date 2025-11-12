@@ -53,6 +53,107 @@ export default function OrderConfirmationScreen() {
     }
   };
 
+  const calculateEstimatedTime = () => {
+    if (!order) return;
+    
+    // Base preparation time: 15-20 minutes
+    const prepTime = 15 + Math.floor(Math.random() * 6);
+    
+    // Additional time based on number of items (1 min per 2 items)
+    const itemsTime = Math.ceil(order.items.length / 2);
+    
+    // Delivery time: 10-15 minutes
+    const deliveryTime = 10 + Math.floor(Math.random() * 6);
+    
+    const total = prepTime + itemsTime + deliveryTime;
+    setEstimatedMinutes(total);
+  };
+
+  const startAnimations = () => {
+    // Checkmark pop-in animation
+    Animated.sequence([
+      Animated.spring(checkmarkScale, {
+        toValue: 1.2,
+        tension: 50,
+        friction: 3,
+        useNativeDriver: true,
+      }),
+      Animated.spring(checkmarkScale, {
+        toValue: 1,
+        tension: 50,
+        friction: 7,
+        useNativeDriver: true,
+      }),
+    ]).start();
+
+    // Checkmark rotation
+    Animated.timing(checkmarkRotate, {
+      toValue: 1,
+      duration: 600,
+      easing: Easing.out(Easing.exp),
+      useNativeDriver: true,
+    }).start();
+
+    // Confetti fade in and out
+    Animated.sequence([
+      Animated.timing(confettiOpacity, {
+        toValue: 1,
+        duration: 300,
+        useNativeDriver: true,
+      }),
+      Animated.delay(2000),
+      Animated.timing(confettiOpacity, {
+        toValue: 0,
+        duration: 500,
+        useNativeDriver: true,
+      }),
+    ]).start();
+
+    // Delivery icon animation (floating up)
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(deliveryIconY, {
+          toValue: -10,
+          duration: 1500,
+          easing: Easing.inOut(Easing.ease),
+          useNativeDriver: true,
+        }),
+        Animated.timing(deliveryIconY, {
+          toValue: 0,
+          duration: 1500,
+          easing: Easing.inOut(Easing.ease),
+          useNativeDriver: true,
+        }),
+      ])
+    ).start();
+
+    // Fade in delivery icon
+    Animated.timing(deliveryIconOpacity, {
+      toValue: 1,
+      duration: 800,
+      delay: 400,
+      useNativeDriver: true,
+    }).start();
+
+    // Pulse animation for estimated time
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(pulseAnim, {
+          toValue: 1.05,
+          duration: 1000,
+          easing: Easing.inOut(Easing.ease),
+          useNativeDriver: true,
+        }),
+        Animated.timing(pulseAnim, {
+          toValue: 1,
+          duration: 1000,
+          easing: Easing.inOut(Easing.ease),
+          useNativeDriver: true,
+        }),
+      ])
+    ).start();
+  };
+
   if (loading) {
     return (
       <SafeAreaView style={styles.container}>
