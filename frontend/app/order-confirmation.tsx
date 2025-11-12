@@ -183,6 +183,22 @@ export default function OrderConfirmationScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
+      {/* Blurred Map Background */}
+      {Platform.OS === 'web' && order && (
+        <View style={styles.mapBackground}>
+          <div 
+            ref={mapRef} 
+            style={{ 
+              width: '100%', 
+              height: '100%',
+              filter: 'blur(8px)',
+              opacity: 0.6
+            }} 
+          />
+          <View style={styles.mapOverlay} />
+        </View>
+      )}
+      
       <ScrollView contentContainerStyle={styles.scrollContent}>
         {/* Success Header with Checkmark */}
         <View style={styles.successHeader}>
