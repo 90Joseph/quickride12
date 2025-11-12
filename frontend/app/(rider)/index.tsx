@@ -70,7 +70,7 @@ function RiderAvailableContent() {
   useEffect(() => {
     // Wait for auth to load and verify user is a rider before fetching
     if (authLoading || !user || user.role !== 'rider') {
-      console.log('⚠️ Waiting for authentication or user is not a rider');
+      // Silently skip - layout will redirect if not authenticated
       return;
     }
 
