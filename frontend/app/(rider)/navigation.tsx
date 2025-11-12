@@ -577,7 +577,7 @@ const fetchRouteFromDirectionsAPI = async (origin: any, destination: any, map: a
         strokeWeight: 6,
         strokeOpacity: 0.8,
       },
-      preserveViewport: true, // Don't auto-zoom, we handle that manually
+      preserveViewport: false, // Let DirectionsRenderer handle the viewport
     });
 
     console.log('✅ DirectionsService and DirectionsRenderer created');
