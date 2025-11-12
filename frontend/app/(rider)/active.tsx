@@ -27,7 +27,9 @@ interface Order {
   created_at: string;
 }
 
-export default function RiderActiveScreen() {
+import { useAuthStore } from '../../store/authStore';
+
+function RiderActiveContent() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
