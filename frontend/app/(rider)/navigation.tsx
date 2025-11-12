@@ -522,7 +522,7 @@ function RiderNavigationContent() {
 
       if (destination) {
         console.log('🗺️ Getting route from', origin, 'to', destination);
-        fetchRouteFromRoutesAPI(origin, destination, map);
+        fetchRouteFromDirectionsAPI(origin, destination, map);
       }
     }
 
