@@ -89,11 +89,38 @@ export default function LiveOrderTrackingScreen() {
     try {
       const response = await api.get(`/orders/${orderId}`);
       setOrder(response.data);
+      calculateEstimatedTime(response.data);
       setLoading(false);
     } catch (error) {
       console.error('Error fetching order:', error);
       setLoading(false);
     }
+  };
+
+  const calculateEstimatedTime = (orderData: Order) => {
+    if (!orderData) return;
+    
+    // Base preparation time: 15-20 minutes
+    const prepTime = 15 + Math.floor(Math.random() * 6);
+    
+    // Additional time based on number of items (1 min per 2 items)
+    const itemsTime = Math.ceil(orderData.items.length / 2);
+    
+    // Delivery time: 10-15 minutes
+    const deliveryTime = 10 + Math.floor(Math.random() * 6);
+    
+    // Reduce time based on order status
+    let statusReduction = 0;
+    if (orderData.status === 'confirmed' || orderData.status === 'ready_for_pickup') {
+      statusReduction = 5; // Already preparing
+    } else if (orderData.status === 'rider_assigned' || orderData.status === 'picked_up') {
+      statusReduction = 15; // Past preparation, only delivery left
+    } else if (orderData.status === 'out_for_delivery') {
+      statusReduction = 20; // Just delivery time remaining
+    }
+    
+    const total = Math.max(5, prepTime + itemsTime + deliveryTime - statusReduction);
+    setEstimatedMinutes(total);
   };
 
   const fetchRiderLocation = async () => {
