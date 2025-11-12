@@ -402,11 +402,14 @@ export default function CheckoutScreen() {
 
   // Modified handlePlaceOrder - shows verification modal first
   const handlePlaceOrder = async () => {
-    console.log('Place Order clicked');
+    console.log('🛒 Place Order clicked');
+    console.log('📍 Delivery Address:', deliveryAddress);
+    console.log('📱 Phone Number:', phoneNumber);
+    console.log('🏪 Restaurant ID:', restaurantId);
     
     if (!deliveryAddress.trim()) {
       const msg = 'Please enter your delivery address';
-      console.log('Validation error:', msg);
+      console.log('❌ Validation error:', msg);
       if (Platform.OS === 'web') {
         window.alert(msg);
       } else {
@@ -417,7 +420,7 @@ export default function CheckoutScreen() {
 
     if (!phoneNumber.trim()) {
       const msg = 'Please enter your phone number';
-      console.log('Validation error:', msg);
+      console.log('❌ Validation error:', msg);
       if (Platform.OS === 'web') {
         window.alert(msg);
       } else {
@@ -428,7 +431,7 @@ export default function CheckoutScreen() {
 
     if (!restaurantId) {
       const msg = 'Restaurant ID is missing';
-      console.error('Error:', msg);
+      console.error('❌ Error:', msg);
       if (Platform.OS === 'web') {
         window.alert(msg);
       } else {
@@ -438,7 +441,7 @@ export default function CheckoutScreen() {
     }
 
     // Show location verification modal before placing order
-    console.log('📍 Opening location verification modal');
+    console.log('✅ All validations passed. Opening location verification modal');
     setShowLocationVerification(true);
     setVerificationMapLoaded(false);
     loadVerificationMap();
