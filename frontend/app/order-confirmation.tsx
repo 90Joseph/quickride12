@@ -493,7 +493,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     color: '#333',
-    marginLeft: 8,
+    marginBottom: 16,
   },
   restaurantName: {
     fontSize: 18,
