@@ -125,6 +125,7 @@ class User(BaseModel):
     role: UserRole
     phone: Optional[str] = None
     password_hash: Optional[str] = None  # For username/password auth
+    default_delivery_location: Optional[dict] = None  # Store customer's preferred location
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 class UserSession(BaseModel):
