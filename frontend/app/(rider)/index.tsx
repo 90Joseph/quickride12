@@ -580,144 +580,71 @@ function RiderAvailableContent() {
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* Availability Toggle */}
-      <View style={styles.availabilityCard}>
-        <View style={styles.availabilityInfo}>
-          <Ionicons 
-            name={isAvailable ? "checkmark-circle" : "close-circle"} 
-            size={28} 
-            color={isAvailable ? '#4CAF50' : '#FF6B6B'} 
-          />
-          <View style={styles.availabilityTextContainer}>
-            <Text style={styles.availabilityTitle}>
-              {isAvailable ? '🟢 Available for Delivery' : '🔴 Offline'}
+      {/* Compact Status Header */}
+      <View style={styles.compactHeader}>
+        <View style={styles.statusRow}>
+          <View style={styles.statusBadge}>
+            <Ionicons 
+              name={isAvailable ? "checkmark-circle" : "close-circle"} 
+              size={20} 
+              color={isAvailable ? "#4CAF50" : "#FF6B6B"} 
+            />
+            <Text style={styles.statusText}>
+              {isAvailable ? 'Available' : 'Offline'}
             </Text>
-            <Text style={styles.availabilitySubtext}>
-              {isAvailable ? 'You will receive new orders' : 'Toggle ON to receive orders'}
-            </Text>
+            <Switch
+              value={isAvailable}
+              onValueChange={toggleAvailability}
+              trackColor={{ false: '#FFE0E0', true: '#C8E6C9' }}
+              thumbColor={isAvailable ? '#4CAF50' : '#FF6B6B'}
+              ios_backgroundColor="#FFE0E0"
+              style={{ transform: [{ scale: 0.8 }] }}
+            />
           </View>
-        </View>
-        <Switch
-          value={isAvailable}
-          onValueChange={toggleAvailability}
-          trackColor={{ false: '#FFE0E0', true: '#C8E6C9' }}
-          thumbColor={isAvailable ? '#4CAF50' : '#FF6B6B'}
-          ios_backgroundColor="#FFE0E0"
-        />
-      </View>
 
-      {/* Nearby Orders Info */}
-      {isAvailable && nearbyOrders.length > 0 && (
-        <View style={styles.nearbyInfoCard}>
-          <Ionicons name="location" size={20} color="#2196F3" />
-          <Text style={styles.nearbyInfoText}>
-            {nearbyOrders.length} order{nearbyOrders.length !== 1 ? 's' : ''} within 10km
-          </Text>
-          <Text style={styles.nearbyInfoSubtext}>
-            Nearest: {nearbyOrders[0]?.distance_km}km away
-          </Text>
+          {isAvailable && nearbyOrders.length > 0 && (
+            <View style={styles.nearbyBadge}>
+              <Ionicons name="location" size={16} color="#2196F3" />
+              <Text style={styles.nearbyText}>{nearbyOrders.length} nearby</Text>
+            </View>
+          )}
         </View>
-      )}
 
-      {/* Current Location Display */}
-      <View style={styles.locationCard}>
-        <View style={styles.locationHeader}>
-          <View style={styles.locationIconContainer}>
-            <Ionicons name="navigate-circle" size={24} color="#FF6B6B" />
-            <Text style={styles.locationTitle}>Your Location</Text>
-          </View>
+        {/* Service Type Toggle - Compact */}
+        <View style={styles.serviceToggle}>
           <TouchableOpacity
-            style={styles.locationDropdownButton}
-            onPress={() => setShowLocationPicker(!showLocationPicker)}
+            style={[styles.serviceTab, serviceType === 'food_delivery' && styles.serviceTabActive]}
+            onPress={() => !toggling && toggleService(false)}
           >
-            <Ionicons name="chevron-down" size={20} color="#666" />
-          </TouchableOpacity>
-        </View>
-        
-        <Text style={styles.locationAddress} numberOfLines={2}>
-          {locationAddress}
-        </Text>
-        
-        {currentLocation && (
-          <Text style={styles.locationCoords}>
-            📍 {currentLocation.latitude?.toFixed(6)}, {currentLocation.longitude?.toFixed(6)}
-          </Text>
-        )}
-
-        {/* Location Dropdown */}
-        {showLocationPicker && (
-          <View style={styles.locationDropdown}>
-            <TouchableOpacity
-              style={styles.locationOption}
-              onPress={() => {
-                getCurrentGPSLocation();
-                setShowLocationPicker(false);
-              }}
-            >
-              <Ionicons name="locate" size={22} color="#4CAF50" />
-              <View style={styles.locationOptionText}>
-                <Text style={styles.locationOptionTitle}>📍 Current GPS Location</Text>
-                <Text style={styles.locationOptionSubtext}>Use your real-time GPS</Text>
-              </View>
-            </TouchableOpacity>
-
-            <View style={styles.locationDivider} />
-
-            <TouchableOpacity
-              style={styles.locationOption}
-              onPress={() => {
-                setShowLocationPicker(false);
-                setShowSearchModal(true);
-              }}
-            >
-              <Ionicons name="search" size={22} color="#2196F3" />
-              <View style={styles.locationOptionText}>
-                <Text style={styles.locationOptionTitle}>🔍 Search Location</Text>
-                <Text style={styles.locationOptionSubtext}>Search any place</Text>
-              </View>
-            </TouchableOpacity>
-          </View>
-        )}
-      </View>
-
-      {/* Service Toggle Header */}
-      <View style={styles.toggleHeader}>
-        <View style={styles.toggleContainer}>
-          <View style={styles.toggleOption}>
             <Ionicons 
               name="fast-food" 
-              size={24} 
-              color={serviceType === 'food_delivery' ? '#FF6B6B' : '#999'} 
+              size={20} 
+              color={serviceType === 'food_delivery' ? '#FFF' : '#999'} 
             />
             <Text style={[
-              styles.toggleText,
-              serviceType === 'food_delivery' && styles.toggleTextActive
+              styles.serviceTabText,
+              serviceType === 'food_delivery' && styles.serviceTabTextActive
             ]}>
-              Food Delivery
+              Food
             </Text>
-          </View>
-          
-          <Switch
-            value={serviceType === 'ride_service'}
-            onValueChange={toggleService}
-            disabled={toggling}
-            trackColor={{ false: '#FFE8E8', true: '#E3F2FD' }}
-            thumbColor={serviceType === 'ride_service' ? '#2196F3' : '#FF6B6B'}
-          />
-          
-          <View style={styles.toggleOption}>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[styles.serviceTab, serviceType === 'ride_service' && styles.serviceTabActive]}
+            onPress={() => !toggling && toggleService(true)}
+          >
             <Ionicons 
               name="bicycle" 
-              size={24} 
-              color={serviceType === 'ride_service' ? '#2196F3' : '#999'} 
+              size={20} 
+              color={serviceType === 'ride_service' ? '#FFF' : '#999'} 
             />
             <Text style={[
-              styles.toggleText,
-              serviceType === 'ride_service' && styles.toggleTextActive
+              styles.serviceTabText,
+              serviceType === 'ride_service' && styles.serviceTabTextActive
             ]}>
-              Ride Service
+              Ride
             </Text>
-          </View>
+          </TouchableOpacity>
         </View>
       </View>
 
