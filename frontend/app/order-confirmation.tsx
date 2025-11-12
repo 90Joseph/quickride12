@@ -21,6 +21,7 @@ export default function OrderConfirmationScreen() {
   const [order, setOrder] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [estimatedMinutes, setEstimatedMinutes] = useState(35);
+  const mapRef = useRef<any>(null);
   
   // Animation values
   const checkmarkScale = useState(new Animated.Value(0))[0];
