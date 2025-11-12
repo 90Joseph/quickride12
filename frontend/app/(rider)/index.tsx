@@ -66,10 +66,6 @@ function RiderAvailableContent() {
   const [searching, setSearching] = useState(false);
 
   // Auth and role checked in wrapper - this will only render for riders
-        </View>
-      </SafeAreaView>
-    );
-  }
 
   useEffect(() => {
     // Wait for auth to load and verify user is a rider before fetching
