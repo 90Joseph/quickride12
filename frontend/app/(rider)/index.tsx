@@ -826,6 +826,42 @@ function RiderAvailableContent() {
   );
 }
 
+// Wrapper component to prevent hooks violation
+export default function RiderAvailableScreen() {
+  const router = useRouter();
+  const { user, isLoading: authLoading } = useAuthStore();
+
+  if (authLoading) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#FF6B6B" />
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  if (user && user.role !== 'rider') {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={styles.emptyContainer}>
+          <Ionicons name="lock-closed" size={80} color="#FF6B6B" />
+          <Text style={styles.emptyText}>Access Restricted</Text>
+          <Text style={styles.emptySubtext}>This screen is only accessible to riders</Text>
+          <TouchableOpacity 
+            style={styles.actionButton}
+            onPress={() => router.replace('/(auth)/login')}
+          >
+            <Text style={styles.actionButtonText}>Go to Login</Text>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  return <RiderAvailableContent />;
+}
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
