@@ -98,14 +98,8 @@ export default function GCashPaymentScreen() {
         payment_proof_base64: paymentProof,
       });
 
-      if (Platform.OS === 'web') {
-        window.alert('Payment submitted successfully! Your order is now being prepared. 🎉');
-      } else {
-        Alert.alert('Success', 'Payment submitted successfully! Your order is now being prepared. 🎉');
-      }
-
       clearCart();
-      router.replace('/(customer)/orders');
+      router.replace(`/order-confirmation?orderId=${orderId}` as any);
     } catch (error: any) {
       console.error('Payment submission failed:', error);
       if (Platform.OS === 'web') {
