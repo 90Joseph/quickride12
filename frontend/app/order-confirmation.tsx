@@ -243,6 +243,108 @@ export default function OrderConfirmationScreen() {
           </View>
         </View>
 
+        {/* Order Status Timeline Card */}
+        <View style={styles.statusTimelineCard}>
+          <View style={styles.statusHeader}>
+            <View style={styles.statusIconCircle}>
+              <Ionicons 
+                name={
+                  order.status === 'delivered' ? 'checkmark' :
+                  order.status === 'out_for_delivery' ? 'bicycle' :
+                  order.status === 'rider_assigned' ? 'person' :
+                  'restaurant'
+                } 
+                size={32} 
+                color="#FFF" 
+              />
+            </View>
+            <View style={styles.statusHeaderText}>
+              <Text style={styles.statusMainText}>
+                {order.status === 'pending' ? 'Order Received' :
+                 order.status === 'confirmed' ? 'Preparing' :
+                 order.status === 'ready_for_pickup' ? 'Ready' :
+                 order.status === 'rider_assigned' ? 'Rider Assigned' :
+                 order.status === 'picked_up' ? 'Picked Up' :
+                 order.status === 'out_for_delivery' ? 'Out for Delivery' :
+                 order.status === 'delivered' ? 'Delivered' :
+                 'Preparing'}
+              </Text>
+              <Text style={styles.statusOrderId}>Order #{order.id.slice(0, 8).toUpperCase()}</Text>
+            </View>
+          </View>
+
+          {/* Status Timeline */}
+          <View style={styles.timelineContainer}>
+            <Text style={styles.timelineTitle}>Order Status</Text>
+            
+            {/* Preparing Food */}
+            <View style={styles.timelineItem}>
+              <View style={[
+                styles.timelineDot,
+                (order.status === 'confirmed' || order.status === 'ready_for_pickup' || 
+                 order.status === 'rider_assigned' || order.status === 'picked_up' || 
+                 order.status === 'out_for_delivery' || order.status === 'delivered') && styles.timelineDotActive
+              ]} />
+              <View style={styles.timelineLine} />
+              <Text style={[
+                styles.timelineLabel,
+                (order.status === 'confirmed' || order.status === 'ready_for_pickup' || 
+                 order.status === 'rider_assigned' || order.status === 'picked_up' || 
+                 order.status === 'out_for_delivery' || order.status === 'delivered') && styles.timelineLabelActive
+              ]}>Preparing Food</Text>
+            </View>
+
+            {/* Rider Assigned */}
+            <View style={styles.timelineItem}>
+              <View style={[
+                styles.timelineDot,
+                (order.status === 'rider_assigned' || order.status === 'picked_up' || 
+                 order.status === 'out_for_delivery' || order.status === 'delivered') && styles.timelineDotActive
+              ]} />
+              <View style={styles.timelineLine} />
+              <Text style={[
+                styles.timelineLabel,
+                (order.status === 'rider_assigned' || order.status === 'picked_up' || 
+                 order.status === 'out_for_delivery' || order.status === 'delivered') && styles.timelineLabelActive
+              ]}>Rider Assigned</Text>
+            </View>
+
+            {/* Out for Delivery */}
+            <View style={styles.timelineItem}>
+              <View style={[
+                styles.timelineDot,
+                (order.status === 'out_for_delivery' || order.status === 'delivered') && styles.timelineDotActive
+              ]} />
+              <View style={styles.timelineLine} />
+              <Text style={[
+                styles.timelineLabel,
+                (order.status === 'out_for_delivery' || order.status === 'delivered') && styles.timelineLabelActive
+              ]}>Out for Delivery</Text>
+            </View>
+
+            {/* Delivered */}
+            <View style={styles.timelineItem}>
+              <View style={[
+                styles.timelineDot,
+                order.status === 'delivered' && styles.timelineDotActive
+              ]} />
+              <Text style={[
+                styles.timelineLabel,
+                order.status === 'delivered' && styles.timelineLabelActive
+              ]}>Delivered</Text>
+            </View>
+          </View>
+
+          {/* Restaurant Info */}
+          <View style={styles.restaurantSection}>
+            <Text style={styles.restaurantSectionTitle}>Restaurant</Text>
+            <View style={styles.restaurantInfo}>
+              <Ionicons name="close" size={20} color="#FF6B6B" />
+              <Text style={styles.restaurantName}>{order.restaurant_name}</Text>
+            </View>
+          </View>
+        </View>
+
         {/* Order Details Section */}
         <View style={styles.sectionContainer}>
           <Text style={styles.sectionTitle}>Order Details</Text>
