@@ -33,6 +33,12 @@ export default function CheckoutScreen() {
   const [paymentMethod, setPaymentMethod] = useState<'cash' | 'gcash'>('gcash');
   const [gcashNumber, setGcashNumber] = useState('09609317687'); // Merchant number for display
   
+  // Error states for validation
+  const [phoneError, setPhoneError] = useState(false);
+  const [addressError, setAddressError] = useState(false);
+  const scrollViewRef = useRef<any>(null);
+  const phoneInputRef = useRef<any>(null);
+  
   // Location verification modal
   const [showLocationVerification, setShowLocationVerification] = useState(false);
   const [verificationMapLoaded, setVerificationMapLoaded] = useState(false);
