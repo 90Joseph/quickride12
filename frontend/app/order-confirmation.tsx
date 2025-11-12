@@ -40,8 +40,63 @@ export default function OrderConfirmationScreen() {
     if (order) {
       startAnimations();
       calculateEstimatedTime();
+      initializeBackgroundMap();
     }
   }, [order]);
+
+  const initializeBackgroundMap = () => {
+    if (Platform.OS !== 'web' || !mapRef.current || !order) return;
+
+    try {
+      // Get delivery location
+      let lat, lng;
+      if (typeof order.delivery_address === 'string') {
+        // Default location if address is just a string
+        lat = 14.5995; // Manila default
+        lng = 120.9842;
+      } else if (order.delivery_address?.latitude && order.delivery_address?.longitude) {
+        lat = order.delivery_address.latitude;
+        lng = order.delivery_address.longitude;
+      } else {
+        lat = 14.5995;
+        lng = 120.9842;
+      }
+
+      const google = (window as any).google;
+      if (!google) return;
+
+      const map = new google.maps.Map(mapRef.current, {
+        center: { lat, lng },
+        zoom: 15,
+        disableDefaultUI: true,
+        gestureHandling: 'none',
+        keyboardShortcuts: false,
+        styles: [
+          {
+            featureType: 'all',
+            elementType: 'labels',
+            stylers: [{ visibility: 'off' }]
+          }
+        ]
+      });
+
+      // Add marker for delivery location
+      new google.maps.Marker({
+        position: { lat, lng },
+        map: map,
+        icon: {
+          path: google.maps.SymbolPath.CIRCLE,
+          scale: 8,
+          fillColor: '#FF6B6B',
+          fillOpacity: 1,
+          strokeColor: '#FFF',
+          strokeWeight: 3,
+        },
+      });
+    } catch (error) {
+      console.error('Error initializing background map:', error);
+    }
+  };
 
   const fetchOrderDetails = async () => {
     try {
