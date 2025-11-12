@@ -228,8 +228,8 @@ function RiderAvailableContent() {
       const response = await api.get('/riders/nearby-orders?radius=10');
       setNearbyOrders(response.data.orders || []);
     } catch (error: any) {
-      // Silently fail if unauthorized
-      if (error?.response?.status === 401) return;
+      // Silently ignore auth errors (401/403) - user is not a rider
+      if (error?.response?.status === 401 || error?.response?.status === 403) return;
       console.error('Error fetching nearby orders:', error);
     }
   };
