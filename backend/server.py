@@ -545,6 +545,42 @@ async def logout(request: Request):
     response.delete_cookie("session_token")
     return response
 
+@api_router.put("/users/me/delivery-location")
+async def update_delivery_location(request: Request):
+    """Save customer's default delivery location"""
+    user = await require_auth(request)
+    
+    # Only customers can set delivery location
+    if user.get("role") != UserRole.CUSTOMER:
+        raise HTTPException(status_code=403, detail="Only customers can set delivery location")
+    
+    body = await request.json()
+    location_data = {
+        "address": body.get("address"),
+        "latitude": body.get("latitude"),
+        "longitude": body.get("longitude")
+    }
+    
+    # Update user's default delivery location
+    await db.users.update_one(
+        {"id": user["id"]},
+        {"$set": {"default_delivery_location": location_data}}
+    )
+    
+    logger.info(f"✅ Saved default delivery location for user {user['email']}: {location_data['address']}")
+    return {"message": "Delivery location saved", "location": location_data}
+
+@api_router.get("/users/me/delivery-location")
+async def get_delivery_location(request: Request):
+    """Get customer's default delivery location"""
+    user = await require_auth(request)
+    
+    user_data = await db.users.find_one({"id": user["id"]})
+    if user_data and user_data.get("default_delivery_location"):
+        return user_data["default_delivery_location"]
+    
+    return None
+
 # ============= RESTAURANT ENDPOINTS =============
 @api_router.post("/restaurants")
 async def create_restaurant(restaurant_data: Dict[str, Any], request: Request):
