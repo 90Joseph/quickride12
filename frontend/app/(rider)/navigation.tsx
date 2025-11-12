@@ -20,7 +20,8 @@ import { useAuthStore } from '../../store/authStore';
 
 const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 
-export default function RiderNavigationScreen() {
+// Inner component with all the hooks - only renders for riders
+function RiderNavigationContent() {
   const router = useRouter();
   const { user, isLoading: authLoading } = useAuthStore();
   const mapRef = useRef<any>(null);
