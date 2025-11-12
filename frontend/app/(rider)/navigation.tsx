@@ -545,91 +545,76 @@ function RiderNavigationContent() {
 };
 
 // Fetch route using Google Routes API (new)
-const fetchRouteFromRoutesAPI = async (origin: any, destination: any, map: any) => {
+const fetchRouteFromDirectionsAPI = async (origin: any, destination: any, map: any) => {
   try {
-    const apiKey = process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY || 'AIzaSyDJqsXxZXuu808lFZXARvy4rd0xktuqwJQ';
+    console.log('📡 Using Google Maps Directions API for route display...');
     
-    const requestBody = {
-      origin: {
-        location: {
-          latLng: {
-            latitude: origin.lat,
-            longitude: origin.lng,
-          }
-        }
-      },
-      destination: {
-        location: {
-          latLng: {
-            latitude: destination.lat,
-            longitude: destination.lng,
-          }
-        }
-      },
-      travelMode: 'DRIVE',
-      routingPreference: 'TRAFFIC_AWARE',
-      computeAlternativeRoutes: false,
-      languageCode: 'en-US',
-      units: 'METRIC',
-    };
+    const google = (window as any).google;
+    if (!google || !google.maps) {
+      console.error('❌ Google Maps not loaded');
+      return;
+    }
 
-    console.log('📡 Calling Routes API...');
-    
-    const response = await fetch('https://routes.googleapis.com/directions/v2:computeRoutes', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Goog-Api-Key': apiKey,
-        'X-Goog-FieldMask': 'routes.duration,routes.distanceMeters,routes.polyline.encodedPolyline',
+    const directionsService = new google.maps.DirectionsService();
+    const directionsRenderer = new google.maps.DirectionsRenderer({
+      map: map,
+      suppressMarkers: true, // We'll keep our custom markers
+      polylineOptions: {
+        strokeColor: '#4285F4', // Google Maps blue
+        strokeWeight: 6,
+        strokeOpacity: 0.8,
       },
-      body: JSON.stringify(requestBody),
+      preserveViewport: true, // Don't auto-zoom, we handle that manually
     });
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('❌ Routes API error:', response.status, errorText);
-      throw new Error(`Routes API failed: ${response.status}`);
-    }
+    // Store renderer for cleanup
+    directionsRendererRef.current = directionsRenderer;
 
-    const data = await response.json();
-    console.log('✅ Routes API response:', data);
+    const request = {
+      origin: origin,
+      destination: destination,
+      travelMode: google.maps.TravelMode.DRIVING,
+      provideRouteAlternatives: false,
+      drivingOptions: {
+        departureTime: new Date(),
+        trafficModel: google.maps.TrafficModel.BEST_GUESS,
+      },
+    };
 
-    if (data.routes && data.routes.length > 0) {
-      const route = data.routes[0];
-      
-      // Extract distance and duration
-      const distanceMeters = route.distanceMeters;
-      const durationSeconds = parseInt(route.duration.replace('s', ''));
-      
-      const distanceKm = (distanceMeters / 1000).toFixed(1);
-      const durationMins = Math.ceil(durationSeconds / 60);
-      
-      setDistanceToDestination(`${distanceKm} km`);
-      setEtaToDestination(`${durationMins} mins`);
-      
-      console.log(`✅ Route loaded: ${distanceKm} km, ${durationMins} mins`);
+    console.log('🗺️ Requesting directions from', origin, 'to', destination);
 
-      // Draw polyline on map
-      const google = (window as any).google;
-      if (google && route.polyline?.encodedPolyline) {
-        const path = google.maps.geometry.encoding.decodePath(route.polyline.encodedPolyline);
+    directionsService.route(request, (result: any, status: any) => {
+      if (status === 'OK' && result) {
+        console.log('✅ Directions API response received');
         
-        const polyline = new google.maps.Polyline({
-          path: path,
-          geodesic: true,
-          strokeColor: '#2196F3',
-          strokeOpacity: 1.0,
-          strokeWeight: 4,
-          map: map,
-        });
-
-        console.log('✅ Route polyline drawn on map');
+        // Display the route on the map
+        directionsRenderer.setDirections(result);
+        
+        const route = result.routes[0];
+        const leg = route.legs[0];
+        
+        // Extract distance and duration
+        const distanceKm = (leg.distance.value / 1000).toFixed(1);
+        const durationMins = Math.ceil(leg.duration.value / 60);
+        
+        setDistanceToDestination(`${distanceKm} km`);
+        setEtaToDestination(`${durationMins} mins`);
+        
+        console.log(`✅ Route loaded: ${distanceKm} km, ${durationMins} mins, ${leg.steps.length} steps`);
+        
+        // Store navigation steps for potential turn-by-turn display
+        setNavigationSteps(leg.steps);
+        if (leg.steps.length > 0) {
+          setCurrentStep(leg.steps[0]);
+        }
+      } else {
+        console.error('❌ Directions request failed:', status);
+        setDistanceToDestination('N/A');
+        setEtaToDestination('N/A');
       }
-    } else {
-      console.warn('⚠️ No routes found in response');
-    }
+    });
   } catch (error) {
-    console.error('❌ Error fetching route:', error);
+    console.error('❌ Error fetching directions:', error);
     setDistanceToDestination('N/A');
     setEtaToDestination('N/A');
   }
