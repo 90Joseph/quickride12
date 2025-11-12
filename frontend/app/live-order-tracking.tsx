@@ -665,6 +665,13 @@ export default function LiveOrderTrackingScreen() {
           <Ionicons name="arrow-back" size={24} color="#333" />
         </TouchableOpacity>
 
+        {/* Estimated Time Card */}
+        <View style={styles.timeCard}>
+          <Text style={styles.timeCardText}>
+            {estimatedMinutes - 5} — {estimatedMinutes + 5} mins
+          </Text>
+        </View>
+
         {/* Draggable Bottom Sheet */}
         <BottomSheet
           ref={bottomSheetRef}
