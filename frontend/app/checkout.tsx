@@ -625,9 +625,26 @@ export default function CheckoutScreen() {
             <Text style={styles.sectionTitle}>Order Items</Text>
             {items.map((item) => (
               <View key={item.menu_item_id} style={styles.orderItem}>
-                <Text style={styles.orderItemQuantity}>{item.quantity}x</Text>
-                <Text style={styles.orderItemName}>{item.name}</Text>
-                <Text style={styles.orderItemPrice}>
+                <View style={styles.itemLeft}>
+                  <Text style={styles.orderItemName}>{item.name}</Text>
+                  <Text style={styles.orderItemPrice}>₱{item.price.toFixed(2)} each</Text>
+                </View>
+                <View style={styles.quantityControls}>
+                  <TouchableOpacity
+                    style={styles.quantityButton}
+                    onPress={() => handleDecreaseQuantity(item.menu_item_id)}
+                  >
+                    <Ionicons name="remove" size={20} color="#FF6B6B" />
+                  </TouchableOpacity>
+                  <Text style={styles.quantityText}>{item.quantity}</Text>
+                  <TouchableOpacity
+                    style={styles.quantityButton}
+                    onPress={() => handleIncreaseQuantity(item.menu_item_id)}
+                  >
+                    <Ionicons name="add" size={20} color="#FF6B6B" />
+                  </TouchableOpacity>
+                </View>
+                <Text style={styles.orderItemTotal}>
                   ₱{(item.price * item.quantity).toFixed(2)}
                 </Text>
               </View>
