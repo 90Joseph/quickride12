@@ -252,6 +252,21 @@ export default function OrderConfirmationScreen() {
             <Text style={styles.detailValue}>#{order.id.slice(0, 8).toUpperCase()}</Text>
           </View>
 
+          {/* Order Status Row */}
+          <View style={styles.detailRow}>
+            <Text style={styles.detailLabel}>Order status</Text>
+            <Text style={[styles.detailValue, styles.statusText]}>
+              {order.status === 'pending' ? 'Order Received' :
+               order.status === 'confirmed' ? 'Preparing Your Order' :
+               order.status === 'ready_for_pickup' ? 'Ready for Pickup' :
+               order.status === 'rider_assigned' ? 'Rider on the Way' :
+               order.status === 'picked_up' ? 'Order Picked Up' :
+               order.status === 'out_for_delivery' ? 'Out for Delivery' :
+               order.status === 'delivered' ? 'Delivered' :
+               'Preparing Your Order'}
+            </Text>
+          </View>
+
           {/* Restaurant Row */}
           <View style={styles.detailRow}>
             <Text style={styles.detailLabel}>Order from</Text>
