@@ -561,6 +561,10 @@ const styles = StyleSheet.create({
     flex: 1,
     textAlign: 'right',
   },
+  statusText: {
+    color: '#FF6B6B',
+    fontWeight: '600',
+  },
   restaurantName: {
     fontSize: 18,
     fontWeight: '600',
