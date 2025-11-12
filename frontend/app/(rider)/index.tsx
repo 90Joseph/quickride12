@@ -95,7 +95,9 @@ function RiderAvailableContent() {
     try {
       const response = await api.get('/riders/me');
       setIsAvailable(response.data.is_available !== false);
-    } catch (error) {
+    } catch (error: any) {
+      // Silently fail if unauthorized (user not logged in or not a rider)
+      if (error?.response?.status === 401) return;
       console.error('Error fetching rider availability:', error);
     }
   };
