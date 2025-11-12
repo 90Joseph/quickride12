@@ -2027,4 +2027,43 @@ const styles = StyleSheet.create({
     color: '#666',
     lineHeight: 22,
   },
+  locationCard: {
+    position: 'absolute',
+    top: 60,
+    left: 16,
+    right: 16,
+    backgroundColor: '#FFF',
+    borderRadius: 12,
+    padding: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 5,
+    zIndex: 20,
+  },
+  locationCardHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+  },
+  locationCardTextContainer: {
+    flex: 1,
+    marginLeft: 12,
+  },
+  locationCardTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#333',
+    marginBottom: 2,
+  },
+  locationCardAddress: {
+    fontSize: 12,
+    color: '#666',
+  },
+  editLocationButton: {
+    padding: 8,
+    borderRadius: 8,
+    backgroundColor: '#F5F5F5',
+  },
 });
