@@ -130,8 +130,25 @@ export default function HomeScreen() {
     loadSavedLocation();
   }, []);
 
-  // Load saved location from localStorage on mount
-  const loadSavedLocation = () => {
+  // Load saved location from backend and localStorage on mount
+  const loadSavedLocation = async () => {
+    try {
+      // Try to load from backend first
+      const response = await api.get('/users/me/delivery-location');
+      if (response.data) {
+        setSelectedLocation(response.data.address);
+        setTempLocation({
+          lat: response.data.latitude,
+          lng: response.data.longitude
+        });
+        console.log('✅ Loaded saved location from backend:', response.data.address);
+        return;
+      }
+    } catch (error) {
+      console.log('No saved location in backend, checking localStorage...');
+    }
+    
+    // Fallback to localStorage if backend has no saved location
     try {
       if (Platform.OS === 'web') {
         const savedLocationData = localStorage.getItem('deliveryLocation');
@@ -142,7 +159,7 @@ export default function HomeScreen() {
             lat: locationData.latitude,
             lng: locationData.longitude
           });
-          console.log('✅ Loaded saved location:', locationData.address);
+          console.log('✅ Loaded saved location from localStorage:', locationData.address);
         }
       }
     } catch (error) {
