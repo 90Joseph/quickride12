@@ -55,8 +55,11 @@ function RiderActiveContent() {
       }
       
       setOrders(activeOrders);
-    } catch (error) {
-      console.error('Error fetching active orders:', error);
+    } catch (error: any) {
+      // Silently fail if unauthorized
+      if (error?.response?.status !== 401) {
+        console.error('Error fetching active orders:', error);
+      }
       setOrders([]);
     } finally {
       setLoading(false);
