@@ -21,7 +21,7 @@ import api from '../utils/api';
 
 export default function CheckoutScreen() {
   const router = useRouter();
-  const { items, getTotalAmount, clearCart, restaurantId, restaurantName } = useCartStore();
+  const { items, getTotalAmount, clearCart, restaurantId, restaurantName, updateQuantity, removeItem } = useCartStore();
   const { user } = useAuthStore();
 
   const [deliveryAddress, setDeliveryAddress] = useState('');
