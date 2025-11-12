@@ -630,7 +630,7 @@ export default function CheckoutScreen() {
           <View style={styles.placeholder} />
         </View>
 
-        <ScrollView contentContainerStyle={styles.scrollContent}>
+        <ScrollView ref={scrollViewRef} contentContainerStyle={styles.scrollContent}>
           {/* Restaurant Info */}
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Order from</Text>
