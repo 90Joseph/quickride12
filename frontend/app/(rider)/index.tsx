@@ -105,7 +105,6 @@ function RiderAvailableContent() {
   const fetchRiderLocation = async () => {
     // Guard: Only fetch if user is a rider
     if (!user || user.role !== 'rider') {
-      console.log('⚠️ Skipping rider location fetch - user is not a rider');
       return;
     }
 
@@ -115,7 +114,9 @@ function RiderAvailableContent() {
         setCurrentLocation(response.data.current_location);
         setLocationAddress(response.data.current_location.address || 'Location set');
       }
-    } catch (error) {
+    } catch (error: any) {
+      // Silently fail if unauthorized
+      if (error?.response?.status === 401) return;
       console.error('Error fetching rider location:', error);
     }
   };
