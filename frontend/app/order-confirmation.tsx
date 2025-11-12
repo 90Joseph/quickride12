@@ -401,7 +401,7 @@ const styles = StyleSheet.create({
   timeEstimateText: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: '#333',
+    color: '#FF6B6B',
   },
   deliveryInfoRow: {
     flexDirection: 'row',
