@@ -466,7 +466,7 @@ export default function OrderConfirmationScreen() {
         {/* Action Buttons */}
         <TouchableOpacity
           style={styles.trackButton}
-          onPress={() => router.replace('/(customer)/orders' as any)}
+          onPress={() => router.push(`/live-order-tracking?orderId=${orderId}` as any)}
         >
           <Ionicons name="navigate" size={20} color="#FFF" />
           <Text style={styles.trackButtonText}>Track Your Order</Text>
