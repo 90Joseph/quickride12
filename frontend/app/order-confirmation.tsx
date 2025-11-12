@@ -339,23 +339,6 @@ export default function OrderConfirmationScreen() {
               {order.payment_method === 'gcash' ? 'GCash' : 'Cash on Delivery'}
             </Text>
           </View>
-
-          {/* Animated Estimated Time */}
-          <Animated.View 
-            style={[
-              styles.estimatedTimeBox,
-              { transform: [{ scale: pulseAnim }] }
-            ]}
-          >
-            <Ionicons name="time" size={24} color="#4CAF50" />
-            <View style={styles.estimatedTimeContent}>
-              <Text style={styles.estimatedTimeLabel}>Estimated Delivery Time</Text>
-              <Text style={styles.estimatedTimeValue}>{estimatedMinutes} minutes</Text>
-              <Text style={styles.estimatedTimeSubtext}>
-                We'll notify you when it's on the way
-              </Text>
-            </View>
-          </Animated.View>
         </View>
 
         {/* Action Buttons */}
