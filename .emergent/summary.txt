@@ -1,93 +1,82 @@
 <analysis>
-The AI engineer's work primarily concentrated on enhancing the QuickRide application's mapping and navigation functionalities for both riders and customers. The initial phase addressed critical map re-initialization issues in rider navigation due to  dependencies and fixed authentication persistence using . This led to a significant UI/UX overhaul, transforming static map views into dynamic, full-screen Google Maps integrated with draggable bottom sheets, resembling FoodPanda/Uber Eats. Key improvements included custom icon markers, migration from Google Directions API to Routes API, and robust error handling.
+The trajectory documents an extensive debugging and refinement process for the QuickRide application, focusing heavily on the rider and customer-facing map functionalities. The work began by resolving critical environment issues with malformed  files that broke the application preview.
 
-A continuous iterative process followed, refining map animations and transitions. The engineer tackled multiple syntax errors, implemented smooth zoom effects, auto-follow navigation, dark mode (later reverted), and directional rider markers with flashlight cones. Performance was a recurring concern, culminating in the removal of dark mode styling due to perceived lag. The work demonstrates an agile approach, directly addressing user feedback and progressively enhancing the app's real-time tracking and navigation experience.
+A significant portion of the effort was dedicated to fixing persistent  errors across all rider-specific screens. This was traced to a race condition where API calls were made before the Zustand auth store could initialize the user's role. The solution evolved from simple role checks to more robust guards that wait for auth initialization ( state) and prevent API calls from firing prematurely. This also solved session loss issues when switching tabs by ensuring the API client always reads the token from storage.
+
+Another major focus was the customer's live order tracking. The recurring bug of a missing route line was eventually traced to a backend authorization issue, where the user was logged in as a customer who did not own the order being tracked.
+
+Throughout the process, the engineer addressed numerous UI/UX requests: removing performance-hindering dark mode, creating a dedicated logout page, fixing navigation redirects after order completion, ensuring the rider's map is always visible on the navigation tab, and adding crucial status update buttons (e.g., Mark as Picked Up).
+
+The work concluded with a strategic decision, prompted by the user, to separate the application into distinct apps for each user role (Rider, Restaurant, Admin) to enhance stability.
 </analysis>
 
 <product_requirements>
-The QuickRide app, a delivery service in the Philippines, targets customer, restaurant, rider, and admin roles. A core requirement is robust live tracking and navigation. Previous work involved refining existing rider navigation and customer live order tracking, requiring real-time location updates and map integration.
-Key explicit requests and implemented features include:
-- **Customer Interactive Map**: An interactive Google Maps location picker on the home screen for exact delivery points, including quick selection dropdowns (Home, Work, School, Current Location) and a search bar, integrating into a checkout map verification step.
-- **Rider Location Features**: Riders should see their current location, toggle availability, and auto-assignment should prioritize nearest available riders within 10km. A dropdown and Google Places search for riders to change their real-time location.
-- **Restaurant Location Editor**: A map modal for restaurants to accurately edit their location.
-- **Live Tracking UI/UX Enhancement**: Full-screen Google Maps with draggable bottom sheets for order details, minimal UI, and hidden navigation tabs for an immersive experience (FoodPanda/Uber Eats style).
-- **Advanced Rider Navigation**: Full turn-by-turn navigation with real-time directions, GPS-style auto-follow, smooth zoom, tilting, thick blue route lines, directional arrow markers with a flashlight cone, and cinematic transitions.
-- **Performance**: Smoother, more gradual transitions and removal of features causing lag.
+The QuickRide application is a multi-faceted delivery platform with distinct roles: Customer, Rider, Restaurant, and Admin. The primary goal is to provide a seamless and reliable live tracking and navigation experience.
+
+**Implemented/Refined Features:**
+- **Live Tracking:** Both customers and riders require real-time map views. Customers must see the rider's route to their location, and riders need GPS-style navigation for deliveries.
+- **UI/UX:** The interface should be modern and intuitive, resembling apps like Uber Eats. This includes full-screen maps with draggable bottom sheets for details, clear status updates, and consistent navigation.
+- **Authentication:** A robust, role-based authentication system is critical. Users must be restricted to their designated sections, and sessions should persist across page reloads and tab switches.
+- **Rider Workflow:** The rider's journey must be fully supported, from accepting an order, marking it as picked up, navigating to the customer, and marking it as delivered, with the UI correctly reflecting each stage.
+
+**Final User Request:**
+To improve system stability and prevent role-based errors, the user has decided to split the monolithic Expo app into separate applications for the Rider and Restaurant roles, with the Admin panel becoming a dedicated web application.
 </product_requirements>
 
 <key_technical_concepts>
-- **Frontend**: Expo, React Native, Expo Router, React Navigation, Zustand (with ), , , , Geolocation API, , , .
-- **Backend**: FastAPI, MongoDB.
-- **Third-party Integration**: Google Maps API (Maps JavaScript API, Places API, Geocoding API, Routes API).
-- **UI/UX Principles**: Responsive design, real-time updates, map interaction, native-like animations, ref-based state management, error handling.
+- **Frontend:** Expo, React Native, Expo Router (file-based routing), Zustand (for state management),  (for auth persistence).
+- **Backend:** FastAPI, MongoDB.
+- **APIs & Integration:** Google Maps JavaScript API, Google Maps Routes API.
+- **Core Concepts:** Role-Based Access Control (RBAC), fixing authentication race conditions, state management for real-time UI updates, debugging  errors, and managing component lifecycle with .
 </key_technical_concepts>
 
 <code_architecture>
-The application uses a monorepo structure with  (FastAPI) and  (Expo/React Native).
+The application is a monorepo with a  (Expo) and  (FastAPI).
 
 
 
-- : Central FastAPI backend.
-    - **Importance**: Handles all API endpoints.
-    - **Changes**: Made  and  fields optional in the  model to fix No restaurants found error in customer home screen.
-- : Backend environment variables.
-    - **Importance**: Stores critical configuration.
-    - **Changes**:  was added during a brief attempt to integrate Mapbox.
-- : Expo app configuration.
-    - **Importance**: Defines app metadata and exposes  environment variables.
-    - **Changes**: Added  field to expose .
-- : Frontend package dependencies.
-    - **Importance**: Manages frontend libraries.
-    - **Changes**: Added  and  for draggable UI, and  (later superseded).
-- : Root layout for the Expo app.
-    - **Importance**: Handles global layout and authentication initialization.
-    - **Changes**: Integrated  to persist and load user session from .
-- : Rider's tab navigation layout.
-    - **Importance**: Manages the rider's primary navigation tabs.
-    - **Changes**: Updated  for the  screen to hide  and  for an immersive, full-screen navigation.
-- : Rider's live navigation screen.
-    - **Importance**: Provides live location, directions, and turn-by-turn guidance for riders.
-    - **Changes**:
-        - Optimized  dependencies and used  to prevent map re-initialization.
-        - Upgraded map markers to custom SVG icons for better recognition.
-        - Redesigned UI to a full-screen Google Map with a draggable bottom sheet for job details.
-        - Implemented turn-by-turn navigation state, Start Navigation button, and functions for voice guidance.
-        - Integrated Google Maps GPS-style auto-follow, camera rotation, smooth zoom, and tilt using native API calls.
-        - Auto-minimizes bottom sheet and transitions map view on navigation start.
-        - Route line color changed to blue and thickness increased.
-        - Rider marker changed to a directional arrow with a flashlight cone, rotating with bearing.
-        - Implemented smooth, sequential animations for bottom sheet minimization and map camera movements, using native Google Maps methods instead of .
-        - Introduced dark mode map styling, then removed it due to perceived performance issues.
-        - Simplified map to show only essential delivery markers.
-        - Fixed multiple syntax errors related to  and function closures in animation logic.
-- : Customer's live order tracking screen.
-    - **Importance**: Enables customers to track their food delivery rider's location and route.
-    - **Changes**:
-        - Optimized  dependencies and used  to prevent map re-initialization.
-        - Modified  to ensure it loads even without rider location (showing customer location initially).
-        - Replaced deprecated Google Maps Directions API calls with Routes API for route drawing.
-        -  now correctly redraws the route upon  changes without full map re-initialization.
-        - Redesigned UI to a full-screen Google Map with a draggable bottom sheet for order details.
-        - Fixed React hooks error by ensuring hooks are called unconditionally at the top of the component.
-- : Zustand store for authentication.
-    - **Importance**: Manages user authentication state.
-    - **Changes**: Integrated  to persist  and  data for continuous sessions.
+- ****
+    - **Importance:** The core screen for a rider's active delivery, providing map-based navigation, turn-by-turn directions, and order status updates. It's the most complex component.
+    - **Changes:** This file underwent massive changes. Dark mode styling was removed. Robust auth guards (, ) were added to prevent race conditions. Logic was added to display the map with the rider's location even with no active job. A Mark Delivered redirect was fixed. A critical React Hooks violation was resolved.
+
+- ****
+    - **Importance:** The customer-facing screen to track a rider's location in real-time.
+    - **Changes:** Fixed a bug where the route polyline wouldn't draw by ensuring drawing logic runs after rider location is fetched. Addressed 403 errors by explaining the need to be logged in as the correct customer. Synchronized Google Routes API parameters with the rider's navigation screen for consistency.
+
+- ** & **
+    - **Importance:** These screens show available orders and the rider's active jobs.
+    - **Changes:** Implemented the same robust auth guards as  to prevent  errors. Fixed a data synchronization issue in  by ensuring it fetched data from the correct rider-specific endpoint () instead of the generic  endpoint. Added a Mark as Picked Up button.
+
+- ****
+    - **Importance:** Zustand store managing user session, token, and role, with  for persistence.
+    - **Changes:** Logic was updated to properly clear the token on logout and re-initialize the session on app start, which was key to fixing session persistence issues.
+
+- ****
+    - **Importance:** The central Axios instance for all backend API calls.
+    - **Changes:** Updated to include an interceptor that re-reads the  from  before every request. This was a critical fix to ensure the auth header wasn't lost when switching browser tabs or after a page reload.
+
+- ****
+    - **Importance:** The FastAPI backend handling all API logic and database interactions.
+    - **Changes:** The  endpoint was fixed by a testing agent to use the correct  field for lookup, resolving a key bug preventing customers from seeing the route line. Role checks were confirmed to be correctly implemented, enforcing security.
 </code_architecture>
 
 <pending_tasks>
+- Separate the single Expo application into dedicated apps for Rider and Restaurant roles, and a web app for the Admin panel.
 - Fully integrate automated GCash payment via Xendit.
-- Implement full functionality for remaining profile sub-pages (e.g., Saved Addresses).
-- Continue refining other Restaurant and Rider specific screens (e.g., , ).
-- Resolve persistent Google Maps API key configuration issues for the admin dashboard.
-- Consider Mapbox integration for Expo web if higher performance is needed, noting the different integration approach required.
+- Implement full functionality for the newly created customer profile sub-pages (Saved Addresses, Payment Methods, etc.).
+- Resolve any remaining Google Maps API key configuration issues for the admin dashboard.
 </pending_tasks>
 
 <current_work>
-The immediate focus was on refining the visual performance and transitions of the map in the rider's navigation screen (). The user requested a smoother, more gradual zoom transition, specifically 1 second only duration, with the map being movable by the user and including tilting, also emphasizing that the bottom sheet minimize first then zoom, not simultaneous. The AI engineer implemented these sequential and native Google Maps-style animations.
+The most recent work was a direct response to the user's strategic question about how to best prevent errors. After the AI engineer explained the pros and cons of a monolithic versus a multi-app architecture, the user made a decisive choice.
 
-The very last user feedback stated, can you please not make it into dark i believe it is the one causing the lags, indicating a suspicion that the recently implemented dark mode map styling was negatively impacting performance. The AI engineer acknowledged this and immediately confirmed, Perfect! Let me remove the dark mode styling which could be causing the performance issues. This is where the work left off.
+**User's Explicit Request:** *okay . separate the app of rider and restaurant and admin for web to make it more conducive for the system*
+
+**AI Engineer's Action:** The engineer acknowledged this as an Excellent decision! and the immediate task became planning this major architectural refactor.
+
+The work stopped right at the point where the engineer was about to formulate and present a comprehensive plan for this separation. All other bug-fixing activities were paused in favor of this new, high-level architectural task. This represents a significant shift from iterative debugging to a foundational re-architecting of the entire frontend project structure.
 </current_work>
 
 <optional_next_step>
-Remove the dark mode styling from the rider's navigation map to address the user's performance concerns.
+Create a comprehensive, step-by-step plan to separate the monolithic Expo application into distinct Rider, Restaurant, and Admin applications, and present this plan to the user for confirmation before execution.
 </optional_next_step>
