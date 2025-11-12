@@ -184,6 +184,29 @@ export default function OrderConfirmationScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
+        {/* Success Header with Checkmark */}
+        <View style={styles.successHeader}>
+          <Animated.View 
+            style={[
+              styles.checkmarkCircle,
+              {
+                transform: [
+                  { scale: checkmarkScale },
+                  { 
+                    rotate: checkmarkRotate.interpolate({
+                      inputRange: [0, 1],
+                      outputRange: ['0deg', '360deg']
+                    })
+                  }
+                ]
+              }
+            ]}
+          >
+            <Ionicons name="checkmark" size={60} color="#FFF" />
+          </Animated.View>
+          <Text style={styles.successTitle}>Order Placed!</Text>
+        </View>
+
         {/* Top Card with Time Estimate */}
         <View style={styles.topCard}>
           <Animated.View 
