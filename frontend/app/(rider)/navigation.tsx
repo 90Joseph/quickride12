@@ -515,7 +515,7 @@ function RiderNavigationContent() {
       }
     }
 
-    // Draw route using Routes API (new)
+    // Draw route using Directions API
     if (pickupLocation || dropoffLocation) {
       const origin = userPosition; // Use userPosition with proper lat/lng
       const destination = currentJob.data.status === 'picked_up' || currentJob.data.status === 'out_for_delivery'
@@ -524,20 +524,23 @@ function RiderNavigationContent() {
 
       if (destination) {
         console.log('🗺️ Getting route from', origin, 'to', destination);
-        fetchRouteFromDirectionsAPI(origin, destination, map);
+        // Pass a callback to handle bounds after directions are loaded
+        fetchRouteFromDirectionsAPI(origin, destination, map, () => {
+          console.log('✅ Route displayed, DirectionsRenderer handled viewport');
+        });
       }
-    }
-
-    // Fit bounds to show all markers
-    try {
-      const bounds = new google.maps.LatLngBounds();
-      bounds.extend(userPosition); // Use userPosition instead of userLocation
-      if (pickupLocation) bounds.extend(pickupLocation);
-      if (dropoffLocation) bounds.extend(dropoffLocation);
-      map.fitBounds(bounds);
-      console.log('✅ Map bounds fitted successfully');
-    } catch (error) {
-      console.error('❌ Error fitting map bounds:', error);
+    } else {
+      // Only fit bounds manually if we're NOT using DirectionsRenderer
+      try {
+        const bounds = new google.maps.LatLngBounds();
+        bounds.extend(userPosition);
+        if (pickupLocation) bounds.extend(pickupLocation);
+        if (dropoffLocation) bounds.extend(dropoffLocation);
+        map.fitBounds(bounds);
+        console.log('✅ Map bounds fitted manually');
+      } catch (error) {
+        console.error('❌ Error fitting map bounds:', error);
+      }
     }
   } catch (error) {
     console.error('❌ Error initializing map:', error);
