@@ -21,7 +21,7 @@ from datetime import datetime
 import sys
 
 # Configuration
-BACKEND_URL = "https://quickride-tracker.preview.emergentagent.com/api"
+BACKEND_URL = "https://quickride-debug.preview.emergentagent.com/api"
 
 class NavigationCrashTester:
     def __init__(self):
