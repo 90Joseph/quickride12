@@ -127,7 +127,28 @@ export default function HomeScreen() {
 
   useEffect(() => {
     fetchRestaurants();
+    loadSavedLocation();
   }, []);
+
+  // Load saved location from localStorage on mount
+  const loadSavedLocation = () => {
+    try {
+      if (Platform.OS === 'web') {
+        const savedLocationData = localStorage.getItem('deliveryLocation');
+        if (savedLocationData) {
+          const locationData = JSON.parse(savedLocationData);
+          setSelectedLocation(locationData.address);
+          setTempLocation({
+            lat: locationData.latitude,
+            lng: locationData.longitude
+          });
+          console.log('✅ Loaded saved location:', locationData.address);
+        }
+      }
+    } catch (error) {
+      console.error('Error loading saved location:', error);
+    }
+  };
 
   // Auto-slide banner every 4 seconds with animation
   useEffect(() => {
