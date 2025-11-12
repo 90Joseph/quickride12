@@ -740,7 +740,10 @@ async def create_order(order_data: Dict[str, Any], request: Request):
     """Create a new order"""
     user = await require_auth(request)
     
+    logger.info(f"📝 Order creation attempt by user: {user.email}, role: {user.role}, type: {type(user.role)}")
+    
     if user.role != UserRole.CUSTOMER:
+        logger.error(f"❌ Order creation blocked - user role '{user.role}' != '{UserRole.CUSTOMER}'")
         raise HTTPException(status_code=403, detail="Only customers can create orders")
     
     # Get restaurant details
