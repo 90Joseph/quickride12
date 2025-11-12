@@ -576,30 +576,15 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#FF6B6B',
   },
-  estimatedTimeBox: {
-    flexDirection: 'row',
+  simpleEstimatedTime: {
     alignItems: 'center',
-    backgroundColor: '#E8F5E9',
-    padding: 16,
-    borderRadius: 12,
     marginTop: 16,
+    marginBottom: 8,
   },
-  estimatedTimeContent: {
-    marginLeft: 12,
-  },
-  estimatedTimeLabel: {
-    fontSize: 14,
+  simpleEstimatedTimeText: {
+    fontSize: 18,
+    fontWeight: '600',
     color: '#666',
-  },
-  estimatedTimeValue: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#4CAF50',
-  },
-  estimatedTimeSubtext: {
-    fontSize: 12,
-    color: '#666',
-    marginTop: 4,
   },
   trackButton: {
     flexDirection: 'row',
