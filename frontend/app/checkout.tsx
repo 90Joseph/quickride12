@@ -500,19 +500,11 @@ export default function CheckoutScreen() {
           }
         });
       } else {
-        // Cash on delivery - show success message
-        if (Platform.OS === 'web') {
-          window.alert('Order placed successfully! 🎉 Check your Orders tab.');
-        } else {
-          Alert.alert('Success', 'Order placed successfully! 🎉 Check your Orders tab.');
-        }
-
+        // Cash on delivery - redirect to order confirmation page
         clearCart();
         
-        // Redirect to orders page
-        setTimeout(() => {
-          router.replace('/(customer)/orders');
-        }, 1000);
+        // Navigate to order confirmation page
+        router.replace(`/order-confirmation?orderId=${orderId}` as any);
       }
     } catch (error: any) {
       console.error('Error placing order:', error);
