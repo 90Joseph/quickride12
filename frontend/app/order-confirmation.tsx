@@ -219,28 +219,6 @@ export default function OrderConfirmationScreen() {
               {estimatedMinutes - 5} — {estimatedMinutes + 5} mins
             </Text>
           </Animated.View>
-          
-          {/* Delivery Info with Icon */}
-          <View style={styles.deliveryInfoRow}>
-            <View style={styles.iconCircle}>
-              <Ionicons name="restaurant" size={24} color="#FF6B6B" />
-            </View>
-            <View style={styles.deliveryTextContainer}>
-              <Text style={styles.deliveryTitle}>
-                {order.status === 'pending' ? 'Order Received' :
-                 order.status === 'confirmed' ? 'Preparing Your Order' :
-                 order.status === 'ready_for_pickup' ? 'Ready for Pickup' :
-                 order.status === 'rider_assigned' ? 'Rider on the Way' :
-                 order.status === 'picked_up' ? 'Order Picked Up' :
-                 order.status === 'out_for_delivery' ? 'Out for Delivery' :
-                 order.status === 'delivered' ? 'Delivered' :
-                 'Preparing Your Order'}
-              </Text>
-              <Text style={styles.deliverySubtext}>
-                {order.restaurant_name || 'The restaurant'} is working on your order. You'll be notified when a rider is assigned.
-              </Text>
-            </View>
-          </View>
         </View>
 
         {/* Order Status Timeline Card */}
