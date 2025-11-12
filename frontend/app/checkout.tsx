@@ -703,18 +703,24 @@ export default function CheckoutScreen() {
               )}
             </View>
 
-            <View style={styles.inputGroup}>
+            <View style={styles.inputGroup} ref={phoneInputRef}>
               <Text style={styles.label}>Phone Number *</Text>
-              <View style={styles.inputContainer}>
-                <Ionicons name="call-outline" size={20} color="#666" style={styles.inputIcon} />
+              <View style={[styles.inputContainer, phoneError && styles.inputContainerError]}>
+                <Ionicons name="call-outline" size={20} color={phoneError ? "#FF6B6B" : "#666"} style={styles.inputIcon} />
                 <TextInput
                   style={styles.input}
                   placeholder="+63 917 123 4567"
                   value={phoneNumber}
-                  onChangeText={setPhoneNumber}
+                  onChangeText={(text) => {
+                    setPhoneNumber(text);
+                    if (phoneError) setPhoneError(false); // Clear error when user starts typing
+                  }}
                   keyboardType="phone-pad"
                 />
               </View>
+              {phoneError && (
+                <Text style={styles.errorText}>Please enter your phone number</Text>
+              )}
             </View>
 
             <View style={styles.inputGroup}>
