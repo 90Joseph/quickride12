@@ -1246,7 +1246,7 @@ const fetchRouteFromRoutesAPI = async (origin: any, destination: any, map: any) 
             </View>
           ) : null}
 
-          {/* Rider Location Card - Floating at Top */}
+          {/* Rider Location Card - At Very Top */}
           <View style={styles.locationCard}>
             <View style={styles.locationCardHeader}>
               <Ionicons name="navigate" size={20} color="#FF6B6B" />
@@ -1260,16 +1260,10 @@ const fetchRouteFromRoutesAPI = async (origin: any, destination: any, map: any) 
               </View>
             </View>
             <TouchableOpacity
-              style={styles.editLocationButton}
-              onPress={() => {
-                if (Platform.OS === 'web') {
-                  window.alert('Location update: Use GPS or search for a new location. This feature updates your real-time position for better order matching.');
-                } else {
-                  Alert.alert('Update Location', 'Use GPS or search for a new location');
-                }
-              }}
+              style={styles.searchLocationButton}
+              onPress={() => setShowLocationSearchModal(true)}
             >
-              <Ionicons name="create-outline" size={18} color="#FF6B6B" />
+              <Ionicons name="search" size={18} color="#FFF" />
             </TouchableOpacity>
           </View>
 
