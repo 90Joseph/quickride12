@@ -536,30 +536,33 @@ const styles = StyleSheet.create({
   },
   itemRow: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: 8,
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#F0F0F0',
   },
-  itemLeft: {
-    flexDirection: 'row',
+  itemQuantityBox: {
+    width: 24,
+    height: 24,
+    backgroundColor: '#F5F5F5',
+    borderRadius: 4,
+    justifyContent: 'center',
     alignItems: 'center',
-    flex: 1,
+    marginRight: 12,
   },
-  itemQuantity: {
-    fontSize: 15,
+  itemQuantityText: {
+    fontSize: 12,
     fontWeight: '600',
-    color: '#333',
-    marginRight: 8,
-    minWidth: 30,
+    color: '#666',
   },
   itemName: {
-    fontSize: 15,
-    color: '#333',
     flex: 1,
+    fontSize: 14,
+    color: '#333',
   },
   itemPrice: {
-    fontSize: 15,
-    fontWeight: '600',
+    fontSize: 14,
+    fontWeight: '500',
     color: '#333',
   },
   totalSection: {
