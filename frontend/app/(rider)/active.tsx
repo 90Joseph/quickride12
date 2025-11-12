@@ -257,6 +257,35 @@ function RiderActiveContent() {
   );
 }
 
+// Wrapper component to prevent hooks violation
+export default function RiderActiveScreen() {
+  const { user, isLoading: authLoading } = useAuthStore();
+
+  if (authLoading) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#FF6B6B" />
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  if (user && user.role !== 'rider') {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={styles.emptyContainer}>
+          <Ionicons name="lock-closed" size={80} color="#FF6B6B" />
+          <Text style={styles.emptyText}>Access Restricted</Text>
+          <Text style={styles.emptySubtext}>This screen is only accessible to riders</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  return <RiderActiveContent />;
+}
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
