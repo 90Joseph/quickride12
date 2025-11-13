@@ -1662,6 +1662,7 @@ const fetchRouteFromDirectionsAPI = async (origin: any, destination: any, map: a
         </BottomSheet>
       </SafeAreaView>
     </GestureHandlerRootView>
+    </Animated.View>
   );
 }
 // Wrapper component to prevent hooks violation when non-riders access this screen
