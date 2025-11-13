@@ -1727,6 +1727,9 @@ const fetchRouteFromDirectionsAPI = async (origin: any, destination: any, map: a
                       // Update order status to delivered
                       await api.put(`/orders/${currentJob.data.id}/status`, { status: 'delivered' });
                       
+                      // Clear pending notification
+                      setPendingJobNotification(null);
+                      
                       // Show congratulations card
                       setShowCongrats(true);
                       
