@@ -776,7 +776,8 @@ async def create_order(order_data: Dict[str, Any], request: Request):
     )
     
     await db.orders.insert_one(order.dict())
-    logger.info(f"Order {order.id} created by {user.email}")
+    logger.info(f"✅ Order {order.id} created by {user.email} for restaurant {order.restaurant_id} ({restaurant['name']})")
+    logger.info(f"   Order status: {order.status}, Items: {len(order.items)}, Total: ${order.total_amount}")
     
     # Emit real-time event to restaurant
     await sio.emit('new_order', order.dict(), room=f"restaurant_{order.restaurant_id}")
