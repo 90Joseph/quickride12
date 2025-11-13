@@ -1484,6 +1484,71 @@ const fetchRouteFromDirectionsAPI = async (origin: any, destination: any, map: a
               </TouchableOpacity>
             </View>
           </View>
+
+          {/* Job Notification Modal */}
+          {pendingJobNotification && (
+            <Modal
+              visible={true}
+              animationType="slide"
+              transparent={true}
+              onRequestClose={() => setPendingJobNotification(null)}
+            >
+              <View style={styles.jobNotificationOverlay}>
+                <View style={styles.jobNotificationCard}>
+                  <View style={styles.jobNotificationHeader}>
+                    <Text style={styles.jobNotificationFee}>
+                      ₱{(pendingJobNotification.data.total_amount * 0.10).toFixed(2)}
+                    </Text>
+                    <Text style={styles.jobNotificationFeeLabel}>Delivery Fee</Text>
+                  </View>
+
+                  <View style={styles.jobNotificationBody}>
+                    <View style={styles.jobNotificationLocation}>
+                      <View style={styles.jobNotificationLocationIcon}>
+                        <Ionicons name="restaurant" size={24} color="#FF6B6B" />
+                      </View>
+                      <View style={styles.jobNotificationLocationInfo}>
+                        <Text style={styles.jobNotificationLocationTitle}>Pick-up</Text>
+                        <Text style={styles.jobNotificationLocationAddress}>
+                          {pendingJobNotification.data.restaurant_name}
+                        </Text>
+                        <Text style={styles.jobNotificationLocationTime}>
+                          {pendingJobNotification.data.restaurant_location?.address || 'Restaurant address'}
+                        </Text>
+                      </View>
+                    </View>
+
+                    <View style={styles.jobNotificationDivider} />
+
+                    <View style={styles.jobNotificationLocation}>
+                      <View style={styles.jobNotificationLocationIcon}>
+                        <Ionicons name="home" size={24} color="#4CAF50" />
+                      </View>
+                      <View style={styles.jobNotificationLocationInfo}>
+                        <Text style={styles.jobNotificationLocationTitle}>Drop-off</Text>
+                        <Text style={styles.jobNotificationLocationAddress}>
+                          {pendingJobNotification.data.customer_name}
+                        </Text>
+                        <Text style={styles.jobNotificationLocationTime}>
+                          {pendingJobNotification.data.delivery_address?.address || 'Customer address'}
+                        </Text>
+                      </View>
+                    </View>
+                  </View>
+
+                  <TouchableOpacity
+                    style={styles.jobNotificationAcceptButton}
+                    onPress={() => {
+                      setPendingJobNotification(null);
+                      setIsNavigating(true);
+                    }}
+                  >
+                    <Text style={styles.jobNotificationAcceptText}>Accept</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </Modal>
+          )}
         </View>
       </SafeAreaView>
       </Animated.View>
