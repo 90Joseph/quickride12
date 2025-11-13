@@ -1,89 +1,76 @@
 <analysis>
-The trajectory chronicles an extensive development and debugging cycle for the QuickRide application. The work began by addressing critical React Hooks violations (Rendered fewer hooks than expected) that were causing app-wide crashes, particularly after user role changes (e.g., logging out as a rider and logging in as a customer). The initial fix involved replacing early returns with conditional JSX, but the definitive solution was implementing a wrapper component pattern. This pattern was applied across all rider-facing screens (, , ) to handle authentication and role checks before rendering any components with hooks, thus ensuring a consistent hook call order.
+The trajectory documents an extensive and complex development cycle for the QuickRide application, focusing heavily on the rider's navigation experience within . The work began by addressing a series of critical infrastructure and architectural issues. First, environment-specific URL problems in  files, which arose from the project being forked, were debugged, resolving initial  errors. Concurrently, persistent  errors, caused by a race condition where screens made API calls before authentication checks completed, were fixed by strengthening the  guard and implementing silent error handling in API calls.
 
-Simultaneously, the engineer tackled persistent  and  errors. This was resolved by adding layout-level route guards in  to redirect non-riders, and by updating API call error handlers to silently fail on 401 errors, preventing console spam when no user is logged in.
+The core of the work involved iterative feature development and debugging on the rider navigation screen, driven by specific user requests and feedback images. This included:
+1.  **Replacing Google Routes API with Directions API** to achieve a turn-by-turn visual style.
+2.  **Implementing custom map markers** (a rotating arrow for the rider, bouncing pins for restaurant/customer) using SVG paths.
+3.  **A complex multi-stage debugging process** to fix React rendering errors that caused the active navigation screen to fail silently, appearing as if the wrong screen (idle map) was loading. This involved fixing duplicate style definitions, state initialization order, and ultimately rewriting a corrupted JSX block.
+4.  **Redesigning the job acceptance flow**, transitioning from an automatic switch to active navigation to a user-initiated flow via a new, custom-designed job notification card.
 
-A significant portion of the work involved iterative UI/UX enhancements based on direct user feedback. This included:
-- **Order Confirmation Page:** A complete multi-stage redesign to mimic a FoodPanda-style receipt, including a blurred map background, animations, a visual status timeline, and theme-consistent colors.
-- **Checkout Page:** Added plus/minus quantity controls and implemented superior UX for phone number validation (red border and auto-scroll instead of alerts).
-- **Rider Screens:** Decluttered the home screen, added a compact, scrollable earnings card, and implemented an editable location card on the navigation screen.
-- **Customer Screens:** Ensured the customer's selected location persists across sessions by saving it to both  and the backend.
-
-The trajectory concludes mid-task, with the engineer implementing a user-requested search functionality for the rider's location card.
+The work concluded mid-task, focused on unifying the user experience by refactoring the customer's  to use the same advanced  and custom marker implementation as the rider's navigation screen.
 </analysis>
 
 <product_requirements>
-The QuickRide application is a food delivery platform with distinct user roles (Customer, Rider, Restaurant). The primary goal is to provide a stable, intuitive, and visually polished user experience, with a focus on real-time tracking and seamless order management.
+The QuickRide application is a three-sided food delivery marketplace (Customer, Rider, Restaurant). The primary goal is to build a polished, stable, and intuitive mobile application with a strong focus on real-time map-based tracking and seamless user flows for each role.
 
-**Core Implemented Features:**
-- **Role-Based Authentication:** A robust system that restricts access to role-specific sections of the app (e.g., customers cannot access rider pages). The system now handles session changes and route protection gracefully.
-- **Customer Order Flow:** Customers can browse, add items to a cart, and check out. The checkout process includes item quantity management and intelligent form validation. Upon ordering, they are shown a sophisticated, animated confirmation page with a visual status tracker and blurred map background.
-- **Customer Location Persistence:** The customer's selected delivery address is saved and reloaded across login/logout sessions.
-- **Rider Experience:** Riders have a decluttered home screen showing available jobs and total earnings. The primary navigation screen displays their current location on a map, which now includes an editable location card.
-- **Bug Fixes:** Resolved critical app-breaking React Hooks violations and persistent authentication/authorization errors that plagued the initial build.
+**Implemented Functionality:**
+-   **Role-Based Access Control:** Users are authenticated and restricted to their specific app sections (e.g., customers cannot access rider tabs). The system now robustly handles redirects and prevents unauthorized API calls.
+-   **Rider Navigation Experience:** A sophisticated, feature-rich screen for riders ().
+    -   **Idle State:** Displays the rider's current location on a map. A job notification card appears as an overlay when a new job is assigned, matching a user-provided design.
+    -   **Active State:** After accepting a job, it displays an active navigation map with custom markers (bouncing pins for locations, an arrow for the rider). It draws dual route lines (rider-to-restaurant in blue, restaurant-to-customer in green) using Google's Directions API. A draggable bottom sheet shows order status and allows the rider to Mark Picked Up and Complete Delivery.
+-   **Congratulatory Flow:** A confirmation modal appears after a delivery is successfully completed.
+-   **Customer Live Tracking:** A dedicated screen () for customers to track their order's progress on a map.
 </product_requirements>
 
 <key_technical_concepts>
-- **Frontend:** React Native, Expo, Expo Router (for file-based routing), Zustand (state management),  (for animations), Google Maps API.
-- **Backend:** FastAPI, MongoDB.
+- **Frontend:** React Native, Expo, Expo Router (file-based routing), Zustand (state management).
+- **Core Libraries:** , , .
+- **APIs:** Google Maps JavaScript API (specifically  and ).
 - **Architectural Patterns:**
-  - **Wrapper Component:** Solved React Hooks violations by wrapping screens in a component that handles auth/role checks before rendering.
-  - **Layout-Level Route Protection:** Used in  to redirect unauthorized users.
-  - **Silent Error Handling:**  blocks in API calls were updated to ignore 401/403 errors to prevent console spam for unauthenticated users.
+    - Layout-level route guards () for auth.
+    - Silent API error handling for 401/403s.
+    - State-driven conditional rendering to manage complex UI flows (e.g., idle map vs. active navigation vs. notification card).
 </key_technical_concepts>
 
 <code_architecture>
-The application is a monorepo containing a  Expo app and a  FastAPI server.
+The application follows a monorepo structure with a frontend Expo app and a backend FastAPI server. The file-based routing is managed by .
 
 
 
-- ****:
-  - **Importance:** Core screen for rider navigation. It was the primary source of the critical React Hooks violation.
-  - **Changes:** Refactored extensively to use a wrapper component pattern, which resolved the hook violation. Added a floating location card that is now visible in both the idle (no job) and active (delivery in progress) states. The card was being moved to the top and a search button was being added.
+-   ****:
+    -   **Importance:** This is the most complex and critical file in the application, serving as the rider's main interface. It manages multiple states: idle map, new job notification, and active turn-by-turn navigation.
+    -   **Changes:** Underwent massive refactoring. Logic was added to handle state-driven rendering between idle/active views, display custom job notification modals, render dual routes using multiple  instances, create custom animated SVG map markers, and manage a draggable bottom sheet for in-progress orders. It was the source of numerous complex debugging cycles related to rendering errors and state management.
 
-- ** & **:
-  - **Importance:** Rider's home screen for available orders and the screen for active jobs.
-  - **Changes:** Also fixed for hooks violations using the wrapper pattern.  was significantly decluttered, and a compact, scrollable Total Earnings card was added, fetching data from a new backend endpoint. Error handling was improved to silently ignore 401s.
+-   ****:
+    -   **Importance:** Provides the tab navigation structure for the rider section and acts as a crucial authentication gate.
+    -   **Changes:** The authentication logic was strengthened to prevent child screens from mounting and making API calls if the user is not a logged-in rider, fixing a  error flood.
 
-- ****:
-  - **Importance:** The layout file for the rider's tab navigation.
-  - **Changes:** Added robust authentication and role-checking logic. It now redirects any non-rider or unauthenticated user away from the rider section, preventing the child screens from mounting unnecessarily and firing off invalid API calls.
+-   ****:
+    -   **Importance:** This is the customer-facing screen for tracking a delivery in real-time. The goal is to make its look-and-feel identical to the rider's navigation screen.
+    -   **Changes:** The most recent work began refactoring this file. The previous implementation used a simple . The update started by adding  hooks to support , with the intent to copy over the advanced route-drawing and custom marker logic from .
 
-- ****:
-  - **Importance:** A new screen created to provide a rich, post-order experience.
-  - **Changes:** This file was created and heavily iterated upon. It was redesigned to match a user-provided FoodPanda style image, including a blurred Google Map background,  animations for a checkmark and other elements, and a visual status timeline component. Object rendering errors were also fixed.
-
-- ****:
-  - **Importance:** The customer's final step before placing an order.
-  - **Changes:** UX was significantly improved. Disruptive  popups for validation were replaced with a red border on the phone number input and an auto-scroll to the field. Plus/minus buttons were added to allow customers to adjust item quantities directly on the page.
-
-- ****:
-  - **Importance:** The customer's home screen where they select their delivery location.
-  - **Changes:** Implemented location persistence. The selected location is now saved to  and also synced to the backend via a new API endpoint, ensuring it's remembered across sessions and devices.
-
-- ****:
-  - **Importance:** The FastAPI backend handling all business logic and database interactions.
-  - **Changes:** Multiple fixes were made to role-checking logic in various endpoints (e.g., , ) where  enums were being incorrectly compared to string roles. New endpoints were added to support frontend features, including  (to save customer location) and  (for the rider's home screen).
+-   ****:
+    -   **Importance:** The rider's home/dashboard screen.
+    -   **Changes:** API call error handlers were modified to silently ignore  errors, preventing console spam when a non-rider user briefly accesses the route before being redirected.
 </code_architecture>
 
 <pending_tasks>
-- Complete the implementation of the location search functionality for the rider's navigation screen. This involves making the new Search button functional by opening a modal with a Google Places Autocomplete input.
-- Address the original list of pending tasks (app-splitting, GCash integration, customer profile pages) which were deferred in favor of critical bug fixes and UI work.
+-   Complete the refactoring of  to fully align its visual implementation (map, markers, route lines) with the rider's navigation screen (). This involves porting over the  logic and custom marker creation functions.
 </pending_tasks>
 
 <current_work>
-The most recent task was a direct response to the user's request: **can you move it to the very top and there must be a search button for the rider easy to change its location**. This work is being done on the rider's navigation screen, .
+The engineer was actively working on making the customer's live order tracking screen visually consistent with the rider's active navigation map, as explicitly requested by the user. The target file is .
 
-The engineer was in the middle of implementing this feature. The work done so far includes:
-1.  Adding state variables to manage the visibility of a new location search modal:
-    
-2.  Relocating the  component in the JSX to appear at the very top of the screen.
-3.  Modifying the  to include a Search button.
-4.  Adding a new  for the search functionality and updating the styles (, , , ) to position the card at the top and style the new button.
+The previous implementation on this screen used a basic, static polyline to draw the route. The goal is to replace it with the more sophisticated  implementation from the rider's  file, which supports turn-by-turn style routes and custom markers.
 
-The work stopped immediately after adding the new styles for the search button. The button's  functionality, which should open the search modal, has not yet been implemented.
+The work performed so far includes:
+1.  Identifying the discrepancy between the customer and rider map implementations.
+2.  Beginning the refactor of .
+3.  Adding the necessary  hooks to hold references for the new  instances that will be created for the routes.
+
+The process was paused just before the main logic transfer, specifically before copying the , , and custom marker creation functions from  into  and adapting them for the customer context. The file  is currently in an incomplete, partially-refactored state.
 </current_work>
 
 <optional_next_step>
-Implement the  handler for the new Search button in  to set , and then build out the UI and logic for the  to allow the rider to search for and select a new location.
+Continue the refactor of . The next step is to replace the existing  function with the -based implementation from the rider's  file to ensure visual consistency.
 </optional_next_step>
