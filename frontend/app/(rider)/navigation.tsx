@@ -1507,8 +1507,13 @@ const fetchRouteFromDirectionsAPI = async (origin: any, destination: any, map: a
               </View>
               
               {nearbyOrders && nearbyOrders.length > 0 ? (
-                nearbyOrders.map((order: any) => (
+                nearbyOrders.map((order: any, index: number) => (
                   <View key={order.id} style={styles.orderCard}>
+                    {index === 0 && nearbyOrders.length > 0 && (
+                      <View style={styles.newOrderBadge}>
+                        <Text style={styles.newOrderBadgeText}>NEW</Text>
+                      </View>
+                    )}
                     <View style={styles.orderCardHeader}>
                       <View style={styles.orderRestaurantInfo}>
                         <Ionicons name="restaurant" size={20} color="#FF6B6B" />
