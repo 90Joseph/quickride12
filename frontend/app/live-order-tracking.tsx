@@ -40,7 +40,7 @@ export default function LiveOrderTrackingScreen() {
   const initializedOrderIdRef = useRef<string | null>(null); // Track initialized order ID
   const bottomSheetRef = useRef<BottomSheet>(null); // Bottom sheet control
   const riderMarkerRef = useRef<any>(null); // Track rider marker for updates
-  const routePolylineRef = useRef<any>(null); // Track route polyline for updates
+  const directionsRenderersRef = useRef<any[]>([]); // Store multiple route renderers
   
   // ALL HOOKS MUST BE CALLED BEFORE ANY CONDITIONAL RETURNS
   const insets = useSafeAreaInsets();
