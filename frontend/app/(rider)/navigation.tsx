@@ -260,7 +260,14 @@ function RiderNavigationContent() {
       
       if (orderResponse.data) {
         console.log('✅ Setting current job as ORDER:', orderResponse.data.id);
-        setCurrentJob({ type: 'order', data: orderResponse.data });
+        const jobData = { type: 'order', data: orderResponse.data };
+        
+        // Show notification if this is a new job assignment
+        if (!currentJob || currentJob.data.id !== orderResponse.data.id) {
+          setPendingJobNotification(jobData);
+        }
+        
+        setCurrentJob(jobData);
         setLoading(false);
         return;
       }
