@@ -1752,10 +1752,13 @@ const fetchRouteFromDirectionsAPI = async (origin: any, destination: any, map: a
                       // Reset navigation state
                       setIsNavigating(false);
                       
-                      // Refresh job (should be null now)
-                      await fetchCurrentJob();
+                      // IMPORTANT: Delay fetchCurrentJob to let congratulations modal render first
+                      setTimeout(async () => {
+                        console.log('⏰ Refreshing job status after showing congrats...');
+                        await fetchCurrentJob();
+                      }, 500); // Small delay to ensure modal renders
                       
-                      // Auto-hide congrats after 5 seconds
+                      // Auto-hide congrats after 5 seconds and then refresh job
                       setTimeout(() => {
                         console.log('⏰ Auto-hiding congrats card');
                         setShowCongrats(false);
