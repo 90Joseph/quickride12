@@ -1777,47 +1777,48 @@ const fetchRouteFromDirectionsAPI = async (origin: any, destination: any, map: a
             )}
           </BottomSheetScrollView>
         </BottomSheet>
-
-        {showCongrats && (
-          <View style={styles.congratsOverlay}>
-            {console.log('🎉🎉🎉 RENDERING CONGRATS MODAL - showCongrats is TRUE 🎉🎉🎉')}
-            {console.log('Completed delivery fee:', completedDeliveryFee)}
-            <View style={styles.congratsCard}>
-              <View style={styles.congratsIconContainer}>
-                <Ionicons name="checkmark-circle" size={80} color="#4CAF50" />
-              </View>
-              <Text style={styles.congratsTitle}>Delivery Completed! 🎉</Text>
-              <Text style={styles.congratsMessage}>
-                Great job! You've successfully completed the delivery.
-              </Text>
-              <View style={styles.congratsEarnings}>
-                <Text style={styles.congratsEarningsLabel}>You earned</Text>
-                <Text style={styles.congratsEarningsAmount}>₱{completedDeliveryFee}</Text>
-              </View>
-              <TouchableOpacity
-                style={styles.congratsButton}
-                onPress={() => {
-                  console.log('👆 Continue button clicked - hiding congrats');
-                  setShowCongrats(false);
-                }}
-              >
-                <Text style={styles.congratsButtonText}>Continue</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        )}
       </SafeAreaView>
     </GestureHandlerRootView>
     </Animated.View>
   );
   };
 
-  // Main component logic - decide which screen to render
-  if (!currentJob || !isNavigating) {
-    return renderIdleScreen();
-  }
+  // Main component logic - decide which screen to render and show congratulations overlay
+  const currentScreen = (!currentJob || !isNavigating) ? renderIdleScreen() : renderActiveScreen();
 
-  return renderActiveScreen();
+  return (
+    <>
+      {currentScreen}
+      {showCongrats && (
+        <View style={styles.congratsOverlay}>
+          {console.log('🎉🎉🎉 RENDERING CONGRATS MODAL - showCongrats is TRUE 🎉🎉🎉')}
+          {console.log('Completed delivery fee:', completedDeliveryFee)}
+          <View style={styles.congratsCard}>
+            <View style={styles.congratsIconContainer}>
+              <Ionicons name="checkmark-circle" size={80} color="#4CAF50" />
+            </View>
+            <Text style={styles.congratsTitle}>Delivery Completed! 🎉</Text>
+            <Text style={styles.congratsMessage}>
+              Great job! You've successfully completed the delivery.
+            </Text>
+            <View style={styles.congratsEarnings}>
+              <Text style={styles.congratsEarningsLabel}>You earned</Text>
+              <Text style={styles.congratsEarningsAmount}>₱{completedDeliveryFee}</Text>
+            </View>
+            <TouchableOpacity
+              style={styles.congratsButton}
+              onPress={() => {
+                console.log('👆 Continue button clicked - hiding congrats');
+                setShowCongrats(false);
+              }}
+            >
+              <Text style={styles.congratsButtonText}>Continue</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      )}
+    </>
+  );
 }
 // Wrapper component to prevent hooks violation when non-riders access this screen
 export default function RiderNavigationScreen() {
