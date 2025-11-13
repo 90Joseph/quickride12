@@ -1453,27 +1453,68 @@ const fetchRouteFromDirectionsAPI = async (origin: any, destination: any, map: a
             backgroundStyle={{ backgroundColor: '#FFF' }}
           >
             <BottomSheetScrollView style={styles.bottomSheetContent}>
-              <View style={styles.idleSheetHeader}>
-                <Ionicons name="bicycle-outline" size={40} color="#FF6B6B" />
-                <Text style={styles.idleSheetTitle}>Ready for Delivery</Text>
+              <View style={styles.availableOrdersHeader}>
+                <Ionicons name="fast-food" size={24} color="#FF6B6B" />
+                <Text style={styles.availableOrdersTitle}>Available Orders Nearby</Text>
               </View>
               
-              <View style={styles.idleSheetBody}>
-                <View style={styles.idleInfoRow}>
-                  <Ionicons name="location" size={20} color="#666" />
-                  <Text style={styles.idleInfoText}>Your current location is shown on the map</Text>
+              {nearbyOrders && nearbyOrders.length > 0 ? (
+                nearbyOrders.map((order: any) => (
+                  <View key={order.id} style={styles.orderCard}>
+                    <View style={styles.orderCardHeader}>
+                      <View style={styles.orderRestaurantInfo}>
+                        <Ionicons name="restaurant" size={20} color="#FF6B6B" />
+                        <Text style={styles.orderRestaurantName}>{order.restaurant_name}</Text>
+                      </View>
+                      <View style={styles.deliveryFeeTag}>
+                        <Text style={styles.deliveryFeeText}>₱{(order.total_amount * 0.10).toFixed(0)}</Text>
+                      </View>
+                    </View>
+                    
+                    <View style={styles.orderDetails}>
+                      <View style={styles.orderDetailRow}>
+                        <Ionicons name="location-outline" size={16} color="#666" />
+                        <Text style={styles.orderDetailText}>{order.distance_km} km away</Text>
+                      </View>
+                      <View style={styles.orderDetailRow}>
+                        <Ionicons name="time-outline" size={16} color="#666" />
+                        <Text style={styles.orderDetailText}>~{Math.ceil(order.distance_km * 3)} mins</Text>
+                      </View>
+                    </View>
+                    
+                    <View style={styles.orderDestination}>
+                      <Ionicons name="navigate" size={16} color="#999" />
+                      <Text style={styles.orderDestinationText} numberOfLines={1}>
+                        {order.delivery_address}
+                      </Text>
+                    </View>
+                    
+                    <TouchableOpacity 
+                      style={styles.markPickupButton}
+                      onPress={async () => {
+                        try {
+                          await api.put(`/orders/${order.id}/status`, { status: 'accepted' });
+                          // Refresh current job
+                          fetchCurrentJob();
+                          // Start navigation immediately
+                          setIsNavigating(true);
+                        } catch (error) {
+                          Alert.alert('Error', 'Failed to accept order');
+                        }
+                      }}
+                    >
+                      <Ionicons name="checkmark-circle" size={20} color="#FFF" />
+                      <Text style={styles.markPickupText}>Mark Pick Up</Text>
+                    </TouchableOpacity>
+                  </View>
+                ))
+              ) : (
+                <View style={styles.noOrdersContainer}>
+                  <Ionicons name="sad-outline" size={48} color="#CCC" />
+                  <Text style={styles.noOrdersText}>No orders nearby</Text>
+                  <Text style={styles.noOrdersSubtext}>New orders will appear here</Text>
                 </View>
-                
-                <View style={styles.idleInfoRow}>
-                  <Ionicons name="notifications" size={20} color="#666" />
-                  <Text style={styles.idleInfoText}>Accept an order from the Available tab to start navigation</Text>
-                </View>
-                
-                <View style={styles.idleInfoRow}>
-                  <Ionicons name="map" size={20} color="#666" />
-                  <Text style={styles.idleInfoText}>Swipe up to see more details about your location</Text>
-                </View>
-              </View>
+              )}
             </BottomSheetScrollView>
           </BottomSheet>
 
