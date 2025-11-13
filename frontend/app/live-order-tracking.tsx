@@ -300,12 +300,13 @@ export default function LiveOrderTrackingScreen() {
     console.log('✅ Map initialized successfully');
     console.log('📍 Rider location available?', riderLocation ? 'Yes' : 'No');
 
-    // Create location pin icon with emoji inside (matching rider's navigation)
-    const createLocationPinIcon = (emoji: string, color: string) => {
+    // Create location pin icon (matching rider's navigation - NO TEXT NODES)
+    const createLocationPinIcon = (color: string, iconType: string) => {
+      // Use simple circle icon instead of emoji to avoid text node errors
       const svg = `
         <svg xmlns="http://www.w3.org/2000/svg" width="50" height="60" viewBox="0 0 50 60">
           <defs>
-            <filter id="shadow-${color}" x="-50%" y="-50%" width="200%" height="200%">
+            <filter id="shadow-${color.replace('#', '')}" x="-50%" y="-50%" width="200%" height="200%">
               <feDropShadow dx="0" dy="2" stdDeviation="3" flood-opacity="0.4"/>
             </filter>
           </defs>
@@ -313,9 +314,9 @@ export default function LiveOrderTrackingScreen() {
                 fill="${color}" 
                 stroke="white" 
                 stroke-width="2" 
-                filter="url(#shadow-${color})"/>
+                filter="url(#shadow-${color.replace('#', '')})"/>
           <circle cx="25" cy="23" r="12" fill="white"/>
-          <text x="25" y="30" font-size="16" text-anchor="middle" fill="black">${emoji}</text>
+          <circle cx="25" cy="23" r="8" fill="${color}"/>
         </svg>
       `;
       return 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(svg);
