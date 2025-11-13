@@ -1478,17 +1478,18 @@ const fetchRouteFromDirectionsAPI = async (origin: any, destination: any, map: a
           </View>
         </View>
       </SafeAreaView>
+      </Animated.View>
     );
   }
 
   // Render active navigation screen (has job AND navigation started)
-  // ... (rest of code continues below)
   console.log('➡️ Rendering ACTIVE NAVIGATION screen with map and route for job:', currentJob.data?.id);
 
   const deliveryFee = currentJob.data.total_amount ? (currentJob.data.total_amount * 0.10).toFixed(0) : '0';
   const orderStatus = currentJob.data.status;
 
   return (
+    <Animated.View style={[{ flex: 1 }, { opacity: fadeAnim }]}>
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaView style={styles.container}>
         {/* Full-screen Map */}
