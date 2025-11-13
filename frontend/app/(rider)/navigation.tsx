@@ -38,6 +38,11 @@ function RiderNavigationContent() {
   const snapPoints = useMemo(() => ['12%', '50%', '90%'], []); // More minimal first snap point
   
   const [currentJob, setCurrentJob] = useState<any>(null);
+  
+  // Debug: Log every time currentJob changes
+  useEffect(() => {
+    console.log('🔄 currentJob STATE CHANGED:', currentJob ? `EXISTS (id: ${currentJob.data?.id})` : 'NULL');
+  }, [currentJob]);
   const [loading, setLoading] = useState(true);
   const [mapLoaded, setMapLoaded] = useState(false);
   const [userLocation, setUserLocation] = useState<any>(null);
