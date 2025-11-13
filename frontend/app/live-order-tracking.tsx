@@ -334,7 +334,7 @@ export default function LiveOrderTrackingScreen() {
         position: restaurantLocation,
         map,
         icon: {
-          url: createLocationPinIcon('🏪', '#EA4335'),
+          url: createLocationPinIcon('#EA4335', 'restaurant'),
           scaledSize: new google.maps.Size(50, 60),
           anchor: new google.maps.Point(25, 55),
         },
