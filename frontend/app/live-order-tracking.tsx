@@ -691,7 +691,6 @@ export default function LiveOrderTrackingScreen() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <View style={styles.container}>
-        {/* Full-screen Map */}
         {Platform.OS === 'web' ? (
           <View style={styles.fullScreenMap}>
             {!mapLoaded && !mapError && (
@@ -727,23 +726,17 @@ export default function LiveOrderTrackingScreen() {
             <Text style={styles.mapPlaceholderText}>Map available on web</Text>
           </View>
         )}
-
-        {/* Back Button Overlay */}
         <TouchableOpacity 
           onPress={() => router.back()} 
           style={[styles.backButtonOverlay, { top: insets.top + 10 }]}
         >
           <Ionicons name="arrow-back" size={24} color="#333" />
         </TouchableOpacity>
-
-        {/* Estimated Time Card */}
         <View style={styles.timeCard}>
           <Text style={styles.timeCardText}>
             {estimatedMinutes - 5} — {estimatedMinutes + 5} mins
           </Text>
         </View>
-
-        {/* Draggable Bottom Sheet */}
         <BottomSheet
           ref={bottomSheetRef}
           index={0}
@@ -753,14 +746,11 @@ export default function LiveOrderTrackingScreen() {
           handleIndicatorStyle={styles.bottomSheetIndicator}
         >
           <BottomSheetScrollView style={styles.bottomSheetContent}>
-            {/* Estimated Time Card - At Top of Bottom Sheet */}
             <View style={styles.bottomSheetTimeCard}>
               <Text style={styles.bottomSheetTimeText}>
                 {estimatedMinutes - 5} — {estimatedMinutes + 5} mins
               </Text>
             </View>
-
-            {/* Minimized View - Key Info */}
             <View style={styles.minimizedSection}>
               <View style={styles.minimizedRow}>
                 <View style={[styles.statusBadge, { backgroundColor: statusInfo.color }]}>
