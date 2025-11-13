@@ -1836,6 +1836,7 @@ const fetchRouteFromDirectionsAPI = async (origin: any, destination: any, map: a
       </View>
     </GestureHandlerRootView>
   );
+  */
 }
 
 // Wrapper component to prevent hooks violation when non-riders access this screen
