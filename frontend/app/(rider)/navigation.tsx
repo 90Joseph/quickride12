@@ -39,6 +39,8 @@ function RiderNavigationContent() {
   
   const [currentJob, setCurrentJob] = useState<any>(null);
   const [nearbyOrders, setNearbyOrders] = useState<any[]>([]);
+  const [showCongrats, setShowCongrats] = useState(false);
+  const [completedDeliveryFee, setCompletedDeliveryFee] = useState('0');
   
   // Debug: Log every time currentJob changes
   useEffect(() => {
