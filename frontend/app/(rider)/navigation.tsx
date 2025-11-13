@@ -545,18 +545,24 @@ function RiderNavigationContent() {
         if (lat !== null && lng !== null) {
           dropoffLocation = { lat, lng };
           
-          // Destination marker - Flag/Pin icon
-          new google.maps.Marker({
+          // Destination marker - Location pin with flag icon
+          const dropoffMarker = new google.maps.Marker({
             position: dropoffLocation,
             map,
             icon: {
-              url: createIconUrl('📍', '#FF6B6B'),
-              scaledSize: new google.maps.Size(48, 48),
-              anchor: new google.maps.Point(24, 24),
+              url: createLocationPinIcon('🚩', '#EA4335'),
+              scaledSize: new google.maps.Size(50, 60),
+              anchor: new google.maps.Point(25, 55),
             },
             title: 'Dropoff: ' + dropoff.address,
             zIndex: 800,
+            animation: google.maps.Animation.BOUNCE,
           });
+          
+          // Stop bouncing after 2 seconds
+          setTimeout(() => {
+            dropoffMarker.setAnimation(null);
+          }, 2000);
         }
       }
     }
