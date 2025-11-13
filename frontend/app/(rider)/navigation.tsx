@@ -378,25 +378,53 @@ function RiderNavigationContent() {
     setMapLoaded(true);
     console.log('✅ Map initialized successfully');
 
-    // Create custom SVG icons for better visibility
-    const createIconUrl = (icon: string, color: string) => {
+    // Create arrow icon for rider (navigation arrow)
+    const createRiderArrowIcon = () => {
       const svg = `
-        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48">
-          <circle cx="24" cy="24" r="20" fill="${color}" stroke="white" stroke-width="3"/>
-          <text x="24" y="30" font-size="20" text-anchor="middle" fill="white">${icon}</text>
+        <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40">
+          <defs>
+            <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
+              <feDropShadow dx="0" dy="2" stdDeviation="2" flood-opacity="0.3"/>
+            </filter>
+          </defs>
+          <circle cx="20" cy="20" r="18" fill="#4285F4" filter="url(#shadow)"/>
+          <path d="M 20 8 L 27 25 L 20 22 L 13 25 Z" fill="white"/>
         </svg>
       `;
       return 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(svg);
     };
 
-    // Current location marker (rider) - Motorcycle icon
-    new google.maps.Marker({
+    // Create location pin icon with emoji inside
+    const createLocationPinIcon = (emoji: string, color: string) => {
+      const svg = `
+        <svg xmlns="http://www.w3.org/2000/svg" width="50" height="60" viewBox="0 0 50 60">
+          <defs>
+            <filter id="shadow-${color}" x="-50%" y="-50%" width="200%" height="200%">
+              <feDropShadow dx="0" dy="2" stdDeviation="3" flood-opacity="0.4"/>
+            </filter>
+          </defs>
+          <!-- Location pin shape -->
+          <path d="M 25 5 C 15 5 7 13 7 23 C 7 33 25 50 25 50 C 25 50 43 33 43 23 C 43 13 35 5 25 5 Z" 
+                fill="${color}" 
+                stroke="white" 
+                stroke-width="2" 
+                filter="url(#shadow-${color})"/>
+          <!-- Inner circle for emoji -->
+          <circle cx="25" cy="23" r="12" fill="white"/>
+          <text x="25" y="30" font-size="16" text-anchor="middle" fill="black">${emoji}</text>
+        </svg>
+      `;
+      return 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(svg);
+    };
+
+    // Current location marker (rider) - Arrow icon
+    const riderMarker = new google.maps.Marker({
       position: userPosition,
       map,
       icon: {
-        url: createIconUrl('🏍️', '#2196F3'),
-        scaledSize: new google.maps.Size(48, 48),
-        anchor: new google.maps.Point(24, 24),
+        url: createRiderArrowIcon(),
+        scaledSize: new google.maps.Size(40, 40),
+        anchor: new google.maps.Point(20, 20),
       },
       title: 'Your Location (Rider)',
       zIndex: 1000,
