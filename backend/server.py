@@ -1338,15 +1338,20 @@ async def update_rider_location(location: Location, request: Request):
     if not rider:
         raise HTTPException(status_code=404, detail="Rider profile not found")
     
+    logger.info(f"🚴 Rider {user.email} updating location to: lat={location.latitude}, lng={location.longitude}")
+    
     await db.riders.update_one(
         {"user_id": user.id},
         {"$set": {"current_location": location.dict()}}
     )
     
+    logger.info(f"✅ Rider {rider['id']} location updated in database")
+    
     # If rider has active order, emit location update
     if rider.get("current_order_id"):
         order = await db.orders.find_one({"id": rider["current_order_id"]})
         if order:
+            logger.info(f"📡 Emitting location update for order {order['id']} to customer {order['customer_id']}")
             await sio.emit('rider_location_update', {
                 "order_id": order["id"],
                 "location": location.dict()
