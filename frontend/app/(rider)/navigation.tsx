@@ -1497,6 +1497,22 @@ const fetchRouteFromDirectionsAPI = async (origin: any, destination: any, map: a
   // Render active navigation screen (has active job)
   console.log('➡️ Rendering ACTIVE NAVIGATION screen with job:', currentJob.data?.id);
 
+  // TEMP FIX: Render simple placeholder to test
+  return (
+    <SafeAreaView style={styles.container}>
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20 }}>
+        <Text style={{ fontSize: 24, fontWeight: 'bold', marginBottom: 20 }}>🎉 ACTIVE NAVIGATION</Text>
+        <Text style={{ fontSize: 16, marginBottom: 10 }}>Job ID: {currentJob.data?.id}</Text>
+        <Text style={{ fontSize: 16, marginBottom: 10 }}>Status: {currentJob.data?.status}</Text>
+        <Text style={{ fontSize: 14, color: '#666', textAlign: 'center' }}>
+          The active navigation screen is now rendering! The complex UI has been temporarily replaced with this placeholder to isolate the JSX error.
+        </Text>
+      </View>
+    </SafeAreaView>
+  );
+
+  // ORIGINAL RETURN (COMMENTED OUT TO ISOLATE ERROR)
+  /*
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <View style={styles.container}>
