@@ -783,6 +783,42 @@ async def create_order(order_data: Dict[str, Any], request: Request):
     
     return order
 
+# Migration function to add restaurant_location to existing orders
+async def migrate_orders_add_restaurant_location():
+    """Add restaurant_location field to existing orders that don't have it"""
+    try:
+        # Find orders without restaurant_location field
+        orders_without_location = await db.orders.find({"restaurant_location": {"$exists": False}}).to_list(1000)
+        
+        if not orders_without_location:
+            logger.info("✅ All orders already have restaurant_location field")
+            return
+        
+        logger.info(f"🔄 Migrating {len(orders_without_location)} orders to add restaurant_location")
+        
+        for order in orders_without_location:
+            # Get restaurant details
+            restaurant = await db.restaurants.find_one({"id": order["restaurant_id"]})
+            if restaurant and restaurant.get("location"):
+                # Update order with restaurant location
+                await db.orders.update_one(
+                    {"id": order["id"]},
+                    {"$set": {"restaurant_location": restaurant["location"]}}
+                )
+                logger.info(f"✅ Updated order {order['id']} with restaurant location")
+            else:
+                logger.warning(f"⚠️ Restaurant {order['restaurant_id']} not found or has no location for order {order['id']}")
+        
+        logger.info(f"✅ Migration completed for {len(orders_without_location)} orders")
+    except Exception as e:
+        logger.error(f"❌ Migration failed: {e}")
+
+# Run migration on startup
+@app.on_event("startup")
+async def startup_event():
+    """Run startup tasks including migrations"""
+    await migrate_orders_add_restaurant_location()
+
 @api_router.get("/orders")
 async def get_orders(request: Request):
     """Get orders for current user"""
