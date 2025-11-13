@@ -1763,6 +1763,30 @@ const fetchRouteFromDirectionsAPI = async (origin: any, destination: any, map: a
                     <Text style={styles.activeNavStatValue}>₱{deliveryFee}</Text>
                   </View>
                 </View>
+
+                <TouchableOpacity 
+                  style={styles.completeDeliveryButton}
+                  onPress={async () => {
+                    try {
+                      // Update order status to delivered
+                      await api.put(`/orders/${currentJob.data.id}/status`, { status: 'delivered' });
+                      
+                      // Show success message
+                      Alert.alert('Success', 'Order delivered successfully!');
+                      
+                      // Reset navigation state
+                      setIsNavigating(false);
+                      
+                      // Refresh job (should be null now)
+                      await fetchCurrentJob();
+                    } catch (error) {
+                      Alert.alert('Error', 'Failed to complete delivery');
+                    }
+                  }}
+                >
+                  <Ionicons name="checkmark-circle" size={22} color="#FFF" />
+                  <Text style={styles.completeDeliveryText}>Complete Delivery</Text>
+                </TouchableOpacity>
               </>
             )}
           </BottomSheetScrollView>
