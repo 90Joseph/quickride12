@@ -44,6 +44,26 @@ function RiderNavigationContent() {
   useEffect(() => {
     console.log('🔄 currentJob STATE CHANGED:', currentJob ? `EXISTS (id: ${currentJob.data?.id})` : 'NULL');
   }, [currentJob]);
+
+  // Fetch nearby orders when on idle screen
+  useEffect(() => {
+    const fetchNearbyOrders = async () => {
+      if (!currentJob && user?.role === 'rider') {
+        try {
+          const response = await api.get('/riders/nearby-orders?radius=10');
+          setNearbyOrders(response.data.orders || []);
+        } catch (error: any) {
+          if (error?.response?.status === 401 || error?.response?.status === 403) return;
+          console.error('Error fetching nearby orders:', error);
+        }
+      }
+    };
+
+    fetchNearbyOrders();
+    // Poll for new orders every 10 seconds
+    const interval = setInterval(fetchNearbyOrders, 10000);
+    return () => clearInterval(interval);
+  }, [currentJob, user]);
   const [loading, setLoading] = useState(true);
   const [mapLoaded, setMapLoaded] = useState(false);
   const [userLocation, setUserLocation] = useState<any>(null);
