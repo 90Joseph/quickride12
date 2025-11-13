@@ -295,28 +295,49 @@ export default function LiveOrderTrackingScreen() {
     console.log('✅ Map initialized successfully');
     console.log('📍 Rider location available?', riderLocation ? 'Yes' : 'No');
 
-    // Delivery location marker (Customer - Red)
+    // Create location pin icon with emoji inside (matching rider's navigation)
+    const createLocationPinIcon = (emoji: string, color: string) => {
+      const svg = `
+        <svg xmlns="http://www.w3.org/2000/svg" width="50" height="60" viewBox="0 0 50 60">
+          <defs>
+            <filter id="shadow-${color}" x="-50%" y="-50%" width="200%" height="200%">
+              <feDropShadow dx="0" dy="2" stdDeviation="3" flood-opacity="0.4"/>
+            </filter>
+          </defs>
+          <path d="M 25 5 C 15 5 7 13 7 23 C 7 33 25 50 25 50 C 25 50 43 33 43 23 C 43 13 35 5 25 5 Z" 
+                fill="${color}" 
+                stroke="white" 
+                stroke-width="2" 
+                filter="url(#shadow-${color})"/>
+          <circle cx="25" cy="23" r="12" fill="white"/>
+          <text x="25" y="30" font-size="16" text-anchor="middle" fill="black">${emoji}</text>
+        </svg>
+      `;
+      return 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(svg);
+    };
+
+    // Delivery location marker (Customer - Green location pin)
     if (order.delivery_address) {
-      new google.maps.Marker({
+      const customerMarker = new google.maps.Marker({
         position: {
           lat: order.delivery_address.latitude,
           lng: order.delivery_address.longitude,
         },
         map,
         icon: {
-          path: google.maps.SymbolPath.CIRCLE,
-          scale: 12,
-          fillColor: '#FF6B6B',
-          fillOpacity: 1,
-          strokeColor: '#FFF',
-          strokeWeight: 3,
+          url: createLocationPinIcon('🏠', '#34A853'),
+          scaledSize: new google.maps.Size(50, 60),
+          anchor: new google.maps.Point(25, 55),
         },
         title: 'Your Location',
-        label: {
-          text: '🏠',
-          fontSize: '20px',
-        }
+        zIndex: 800,
+        animation: google.maps.Animation.BOUNCE,
       });
+      
+      // Stop bouncing after 2 seconds
+      setTimeout(() => {
+        customerMarker.setAnimation(null);
+      }, 2000);
     }
 
     // Rider marker (Real-time location - Blue)
