@@ -2826,4 +2826,83 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
   },
+  jobNotificationOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    justifyContent: 'flex-end',
+  },
+  jobNotificationCard: {
+    backgroundColor: '#FFF',
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    padding: 24,
+    paddingBottom: 40,
+  },
+  jobNotificationHeader: {
+    alignItems: 'center',
+    paddingBottom: 24,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E0E0E0',
+    marginBottom: 20,
+  },
+  jobNotificationFee: {
+    fontSize: 36,
+    fontWeight: 'bold',
+    color: '#4CAF50',
+  },
+  jobNotificationFeeLabel: {
+    fontSize: 14,
+    color: '#999',
+    marginTop: 4,
+  },
+  jobNotificationBody: {
+    marginBottom: 24,
+  },
+  jobNotificationLocation: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+  },
+  jobNotificationLocationIcon: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: '#F5F5F5',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 16,
+  },
+  jobNotificationLocationInfo: {
+    flex: 1,
+  },
+  jobNotificationLocationTitle: {
+    fontSize: 12,
+    color: '#999',
+    marginBottom: 4,
+  },
+  jobNotificationLocationAddress: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#333',
+    marginBottom: 4,
+  },
+  jobNotificationLocationTime: {
+    fontSize: 14,
+    color: '#666',
+  },
+  jobNotificationDivider: {
+    height: 1,
+    backgroundColor: '#E0E0E0',
+    marginVertical: 20,
+  },
+  jobNotificationAcceptButton: {
+    backgroundColor: '#FF6B6B',
+    padding: 18,
+    borderRadius: 12,
+    alignItems: 'center',
+  },
+  jobNotificationAcceptText: {
+    color: '#FFF',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
 });
