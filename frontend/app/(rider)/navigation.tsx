@@ -1506,7 +1506,7 @@ const fetchRouteFromDirectionsAPI = async (origin: any, destination: any, map: a
                     <View style={styles.orderDestination}>
                       <Ionicons name="navigate" size={16} color="#999" />
                       <Text style={styles.orderDestinationText} numberOfLines={1}>
-                        {order.delivery_address}
+                        {order.delivery_address?.address || 'Delivery address'}
                       </Text>
                     </View>
                     
