@@ -611,6 +611,24 @@ export default function LiveOrderTrackingScreen() {
       };
 
       drawDualRoutes();
+    } else {
+      // No rider assigned yet - just show restaurant and customer locations
+      console.log('⏳ No rider assigned yet. Showing restaurant and customer locations only.');
+      
+      // Fit map bounds to show available markers
+      const bounds = new google.maps.LatLngBounds();
+      if (customerLocation) {
+        bounds.extend(customerLocation);
+      }
+      if (restaurantLocation) {
+        bounds.extend(restaurantLocation);
+      }
+      
+      // Only fit bounds if we have at least one location
+      if (customerLocation || restaurantLocation) {
+        map.fitBounds(bounds);
+        console.log('✅ Map bounds set to show available locations');
+      }
     }
   };
 
