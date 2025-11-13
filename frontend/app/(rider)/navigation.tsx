@@ -1561,8 +1561,8 @@ const fetchRouteFromDirectionsAPI = async (origin: any, destination: any, map: a
     );
   }
 
-  // Render active navigation screen (has active job)
-  console.log('➡️ Rendering ACTIVE NAVIGATION screen with job:', currentJob.data?.id);
+  // Step 3: Render active navigation screen (has job AND navigation started)
+  console.log('➡️ Rendering ACTIVE NAVIGATION screen with map and route for job:', currentJob.data?.id);
 
   return (
     <SafeAreaView style={styles.container}>
