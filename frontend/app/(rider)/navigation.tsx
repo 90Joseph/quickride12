@@ -679,16 +679,8 @@ const fetchRouteFromDirectionsAPI = async (origin: any, destination: any, map: a
       return;
     }
 
-    // Clean up old renderers if they exist (DON'T clear for multiple route support)
-    // Each route will have its own renderer
-    // Only clear when explicitly needed (e.g., status change)
-    if (directionsRenderersRef.current.length > 0) {
-      console.log('🧹 Cleaning up old directions renderers');
-      directionsRenderersRef.current.forEach(renderer => {
-        renderer.setMap(null);
-      });
-      directionsRenderersRef.current = [];
-    }
+    // Don't clean up here - allows multiple routes to be drawn simultaneously
+    // Cleanup happens when navigation ends or status changes
 
     const directionsService = new google.maps.DirectionsService();
     
