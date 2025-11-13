@@ -1514,7 +1514,7 @@ const fetchRouteFromDirectionsAPI = async (origin: any, destination: any, map: a
   // TODO: Original complex UI with map, markers, and bottom sheet has been temporarily removed
   // The original UI had React JSX errors that prevented rendering
   // Need to rebuild the UI component by component to identify the issue
-      <View style={styles.container}>
+}
         {/* Full-screen Map */}
         {Platform.OS === 'web' ? (
           <View style={styles.fullScreenMap}>
