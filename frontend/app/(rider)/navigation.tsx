@@ -657,7 +657,7 @@ function RiderNavigationContent() {
 };
 
 // Fetch route using Google Routes API (new)
-const fetchRouteFromDirectionsAPI = async (origin: any, destination: any, map: any, onComplete?: () => void) => {
+const fetchRouteFromDirectionsAPI = async (origin: any, destination: any, map: any, onComplete?: () => void, routeColor: string = '#4285F4') => {
   try {
     console.log('📡 Starting Directions API call...');
     console.log('📍 Origin:', JSON.stringify(origin));
