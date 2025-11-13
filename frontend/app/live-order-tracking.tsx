@@ -770,8 +770,6 @@ export default function LiveOrderTrackingScreen() {
               </View>
               <Text style={styles.pullUpHint}>↑ Pull up for details</Text>
             </View>
-
-            {/* Full Details - Visible when dragged up */}
             <View style={styles.detailsSection}>
               <Text style={styles.sectionTitle}>Order Information</Text>
               
