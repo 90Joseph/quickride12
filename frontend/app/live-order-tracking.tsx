@@ -361,7 +361,7 @@ export default function LiveOrderTrackingScreen() {
         position: customerLocation,
         map,
         icon: {
-          url: createLocationPinIcon('🏠', '#34A853'),
+          url: createLocationPinIcon('#34A853', 'customer'),
           scaledSize: new google.maps.Size(50, 60),
           anchor: new google.maps.Point(25, 55),
         },
