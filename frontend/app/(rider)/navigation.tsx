@@ -51,6 +51,32 @@ function RiderNavigationContent() {
     console.log('🔄 currentJob STATE CHANGED:', currentJob ? `EXISTS (id: ${currentJob.data?.id})` : 'NULL');
   }, [currentJob]);
 
+  // Smooth transition animation when switching between idle and active navigation
+  useEffect(() => {
+    if (isNavigating) {
+      // Fade out then fade in with new content
+      Animated.sequence([
+        Animated.timing(fadeAnim, {
+          toValue: 0,
+          duration: 300,
+          useNativeDriver: true,
+        }),
+        Animated.timing(fadeAnim, {
+          toValue: 1,
+          duration: 400,
+          useNativeDriver: true,
+        }),
+      ]).start();
+    } else {
+      // Simple fade in when returning to idle
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 400,
+        useNativeDriver: true,
+      }).start();
+    }
+  }, [isNavigating]);
+
   // Fetch nearby orders when on idle screen
   useEffect(() => {
     const fetchNearbyOrders = async () => {
