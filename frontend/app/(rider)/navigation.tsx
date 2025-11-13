@@ -1450,7 +1450,8 @@ const fetchRouteFromDirectionsAPI = async (origin: any, destination: any, map: a
     );
   }
 
-  // Step 3: Render active navigation screen (has job AND navigation started)
+  // Render active navigation screen (has job AND navigation started)
+  // ... (rest of code continues below)
   console.log('➡️ Rendering ACTIVE NAVIGATION screen with map and route for job:', currentJob.data?.id);
 
   const deliveryFee = currentJob.data.total_amount ? (currentJob.data.total_amount * 0.10).toFixed(0) : '0';
