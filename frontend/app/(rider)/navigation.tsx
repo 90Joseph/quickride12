@@ -664,14 +664,21 @@ const fetchRouteFromDirectionsAPI = async (origin: any, destination: any, map: a
       
       if (status === 'OK' && result) {
         console.log('✅ Directions API response received successfully!');
-        console.log('📦 Result:', result);
+        console.log('📦 Routes count:', result.routes?.length);
         
         // Display the route on the map
         directionsRenderer.setDirections(result);
         console.log('✅ Directions set on renderer');
         
+        // Verify the renderer has the map
+        const rendererMap = directionsRenderer.getMap();
+        console.log('🗺️ Renderer map:', rendererMap ? 'EXISTS' : 'NULL');
+        
+        // Get the route polyline
         const route = result.routes[0];
         const leg = route.legs[0];
+        
+        console.log('📍 Route overview polyline:', route.overview_polyline ? 'EXISTS' : 'MISSING');
         
         // Extract distance and duration
         const distanceKm = (leg.distance.value / 1000).toFixed(1);
