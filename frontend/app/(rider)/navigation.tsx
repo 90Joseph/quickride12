@@ -42,6 +42,7 @@ function RiderNavigationContent() {
   const [nearbyOrders, setNearbyOrders] = useState<any[]>([]);
   const [showCongrats, setShowCongrats] = useState(false);
   const [completedDeliveryFee, setCompletedDeliveryFee] = useState('0');
+  const [pendingJobNotification, setPendingJobNotification] = useState<any>(null);
   
   // Animation for smooth transitions
   const fadeAnim = useRef(new Animated.Value(1)).current;
