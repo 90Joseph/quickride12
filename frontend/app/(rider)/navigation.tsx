@@ -1551,6 +1551,8 @@ const fetchRouteFromDirectionsAPI = async (origin: any, destination: any, map: a
                   <Text style={styles.noOrdersSubtext}>New orders will appear here</Text>
                 </View>
               )}
+                </>
+              )}
             </BottomSheetScrollView>
           </BottomSheet>
 
