@@ -1044,9 +1044,11 @@ const fetchRouteFromDirectionsAPI = async (origin: any, destination: any, map: a
     setCurrentBearing(0);
     previousLocationRef.current = null;
     
-    if (directionsRendererRef.current) {
-      directionsRendererRef.current.setMap(null);
-      directionsRendererRef.current = null;
+    if (directionsRenderersRef.current.length > 0) {
+      directionsRenderersRef.current.forEach(renderer => {
+        renderer.setMap(null);
+      });
+      directionsRenderersRef.current = [];
     }
 
     // Remove rider marker and direction cone
