@@ -131,15 +131,20 @@ export default function LiveOrderTrackingScreen() {
   const fetchRiderLocation = async () => {
     try {
       const response = await api.get(`/orders/${orderId}/rider-location`);
+      console.log('📍 API Response - Rider Location:', response.data);
       if (response.data.rider_assigned && response.data.location) {
+        console.log('✅ Setting rider location:', response.data.location);
+        console.log('   Lat:', response.data.location.latitude, 'Lng:', response.data.location.longitude);
         setRiderLocation(response.data.location);
         // Calculate distance and ETA if we have both locations
         if (order?.delivery_address && response.data.location) {
           calculateDistanceAndETA(response.data.location, order.delivery_address);
         }
+      } else {
+        console.log('⚠️ No rider location available yet');
       }
     } catch (error) {
-      console.error('Error fetching rider location:', error);
+      console.error('❌ Error fetching rider location:', error);
     }
   };
 
