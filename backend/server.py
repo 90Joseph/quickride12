@@ -2409,7 +2409,9 @@ async def get_order_rider_location(order_id: str, request: Request):
         logger.warning(f"⚠️ Rider not found for order {order_id}, rider_id: {order.get('rider_id')}")
         return {"rider_assigned": True, "location": None}
     
-    logger.info(f"📍 Fetched rider location for order {order_id}: {rider.get('current_location')}")
+    logger.info(f"📍 Fetching rider location for order {order_id}")
+    logger.info(f"   Rider ID: {rider['id']}, User ID: {rider['user_id']}, Name: {rider.get('name')}")
+    logger.info(f"   Current location in DB: {rider.get('current_location')}")
     
     return {
         "rider_assigned": True,
