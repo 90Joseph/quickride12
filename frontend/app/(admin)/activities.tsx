@@ -62,7 +62,7 @@ export default function AdminActivitiesScreen() {
   const getActivityColor = (type: string) => {
     switch (type) {
       case 'order':
-        return '#FF6B6B';
+        return '#210059';
       case 'user':
         return '#2196F3';
       default:
@@ -110,7 +110,7 @@ export default function AdminActivitiesScreen() {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#FF6B6B" />
+          <ActivityIndicator size="large" color="#210059" />
         </View>
       </SafeAreaView>
     );
@@ -127,7 +127,7 @@ export default function AdminActivitiesScreen() {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={onRefresh}
-            colors={['#FF6B6B']}
+            colors={['#210059']}
           />
         }
         ListEmptyComponent={

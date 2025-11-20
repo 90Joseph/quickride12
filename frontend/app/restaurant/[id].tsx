@@ -116,7 +116,7 @@ export default function RestaurantDetailScreen() {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#FF6B6B" />
+          <ActivityIndicator size="large" color="#210059" />
         </View>
       </SafeAreaView>
     );
@@ -307,7 +307,7 @@ const styles = StyleSheet.create({
   },
   backButton: {
     padding: 12,
-    backgroundColor: '#FF6B6B',
+    backgroundColor: '#210059',
     borderRadius: 8,
   },
   backButtonText: {
@@ -344,7 +344,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: -4,
     right: -4,
-    backgroundColor: '#FF6B6B',
+    backgroundColor: '#210059',
     borderRadius: 10,
     minWidth: 20,
     height: 20,
@@ -389,7 +389,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   closedBadge: {
-    backgroundColor: '#FF6B6B',
+    backgroundColor: '#210059',
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 8,
@@ -455,7 +455,7 @@ const styles = StyleSheet.create({
   categoryTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#FF6B6B',
+    color: '#210059',
     marginBottom: 12,
   },
   menuItem: {
@@ -482,13 +482,13 @@ const styles = StyleSheet.create({
   menuItemPrice: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#FF6B6B',
+    color: '#210059',
   },
   addButton: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#FF6B6B',
+    backgroundColor: '#210059',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -507,7 +507,7 @@ const styles = StyleSheet.create({
   },
   viewCartButton: {
     flexDirection: 'row',
-    backgroundColor: '#FF6B6B',
+    backgroundColor: '#210059',
     padding: 16,
     borderRadius: 12,
     alignItems: 'center',

@@ -106,7 +106,7 @@ export default function RestaurantHistoryScreen() {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#FF6B6B" />
+          <ActivityIndicator size="large" color="#210059" />
         </View>
       </SafeAreaView>
     );
@@ -131,7 +131,7 @@ export default function RestaurantHistoryScreen() {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={onRefresh}
-            colors={['#FF6B6B']}
+            colors={['#210059']}
           />
         }
         ListEmptyComponent={

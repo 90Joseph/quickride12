@@ -47,20 +47,20 @@ export default function CartScreen() {
           style={styles.quantityButton}
           onPress={() => updateQuantity(item.menu_item_id, item.quantity - 1)}
         >
-          <Ionicons name="remove" size={20} color="#FF6B6B" />
+          <Ionicons name="remove" size={20} color="#210059" />
         </TouchableOpacity>
         <Text style={styles.quantity}>{item.quantity}</Text>
         <TouchableOpacity
           style={styles.quantityButton}
           onPress={() => updateQuantity(item.menu_item_id, item.quantity + 1)}
         >
-          <Ionicons name="add" size={20} color="#FF6B6B" />
+          <Ionicons name="add" size={20} color="#210059" />
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.removeButton}
           onPress={() => handleRemove(item.menu_item_id)}
         >
-          <Ionicons name="trash-outline" size={20} color="#FF6B6B" />
+          <Ionicons name="trash-outline" size={20} color="#210059" />
         </TouchableOpacity>
       </View>
     </View>
@@ -112,7 +112,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#F5F5F5',
   },
   header: {
-    backgroundColor: '#FF6B6B',
+    backgroundColor: '#210059',
     padding: 16,
   },
   headerTitle: {
@@ -165,7 +165,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#FF6B6B',
+    borderColor: '#210059',
   },
   quantity: {
     marginHorizontal: 16,
@@ -199,11 +199,11 @@ const styles = StyleSheet.create({
   totalAmount: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#FF6B6B',
+    color: '#210059',
   },
   checkoutButton: {
     flexDirection: 'row',
-    backgroundColor: '#FF6B6B',
+    backgroundColor: '#210059',
     padding: 16,
     borderRadius: 12,
     alignItems: 'center',

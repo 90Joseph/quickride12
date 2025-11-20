@@ -121,7 +121,7 @@ export default function RegisterScreen() {
                   <Ionicons
                     name="person"
                     size={20}
-                    color={selectedRole === 'customer' ? '#FF6B6B' : '#666'}
+                    color={selectedRole === 'customer' ? '#210059' : '#666'}
                   />
                   <Text
                     style={[
@@ -143,7 +143,7 @@ export default function RegisterScreen() {
                   <Ionicons
                     name="restaurant"
                     size={20}
-                    color={selectedRole === 'restaurant' ? '#FF6B6B' : '#666'}
+                    color={selectedRole === 'restaurant' ? '#210059' : '#666'}
                   />
                   <Text
                     style={[
@@ -165,7 +165,7 @@ export default function RegisterScreen() {
                   <Ionicons
                     name="bicycle"
                     size={20}
-                    color={selectedRole === 'rider' ? '#FF6B6B' : '#666'}
+                    color={selectedRole === 'rider' ? '#210059' : '#666'}
                   />
                   <Text
                     style={[
@@ -352,7 +352,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFF',
   },
   roleButtonActive: {
-    borderColor: '#FF6B6B',
+    borderColor: '#210059',
     backgroundColor: '#FFF5F5',
   },
   roleButtonText: {
@@ -362,7 +362,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   roleButtonTextActive: {
-    color: '#FF6B6B',
+    color: '#210059',
   },
   inputContainer: {
     flexDirection: 'row',
@@ -387,7 +387,7 @@ const styles = StyleSheet.create({
     padding: 8,
   },
   registerButton: {
-    backgroundColor: '#FF6B6B',
+    backgroundColor: '#210059',
     padding: 18,
     borderRadius: 12,
     alignItems: 'center',
@@ -407,7 +407,7 @@ const styles = StyleSheet.create({
     color: '#666',
   },
   signInLinkBold: {
-    color: '#FF6B6B',
+    color: '#210059',
     fontWeight: '600',
   },
 });

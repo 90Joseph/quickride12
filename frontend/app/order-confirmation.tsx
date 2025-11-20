@@ -87,7 +87,7 @@ export default function OrderConfirmationScreen() {
         icon: {
           path: google.maps.SymbolPath.CIRCLE,
           scale: 8,
-          fillColor: '#FF6B6B',
+          fillColor: '#210059',
           fillOpacity: 1,
           strokeColor: '#FFF',
           strokeWeight: 3,
@@ -214,7 +214,7 @@ export default function OrderConfirmationScreen() {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#FF6B6B" />
+          <ActivityIndicator size="large" color="#210059" />
         </View>
       </SafeAreaView>
     );
@@ -224,7 +224,7 @@ export default function OrderConfirmationScreen() {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.errorContainer}>
-          <Ionicons name="alert-circle" size={64} color="#FF6B6B" />
+          <Ionicons name="alert-circle" size={64} color="#210059" />
           <Text style={styles.errorText}>Order not found</Text>
           <TouchableOpacity
             style={styles.homeButton}
@@ -389,7 +389,7 @@ export default function OrderConfirmationScreen() {
           <View style={styles.restaurantSection}>
             <Text style={styles.restaurantSectionTitle}>Restaurant</Text>
             <View style={styles.restaurantInfo}>
-              <Ionicons name="close" size={20} color="#FF6B6B" />
+              <Ionicons name="close" size={20} color="#210059" />
               <Text style={styles.restaurantName}>{order.restaurant_name}</Text>
             </View>
           </View>
@@ -536,13 +536,13 @@ const styles = StyleSheet.create({
     width: 120,
     height: 120,
     borderRadius: 60,
-    backgroundColor: '#FF6B6B',
+    backgroundColor: '#210059',
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 16,
     ...Platform.select({
       ios: {
-        shadowColor: '#FF6B6B',
+        shadowColor: '#210059',
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.3,
         shadowRadius: 8,
@@ -581,7 +581,7 @@ const styles = StyleSheet.create({
   timeEstimateText: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: '#FF6B6B',
+    color: '#210059',
   },
   deliveryInfoRow: {
     flexDirection: 'row',
@@ -653,7 +653,7 @@ const styles = StyleSheet.create({
   },
   deliveryIconText: {
     fontSize: 14,
-    color: '#FF6B6B',
+    color: '#210059',
     fontWeight: '600',
     marginTop: 4,
   },
@@ -686,7 +686,7 @@ const styles = StyleSheet.create({
   orderNumber: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#FF6B6B',
+    color: '#210059',
   },
   divider: {
     height: 1,
@@ -727,7 +727,7 @@ const styles = StyleSheet.create({
     textAlign: 'right',
   },
   statusText: {
-    color: '#FF6B6B',
+    color: '#210059',
     fontWeight: '600',
   },
   statusTimelineCard: {
@@ -799,8 +799,8 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   timelineDotActive: {
-    borderColor: '#FF6B6B',
-    backgroundColor: '#FF6B6B',
+    borderColor: '#210059',
+    backgroundColor: '#210059',
   },
   timelineLine: {
     position: 'absolute',
@@ -930,7 +930,7 @@ const styles = StyleSheet.create({
   grandTotalValue: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#FF6B6B',
+    color: '#210059',
   },
   simpleEstimatedTime: {
     alignItems: 'center',
@@ -944,7 +944,7 @@ const styles = StyleSheet.create({
   },
   trackButton: {
     flexDirection: 'row',
-    backgroundColor: '#FF6B6B',
+    backgroundColor: '#210059',
     padding: 16,
     borderRadius: 12,
     justifyContent: 'center',
@@ -952,7 +952,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     ...Platform.select({
       ios: {
-        shadowColor: '#FF6B6B',
+        shadowColor: '#210059',
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.3,
         shadowRadius: 8,
@@ -974,11 +974,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 2,
-    borderColor: '#FF6B6B',
+    borderColor: '#210059',
     marginBottom: 16,
   },
   homeButtonText: {
-    color: '#FF6B6B',
+    color: '#210059',
     fontSize: 16,
     fontWeight: '600',
   },

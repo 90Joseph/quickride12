@@ -170,7 +170,7 @@ export default function OrdersScreen() {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#FF6B6B" />
+          <ActivityIndicator size="large" color="#210059" />
         </View>
       </SafeAreaView>
     );
@@ -187,7 +187,7 @@ export default function OrdersScreen() {
           style={styles.historyButton}
           onPress={() => router.push('/(customer)/history' as any)}
         >
-          <Ionicons name="time-outline" size={20} color="#FF6B6B" />
+          <Ionicons name="time-outline" size={20} color="#210059" />
           <Text style={styles.historyButtonText}>History</Text>
         </TouchableOpacity>
       </View>
@@ -198,7 +198,7 @@ export default function OrdersScreen() {
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.listContent}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#FF6B6B']} />
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#210059']} />
         }
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
@@ -244,10 +244,10 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: '#FF6B6B',
+    borderColor: '#210059',
   },
   historyButtonText: {
-    color: '#FF6B6B',
+    color: '#210059',
     fontSize: 14,
     fontWeight: '600',
     marginLeft: 4,
@@ -272,7 +272,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#FF6B6B',
+    backgroundColor: '#210059',
     padding: 14,
     borderBottomLeftRadius: 16,
     borderBottomRightRadius: 16,
@@ -360,7 +360,7 @@ const styles = StyleSheet.create({
   totalAmount: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#FF6B6B',
+    color: '#210059',
   },
   emptyContainer: {
     alignItems: 'center',

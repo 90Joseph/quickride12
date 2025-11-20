@@ -40,7 +40,7 @@ export default function NotificationsScreen() {
             <Switch
               value={orderUpdates}
               onValueChange={setOrderUpdates}
-              trackColor={{ false: '#DDD', true: '#FF6B6B' }}
+              trackColor={{ false: '#DDD', true: '#210059' }}
               thumbColor="#FFF"
             />
           </View>
@@ -57,7 +57,7 @@ export default function NotificationsScreen() {
             <Switch
               value={promotions}
               onValueChange={setPromotions}
-              trackColor={{ false: '#DDD', true: '#FF6B6B' }}
+              trackColor={{ false: '#DDD', true: '#210059' }}
               thumbColor="#FFF"
             />
           </View>
@@ -70,7 +70,7 @@ export default function NotificationsScreen() {
             <Switch
               value={newRestaurants}
               onValueChange={setNewRestaurants}
-              trackColor={{ false: '#DDD', true: '#FF6B6B' }}
+              trackColor={{ false: '#DDD', true: '#210059' }}
               thumbColor="#FFF"
             />
           </View>
@@ -83,7 +83,7 @@ export default function NotificationsScreen() {
             <Switch
               value={specialOffers}
               onValueChange={setSpecialOffers}
-              trackColor={{ false: '#DDD', true: '#FF6B6B' }}
+              trackColor={{ false: '#DDD', true: '#210059' }}
               thumbColor="#FFF"
             />
           </View>

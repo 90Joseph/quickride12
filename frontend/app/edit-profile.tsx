@@ -100,7 +100,7 @@ export default function EditProfileScreen() {
               </View>
             )}
             <TouchableOpacity style={styles.changePhotoButton}>
-              <Ionicons name="camera" size={20} color="#FF6B6B" />
+              <Ionicons name="camera" size={20} color="#210059" />
               <Text style={styles.changePhotoText}>Change Photo</Text>
             </TouchableOpacity>
           </View>
@@ -240,7 +240,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   avatarPlaceholder: {
-    backgroundColor: '#FF6B6B',
+    backgroundColor: '#210059',
   },
   avatarText: {
     fontSize: 14,
@@ -255,7 +255,7 @@ const styles = StyleSheet.create({
   changePhotoText: {
     marginLeft: 8,
     fontSize: 14,
-    color: '#FF6B6B',
+    color: '#210059',
     fontWeight: '600',
   },
   form: {
@@ -302,7 +302,7 @@ const styles = StyleSheet.create({
     marginLeft: 4,
   },
   saveButton: {
-    backgroundColor: '#FF6B6B',
+    backgroundColor: '#210059',
     padding: 18,
     borderRadius: 12,
     alignItems: 'center',

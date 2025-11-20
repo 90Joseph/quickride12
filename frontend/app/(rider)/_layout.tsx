@@ -19,7 +19,7 @@ export default function RiderLayout() {
   if (isLoading) {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <ActivityIndicator size="large" color="#FF6B6B" />
+        <ActivityIndicator size="large" color="#210059" />
       </View>
     );
   }
@@ -29,7 +29,7 @@ export default function RiderLayout() {
     // Return loading screen instead of null to prevent tab flashing
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <ActivityIndicator size="large" color="#FF6B6B" />
+        <ActivityIndicator size="large" color="#210059" />
       </View>
     );
   }
@@ -37,7 +37,7 @@ export default function RiderLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: '#FF6B6B',
+        tabBarActiveTintColor: '#210059',
         tabBarInactiveTintColor: '#999',
         tabBarStyle: {
           backgroundColor: '#FFF',
@@ -52,7 +52,7 @@ export default function RiderLayout() {
           fontWeight: '600',
         },
         headerStyle: {
-          backgroundColor: '#FF6B6B',
+          backgroundColor: '#210059',
         },
         headerTintColor: '#FFF',
         headerTitleStyle: {

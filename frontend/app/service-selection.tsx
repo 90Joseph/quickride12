@@ -44,7 +44,7 @@ export default function ServiceSelectionScreen() {
             activeOpacity={0.9}
           >
             <LinearGradient
-              colors={['#FF6B6B', '#FF8E53']}
+              colors={['#210059', '#FF8E53']}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 1 }}
               style={styles.gradientCard}

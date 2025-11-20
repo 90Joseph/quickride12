@@ -71,7 +71,7 @@ export default function AdminDashboardScreen() {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#FF6B6B" />
+          <ActivityIndicator size="large" color="#210059" />
         </View>
       </SafeAreaView>
     );
@@ -82,7 +82,7 @@ export default function AdminDashboardScreen() {
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#FF6B6B']} />
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#210059']} />
         }
       >
         <View style={styles.header}>
@@ -91,7 +91,7 @@ export default function AdminDashboardScreen() {
             <Text style={styles.subtitleText}>Monitor your platform</Text>
           </View>
           <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-            <Ionicons name="log-out-outline" size={24} color="#FF6B6B" />
+            <Ionicons name="log-out-outline" size={24} color="#210059" />
           </TouchableOpacity>
         </View>
 
@@ -315,7 +315,7 @@ const styles = StyleSheet.create({
   orderItemId: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#FF6B6B',
+    color: '#210059',
   },
   orderItemAmount: {
     fontSize: 16,

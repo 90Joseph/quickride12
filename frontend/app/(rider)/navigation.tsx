@@ -1412,7 +1412,7 @@ const fetchRouteFromDirectionsAPI = async (origin: any, destination: any, map: a
             icon: {
               path: google.maps.SymbolPath.CIRCLE,
               scale: 10,
-              fillColor: '#FF6B6B',
+              fillColor: '#210059',
               fillOpacity: 1,
               strokeColor: '#FFF',
               strokeWeight: 3,
@@ -1464,7 +1464,7 @@ const fetchRouteFromDirectionsAPI = async (origin: any, destination: any, map: a
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#FF6B6B" />
+          <ActivityIndicator size="large" color="#210059" />
         </View>
       </SafeAreaView>
     );
@@ -1533,7 +1533,7 @@ const fetchRouteFromDirectionsAPI = async (origin: any, destination: any, map: a
                   <View style={styles.jobNotificationBody}>
                     <View style={styles.jobNotificationLocation}>
                       <View style={styles.jobNotificationLocationIcon}>
-                        <Ionicons name="restaurant" size={24} color="#FF6B6B" />
+                        <Ionicons name="restaurant" size={24} color="#210059" />
                       </View>
                       <View style={styles.jobNotificationLocationInfo}>
                         <Text style={styles.jobNotificationLocationTitle}>Pick-up</Text>
@@ -1616,7 +1616,7 @@ const fetchRouteFromDirectionsAPI = async (origin: any, destination: any, map: a
         >
           <BottomSheetScrollView style={styles.bottomSheetContent}>
             <View style={styles.activeNavHeader}>
-              <Ionicons name="navigate-circle" size={32} color="#FF6B6B" />
+              <Ionicons name="navigate-circle" size={32} color="#210059" />
               <View style={{ flex: 1, marginLeft: 12 }}>
                 <Text style={styles.activeNavTitle}>
                   {currentJob.type === 'order' ? 'Food Delivery' : 'Ride Service'}
@@ -1830,7 +1830,7 @@ export default function RiderNavigationScreen() {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#FF6B6B" />
+          <ActivityIndicator size="large" color="#210059" />
         </View>
       </SafeAreaView>
     );
@@ -1841,7 +1841,7 @@ export default function RiderNavigationScreen() {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.emptyContainer}>
-          <Ionicons name="lock-closed" size={80} color="#FF6B6B" />
+          <Ionicons name="lock-closed" size={80} color="#210059" />
           <Text style={styles.emptyText}>Access Restricted</Text>
           <Text style={styles.emptySubtext}>This screen is only accessible to riders</Text>
           <TouchableOpacity 
@@ -2003,7 +2003,7 @@ const styles = StyleSheet.create({
   itemQuantity: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#FF6B6B',
+    color: '#210059',
     marginRight: 8,
     minWidth: 30,
   },
@@ -2110,12 +2110,12 @@ const styles = StyleSheet.create({
   errorText: {
     marginTop: 12,
     fontSize: 16,
-    color: '#FF6B6B',
+    color: '#210059',
     textAlign: 'center',
     paddingHorizontal: 20,
   },
   retryButton: {
-    backgroundColor: '#FF6B6B',
+    backgroundColor: '#210059',
     paddingHorizontal: 24,
     paddingVertical: 12,
     borderRadius: 8,
@@ -2206,7 +2206,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#FF6B6B',
+    backgroundColor: '#210059',
     padding: 18,
     borderRadius: 16,
     gap: 12,
@@ -2342,10 +2342,10 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: '#FF6B6B',
+    backgroundColor: '#210059',
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: '#FF6B6B',
+    shadowColor: '#210059',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.3,
     shadowRadius: 4,
@@ -2441,7 +2441,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#FF6B6B',
+    backgroundColor: '#210059',
     padding: 16,
     borderRadius: 12,
     gap: 8,
@@ -2552,7 +2552,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#FF6B6B',
+    backgroundColor: '#210059',
     padding: 16,
     borderRadius: 12,
     gap: 8,
@@ -2581,7 +2581,7 @@ const styles = StyleSheet.create({
     padding: 16,
     marginTop: 12,
     borderLeftWidth: 4,
-    borderLeftColor: '#FF6B6B',
+    borderLeftColor: '#210059',
   },
   orderCardHeader: {
     flexDirection: 'row',
@@ -2640,7 +2640,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#FF6B6B',
+    backgroundColor: '#210059',
     padding: 12,
     borderRadius: 8,
     gap: 8,
@@ -2826,7 +2826,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#FF6B6B',
+    backgroundColor: '#210059',
     padding: 16,
     borderRadius: 12,
     width: '100%',
@@ -2841,12 +2841,12 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: -8,
     right: -8,
-    backgroundColor: '#FF6B6B',
+    backgroundColor: '#210059',
     paddingHorizontal: 12,
     paddingVertical: 4,
     borderRadius: 12,
     zIndex: 10,
-    shadowColor: '#FF6B6B',
+    shadowColor: '#210059',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.4,
     shadowRadius: 4,
@@ -2903,7 +2903,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#FF6B6B',
+    backgroundColor: '#210059',
     padding: 16,
     borderRadius: 12,
     gap: 8,
@@ -2982,7 +2982,7 @@ const styles = StyleSheet.create({
     marginVertical: 20,
   },
   jobNotificationAcceptButton: {
-    backgroundColor: '#FF6B6B',
+    backgroundColor: '#210059',
     padding: 18,
     borderRadius: 12,
     alignItems: 'center',

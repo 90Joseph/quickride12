@@ -161,7 +161,7 @@ function RiderActiveContent() {
       </View>
 
       <View style={styles.addressSection}>
-        <Ionicons name="location" size={20} color="#FF6B6B" />
+        <Ionicons name="location" size={20} color="#210059" />
         <Text style={styles.address} numberOfLines={2}>
           {item.delivery_address.address}
         </Text>
@@ -219,7 +219,7 @@ function RiderActiveContent() {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#FF6B6B" />
+          <ActivityIndicator size="large" color="#210059" />
         </View>
       </SafeAreaView>
     );
@@ -243,7 +243,7 @@ function RiderActiveContent() {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={onRefresh}
-            colors={['#FF6B6B']}
+            colors={['#210059']}
           />
         }
         ListEmptyComponent={
@@ -268,7 +268,7 @@ export default function RiderActiveScreen() {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#FF6B6B" />
+          <ActivityIndicator size="large" color="#210059" />
         </View>
       </SafeAreaView>
     );
@@ -278,7 +278,7 @@ export default function RiderActiveScreen() {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.emptyContainer}>
-          <Ionicons name="lock-closed" size={80} color="#FF6B6B" />
+          <Ionicons name="lock-closed" size={80} color="#210059" />
           <Text style={styles.emptyText}>Access Restricted</Text>
           <Text style={styles.emptySubtext}>This screen is only accessible to riders</Text>
         </View>
@@ -331,7 +331,7 @@ const styles = StyleSheet.create({
   amount: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#FF6B6B',
+    color: '#210059',
   },
   addressSection: {
     flexDirection: 'row',
@@ -365,7 +365,7 @@ const styles = StyleSheet.create({
   },
   statusBadge: {
     padding: 12,
-    backgroundColor: '#FF6B6B',
+    backgroundColor: '#210059',
     borderRadius: 12,
     marginBottom: 12,
     alignItems: 'center',

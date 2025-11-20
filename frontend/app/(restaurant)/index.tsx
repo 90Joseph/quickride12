@@ -171,7 +171,7 @@ export default function RestaurantOrdersScreen() {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#FF6B6B" />
+          <ActivityIndicator size="large" color="#210059" />
         </View>
       </SafeAreaView>
     );
@@ -185,7 +185,7 @@ export default function RestaurantOrdersScreen() {
           style={styles.historyButton}
           onPress={() => router.push('/(restaurant)/history' as any)}
         >
-          <Ionicons name="time-outline" size={20} color="#FF6B6B" />
+          <Ionicons name="time-outline" size={20} color="#210059" />
           <Text style={styles.historyButtonText}>History</Text>
         </TouchableOpacity>
       </View>
@@ -199,7 +199,7 @@ export default function RestaurantOrdersScreen() {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={onRefresh}
-            colors={['#FF6B6B']}
+            colors={['#210059']}
           />
         }
         ListEmptyComponent={
@@ -240,10 +240,10 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: '#FF6B6B',
+    borderColor: '#210059',
   },
   historyButtonText: {
-    color: '#FF6B6B',
+    color: '#210059',
     fontSize: 14,
     fontWeight: '600',
     marginLeft: 4,
@@ -286,7 +286,7 @@ const styles = StyleSheet.create({
   orderTotal: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#FF6B6B',
+    color: '#210059',
   },
   orderItems: {
     marginBottom: 12,
@@ -352,7 +352,7 @@ const styles = StyleSheet.create({
     borderColor: '#F44336',
   },
   primaryButton: {
-    backgroundColor: '#FF6B6B',
+    backgroundColor: '#210059',
   },
   acceptButtonText: {
     color: '#FFF',

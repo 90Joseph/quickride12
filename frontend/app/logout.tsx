@@ -40,7 +40,7 @@ export default function LogoutScreen() {
     <SafeAreaView style={styles.container}>
       <View style={styles.content}>
         <View style={styles.iconContainer}>
-          <Ionicons name="log-out-outline" size={80} color="#FF6B6B" />
+          <Ionicons name="log-out-outline" size={80} color="#210059" />
         </View>
 
         <Text style={styles.title}>Logout</Text>
@@ -173,7 +173,7 @@ const styles = StyleSheet.create({
     color: '#333',
   },
   logoutButton: {
-    backgroundColor: '#FF6B6B',
+    backgroundColor: '#210059',
   },
   logoutButtonText: {
     fontSize: 16,

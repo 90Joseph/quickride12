@@ -38,7 +38,7 @@ export default function HelpSupportScreen() {
           
           <TouchableOpacity style={styles.contactCard} onPress={() => handleContact('email')}>
             <View style={styles.contactIcon}>
-              <Ionicons name="mail" size={24} color="#FF6B6B" />
+              <Ionicons name="mail" size={24} color="#210059" />
             </View>
             <View style={styles.contactInfo}>
               <Text style={styles.contactTitle}>Email Support</Text>

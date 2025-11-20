@@ -248,7 +248,7 @@ export default function RestaurantMenuScreen() {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#FF6B6B" />
+          <ActivityIndicator size="large" color="#210059" />
         </View>
       </SafeAreaView>
     );
@@ -306,7 +306,7 @@ export default function RestaurantMenuScreen() {
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.listContent}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#FF6B6B']} />
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#210059']} />
         }
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
@@ -449,7 +449,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#FF6B6B',
+    backgroundColor: '#210059',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -469,7 +469,7 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   categoryChipActive: {
-    backgroundColor: '#FF6B6B',
+    backgroundColor: '#210059',
   },
   categoryText: {
     fontSize: 14,
@@ -550,7 +550,7 @@ const styles = StyleSheet.create({
   menuPrice: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#FF6B6B',
+    color: '#210059',
   },
   menuCategory: {
     fontSize: 12,
@@ -653,8 +653,8 @@ const styles = StyleSheet.create({
     borderColor: '#E0E0E0',
   },
   categorySelectorChipActive: {
-    backgroundColor: '#FF6B6B',
-    borderColor: '#FF6B6B',
+    backgroundColor: '#210059',
+    borderColor: '#210059',
   },
   categorySelectorText: {
     fontSize: 14,
@@ -707,7 +707,7 @@ const styles = StyleSheet.create({
     color: '#666',
   },
   saveButton: {
-    backgroundColor: '#FF6B6B',
+    backgroundColor: '#210059',
   },
   saveButtonText: {
     fontSize: 16,

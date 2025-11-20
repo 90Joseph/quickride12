@@ -74,7 +74,7 @@ export default function AdminLiveOrders() {
       paid: '#2196F3',
       accepted: '#9C27B0',
       preparing: '#FF9800',
-      ready_for_pickup: '#FF6B6B',
+      ready_for_pickup: '#210059',
       rider_assigned: '#00BCD4',
       picked_up: '#3F51B5',
       out_for_delivery: '#2196F3',
@@ -88,7 +88,7 @@ export default function AdminLiveOrders() {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#FF6B6B" />
+          <ActivityIndicator size="large" color="#210059" />
         </View>
       </SafeAreaView>
     );
@@ -102,7 +102,7 @@ export default function AdminLiveOrders() {
           {/* Stats Bar */}
           <View style={styles.statsBar}>
             <View style={styles.statCard}>
-              <Ionicons name="fast-food" size={24} color="#FF6B6B" />
+              <Ionicons name="fast-food" size={24} color="#210059" />
               <View style={styles.statInfo}>
                 <Text style={styles.statValue}>{stats?.active_orders || 0}</Text>
                 <Text style={styles.statLabel}>Active Orders</Text>
@@ -375,7 +375,7 @@ const styles = StyleSheet.create({
     color: '#333',
   },
   badge: {
-    backgroundColor: '#FF6B6B',
+    backgroundColor: '#210059',
     paddingHorizontal: 12,
     paddingVertical: 4,
     borderRadius: 12,
@@ -406,7 +406,7 @@ const styles = StyleSheet.create({
   orderId: {
     fontSize: 14,
     fontWeight: 'bold',
-    color: '#FF6B6B',
+    color: '#210059',
   },
   statusBadge: {
     paddingHorizontal: 8,
@@ -531,7 +531,7 @@ const styles = StyleSheet.create({
   mobileStatValue: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: '#FF6B6B',
+    color: '#210059',
   },
   mobileStatLabel: {
     fontSize: 12,

@@ -121,7 +121,7 @@ export default function RiderProfileScreen() {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#FF6B6B" />
+          <ActivityIndicator size="large" color="#210059" />
         </View>
       </SafeAreaView>
     );
@@ -133,7 +133,7 @@ export default function RiderProfileScreen() {
         {/* User Info Card */}
         <View style={styles.userCard}>
           <View style={styles.avatarContainer}>
-            <Ionicons name="person-circle" size={80} color="#FF6B6B" />
+            <Ionicons name="person-circle" size={80} color="#210059" />
           </View>
           <Text style={styles.userName}>{user?.name || 'Rider'}</Text>
           <Text style={styles.userEmail}>{user?.email}</Text>
@@ -143,7 +143,7 @@ export default function RiderProfileScreen() {
         {/* Status Card */}
         <View style={styles.statusCard}>
           <View style={styles.statusHeader}>
-            <Ionicons name="bicycle" size={24} color="#FF6B6B" />
+            <Ionicons name="bicycle" size={24} color="#210059" />
             <Text style={styles.statusHeaderText}>Delivery Status</Text>
           </View>
 
@@ -200,7 +200,7 @@ export default function RiderProfileScreen() {
           </View>
 
           {updating && (
-            <ActivityIndicator size="small" color="#FF6B6B" style={{ marginTop: 12 }} />
+            <ActivityIndicator size="small" color="#210059" style={{ marginTop: 12 }} />
           )}
         </View>
 
@@ -276,13 +276,13 @@ const styles = StyleSheet.create({
   },
   userRole: {
     fontSize: 12,
-    color: '#FF6B6B',
+    color: '#210059',
     backgroundColor: '#FFF8F8',
     paddingHorizontal: 12,
     paddingVertical: 4,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#FF6B6B',
+    borderColor: '#210059',
   },
   statusCard: {
     backgroundColor: '#FFF',

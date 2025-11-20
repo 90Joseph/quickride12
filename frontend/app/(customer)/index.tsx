@@ -37,7 +37,7 @@ interface Restaurant {
 const { width } = Dimensions.get('window');
 
 const CATEGORIES = [
-  { id: '1', name: 'Burger', icon: '🍔', color: '#FF6B6B' },
+  { id: '1', name: 'Burger', icon: '🍔', color: '#210059' },
   { id: '2', name: 'Pizza', icon: '🍕', color: '#000000' },
   { id: '3', name: 'Salad', icon: '🥗', color: '#4CAF50' },
   { id: '4', name: 'Sushi', icon: '🍣', color: '#000000' },
@@ -97,7 +97,7 @@ export default function HomeScreen() {
       title: 'Get 50% Off\nYour First Order!',
       buttonText: 'Order Now',
       emoji: '🍟',
-      colors: ['#FF6B6B', '#FF8E53'],
+      colors: ['#210059', '#FF8E53'],
     },
     {
       id: 2,
@@ -470,7 +470,7 @@ export default function HomeScreen() {
       icon: {
         path: google.maps.SymbolPath.CIRCLE,
         scale: 18, // Larger size
-        fillColor: '#FF6B6B',
+        fillColor: '#210059',
         fillOpacity: 1,
         strokeColor: '#FFF',
         strokeWeight: 4,
@@ -486,9 +486,9 @@ export default function HomeScreen() {
       map: map,
       center: tempLocation,
       radius: 30, // 30 meters radius
-      fillColor: '#FF6B6B',
+      fillColor: '#210059',
       fillOpacity: 0.2,
-      strokeColor: '#FF6B6B',
+      strokeColor: '#210059',
       strokeOpacity: 0.6,
       strokeWeight: 2,
     });
@@ -825,7 +825,7 @@ export default function HomeScreen() {
             <Ionicons 
               name={isFavorite ? "heart" : "heart-outline"} 
               size={20} 
-              color={isFavorite ? "#FF6B6B" : "#FFF"} 
+              color={isFavorite ? "#210059" : "#FFF"} 
             />
           </TouchableOpacity>
         </View>
@@ -848,7 +848,7 @@ export default function HomeScreen() {
 
           <View style={styles.cardDeliveryInfo}>
             <View style={styles.deliveryItem}>
-              <Ionicons name="bicycle" size={14} color="#FF6B6B" />
+              <Ionicons name="bicycle" size={14} color="#210059" />
               <Text style={styles.deliveryText}>₱0 Delivery fee</Text>
             </View>
             <View style={styles.deliveryItem}>
@@ -865,7 +865,7 @@ export default function HomeScreen() {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#FF6B6B" />
+          <ActivityIndicator size="large" color="#210059" />
         </View>
       </SafeAreaView>
     );
@@ -881,7 +881,7 @@ export default function HomeScreen() {
             onPress={handleLocationPress}
             activeOpacity={0.7}
           >
-            <Ionicons name="location" size={14} color="#FF6B6B" />
+            <Ionicons name="location" size={14} color="#210059" />
             <Text style={styles.locationBadgeText}>{selectedLocation.split(',')[0]}</Text>
             <Ionicons name="chevron-down" size={12} color="#666" />
           </TouchableOpacity>
@@ -928,7 +928,7 @@ export default function HomeScreen() {
               onPress={handleFilterPress}
               activeOpacity={0.7}
             >
-              <Ionicons name="options-outline" size={24} color="#FF6B6B" />
+              <Ionicons name="options-outline" size={24} color="#210059" />
             </TouchableOpacity>
           )}
         </View>
@@ -1094,7 +1094,7 @@ export default function HomeScreen() {
               onPress={() => handleQuickLocation('home')}
             >
               <View style={styles.quickLocationIcon}>
-                <Ionicons name="home" size={24} color="#FF6B6B" />
+                <Ionicons name="home" size={24} color="#210059" />
               </View>
               <View style={styles.quickLocationTextContainer}>
                 <Text style={styles.quickLocationTitle}>🏠 Home</Text>
@@ -1208,7 +1208,7 @@ export default function HomeScreen() {
                       style={styles.searchResultItem}
                       onPress={() => selectSearchResult(result.place_id)}
                     >
-                      <Ionicons name="location-outline" size={20} color="#FF6B6B" />
+                      <Ionicons name="location-outline" size={20} color="#210059" />
                       <View style={styles.searchResultTextContainer}>
                         <Text style={styles.searchResultMain}>
                           {result.structured_formatting.main_text}
@@ -1233,7 +1233,7 @@ export default function HomeScreen() {
               <View style={styles.mapPickerContainer}>
                 {!mapLoaded && (
                   <View style={styles.mapLoading}>
-                    <ActivityIndicator size="large" color="#FF6B6B" />
+                    <ActivityIndicator size="large" color="#210059" />
                     <Text style={styles.mapLoadingText}>Loading map...</Text>
                     <Text style={styles.mapLoadingSubtext}>Please allow location access</Text>
                   </View>
@@ -1254,7 +1254,7 @@ export default function HomeScreen() {
             {/* Address Display */}
             <View style={styles.mapAddressContainer}>
               <View style={styles.mapAddressCard}>
-                <Ionicons name="location" size={24} color="#FF6B6B" />
+                <Ionicons name="location" size={24} color="#210059" />
                 <View style={styles.mapAddressTextContainer}>
                   <Text style={styles.mapAddressLabel}>Selected Location</Text>
                   <Text style={styles.mapAddressText} numberOfLines={2}>
@@ -1304,7 +1304,7 @@ export default function HomeScreen() {
                   <Text style={[styles.filterOptionText, filters.deliveryFee === option && styles.filterOptionTextSelected]}>
                     {option === 'all' ? 'All' : option === 'free' ? 'Free Delivery' : option === 'under50' ? 'Under ₱50' : 'Under ₱100'}
                   </Text>
-                  {filters.deliveryFee === option && <Ionicons name="checkmark-circle" size={20} color="#FF6B6B" />}
+                  {filters.deliveryFee === option && <Ionicons name="checkmark-circle" size={20} color="#210059" />}
                 </TouchableOpacity>
               ))}
 
@@ -1319,7 +1319,7 @@ export default function HomeScreen() {
                   <Text style={[styles.filterOptionText, filters.rating === option && styles.filterOptionTextSelected]}>
                     {option === 'all' ? 'All Ratings' : `${option}+ ⭐`}
                   </Text>
-                  {filters.rating === option && <Ionicons name="checkmark-circle" size={20} color="#FF6B6B" />}
+                  {filters.rating === option && <Ionicons name="checkmark-circle" size={20} color="#210059" />}
                 </TouchableOpacity>
               ))}
             </ScrollView>
@@ -1372,7 +1372,7 @@ export default function HomeScreen() {
                 }}
               >
                 <View style={styles.notificationIcon}>
-                  <Ionicons name="bicycle" size={24} color="#FF6B6B" />
+                  <Ionicons name="bicycle" size={24} color="#210059" />
                 </View>
                 <View style={styles.notificationContent}>
                   <Text style={styles.notificationItemTitle}>Out for Delivery 🚴</Text>
@@ -1452,7 +1452,7 @@ const styles = StyleSheet.create({
   locationBadgeText: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#FF6B6B',
+    color: '#210059',
   },
   locationContainer: {
     flexDirection: 'row',
@@ -1484,7 +1484,7 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: '#FF6B6B',
+    backgroundColor: '#210059',
   },
 
   // Search Section
@@ -1599,7 +1599,7 @@ const styles = StyleSheet.create({
   },
   paginationDotActive: {
     width: 24,
-    backgroundColor: '#FF6B6B',
+    backgroundColor: '#210059',
   },
 
   // Categories
@@ -1623,7 +1623,7 @@ const styles = StyleSheet.create({
   },
   categoryIconSelected: {
     borderWidth: 3,
-    borderColor: '#FF6B6B',
+    borderColor: '#210059',
   },
   categoryEmoji: {
     fontSize: 32,
@@ -1634,7 +1634,7 @@ const styles = StyleSheet.create({
     color: '#333',
   },
   categoryNameSelected: {
-    color: '#FF6B6B',
+    color: '#210059',
   },
 
   // Section Header
@@ -1653,14 +1653,14 @@ const styles = StyleSheet.create({
   },
   activeFilter: {
     fontSize: 12,
-    color: '#FF6B6B',
+    color: '#210059',
     marginTop: 4,
     fontWeight: '600',
   },
   seeAllText: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#FF6B6B',
+    color: '#210059',
   },
 
   // Restaurant Cards
@@ -1817,7 +1817,7 @@ const styles = StyleSheet.create({
   locationItemSelected: {
     backgroundColor: '#FFE8E8',
     borderWidth: 2,
-    borderColor: '#FF6B6B',
+    borderColor: '#210059',
   },
   locationItemText: {
     flex: 1,
@@ -1825,7 +1825,7 @@ const styles = StyleSheet.create({
     color: '#666',
   },
   locationItemTextSelected: {
-    color: '#FF6B6B',
+    color: '#210059',
     fontWeight: '600',
   },
   filterLabel: {
@@ -1847,18 +1847,18 @@ const styles = StyleSheet.create({
   filterOptionSelected: {
     backgroundColor: '#FFE8E8',
     borderWidth: 2,
-    borderColor: '#FF6B6B',
+    borderColor: '#210059',
   },
   filterOptionText: {
     fontSize: 14,
     color: '#666',
   },
   filterOptionTextSelected: {
-    color: '#FF6B6B',
+    color: '#210059',
     fontWeight: '600',
   },
   applyButton: {
-    backgroundColor: '#FF6B6B',
+    backgroundColor: '#210059',
     padding: 16,
     borderRadius: 12,
     alignItems: 'center',
@@ -1980,7 +1980,7 @@ const styles = StyleSheet.create({
   viewAllNotificationsText: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#FF6B6B',
+    color: '#210059',
   },
   // Google Maps Location Picker Styles
   mapModalContainer: {

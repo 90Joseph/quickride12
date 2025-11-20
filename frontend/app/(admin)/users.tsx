@@ -175,7 +175,7 @@ export default function AdminUsersScreen() {
       case 'rider':
         return '#9C27B0';
       case 'admin':
-        return '#FF6B6B';
+        return '#210059';
       default:
         return '#999';
     }
@@ -252,7 +252,7 @@ export default function AdminUsersScreen() {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#FF6B6B" />
+          <ActivityIndicator size="large" color="#210059" />
         </View>
       </SafeAreaView>
     );
@@ -266,7 +266,7 @@ export default function AdminUsersScreen() {
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.listContent}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#FF6B6B']} />
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#210059']} />
         }
       />
 

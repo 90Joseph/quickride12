@@ -26,7 +26,7 @@ export default function AboutScreen() {
       <ScrollView style={styles.content}>
         <View style={styles.logoContainer}>
           <View style={styles.logo}>
-            <Ionicons name="bicycle" size={60} color="#FF6B6B" />
+            <Ionicons name="bicycle" size={60} color="#210059" />
           </View>
           <Text style={styles.appName}>QuickRide</Text>
           <Text style={styles.version}>Version 1.0.0</Text>
@@ -43,22 +43,22 @@ export default function AboutScreen() {
           <Text style={styles.sectionTitle}>Features</Text>
           
           <View style={styles.featureRow}>
-            <Ionicons name="flash" size={20} color="#FF6B6B" />
+            <Ionicons name="flash" size={20} color="#210059" />
             <Text style={styles.featureText}>Fast delivery within 30 minutes</Text>
           </View>
 
           <View style={styles.featureRow}>
-            <Ionicons name="restaurant" size={20} color="#FF6B6B" />
+            <Ionicons name="restaurant" size={20} color="#210059" />
             <Text style={styles.featureText}>Wide selection of restaurants</Text>
           </View>
 
           <View style={styles.featureRow}>
-            <Ionicons name="location" size={20} color="#FF6B6B" />
+            <Ionicons name="location" size={20} color="#210059" />
             <Text style={styles.featureText}>Real-time order tracking</Text>
           </View>
 
           <View style={styles.featureRow}>
-            <Ionicons name="card" size={20} color="#FF6B6B" />
+            <Ionicons name="card" size={20} color="#210059" />
             <Text style={styles.featureText}>Multiple payment options</Text>
           </View>
         </View>

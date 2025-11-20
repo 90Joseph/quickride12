@@ -191,7 +191,7 @@ export default function OrderDetailScreen() {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#FF6B6B" />
+          <ActivityIndicator size="large" color="#210059" />
         </View>
       </SafeAreaView>
     );
@@ -226,7 +226,7 @@ export default function OrderDetailScreen() {
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#FF6B6B']} />
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#210059']} />
         }
       >
         {/* Status Badge */}
@@ -311,7 +311,7 @@ export default function OrderDetailScreen() {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Restaurant</Text>
           <View style={styles.infoRow}>
-            <Ionicons name="restaurant" size={20} color="#FF6B6B" />
+            <Ionicons name="restaurant" size={20} color="#210059" />
             <Text style={styles.infoText}>{order.restaurant_name}</Text>
           </View>
         </View>
@@ -427,7 +427,7 @@ const styles = StyleSheet.create({
   timeCardText: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#FF6B6B',
+    color: '#210059',
   },
   loadingContainer: {
     flex: 1,
@@ -447,7 +447,7 @@ const styles = StyleSheet.create({
   },
   backButton: {
     padding: 12,
-    backgroundColor: '#FF6B6B',
+    backgroundColor: '#210059',
     borderRadius: 8,
   },
   backButtonText: {
@@ -572,7 +572,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   timelineIconActive: {
-    backgroundColor: '#FF6B6B',
+    backgroundColor: '#210059',
   },
   timelineIconCompleted: {
     backgroundColor: '#4CAF50',
@@ -629,7 +629,7 @@ const styles = StyleSheet.create({
   orderItemQuantity: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#FF6B6B',
+    color: '#210059',
     width: 40,
   },
   orderItemName: {
@@ -692,6 +692,6 @@ const styles = StyleSheet.create({
   totalValue: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#FF6B6B',
+    color: '#210059',
   },
 });

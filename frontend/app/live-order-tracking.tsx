@@ -673,7 +673,7 @@ export default function LiveOrderTrackingScreen() {
       pending: { label: 'Order Received', color: '#FF9800', icon: 'time' },
       paid: { label: 'Payment Confirmed', color: '#2196F3', icon: 'checkmark-circle' },
       accepted: { label: 'Restaurant Accepted', color: '#9C27B0', icon: 'restaurant' },
-      preparing: { label: 'Preparing Your Food', color: '#FF6B6B', icon: 'flame' },
+      preparing: { label: 'Preparing Your Food', color: '#210059', icon: 'flame' },
       ready_for_pickup: { label: 'Ready for Pickup', color: '#FF9800', icon: 'cube' },
       rider_assigned: { label: 'Rider Assigned', color: '#00BCD4', icon: 'bicycle' },
       picked_up: { label: 'Picked Up', color: '#3F51B5', icon: 'bag-check' },
@@ -688,7 +688,7 @@ export default function LiveOrderTrackingScreen() {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#FF6B6B" />
+          <ActivityIndicator size="large" color="#210059" />
           <Text style={styles.loadingText}>Loading order details...</Text>
         </View>
       </SafeAreaView>
@@ -718,13 +718,13 @@ export default function LiveOrderTrackingScreen() {
           <View style={styles.fullScreenMap}>
             {!mapLoaded && !mapError && (
               <View style={styles.mapLoadingOverlay}>
-                <ActivityIndicator size="large" color="#FF6B6B" />
+                <ActivityIndicator size="large" color="#210059" />
                 <Text style={styles.mapLoadingText}>Loading map...</Text>
               </View>
             )}
             {mapError && (
               <View style={styles.mapLoadingOverlay}>
-                <Ionicons name="alert-circle" size={48} color="#FF6B6B" />
+                <Ionicons name="alert-circle" size={48} color="#210059" />
                 <Text style={styles.errorText}>{mapError}</Text>
                 <TouchableOpacity 
                   style={styles.retryButton}
@@ -884,7 +884,7 @@ const styles = StyleSheet.create({
   timeCardText: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#FF6B6B',
+    color: '#210059',
     textAlign: 'center',
   },
   fullScreenMap: {
@@ -1031,7 +1031,7 @@ const styles = StyleSheet.create({
   itemQuantity: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#FF6B6B',
+    color: '#210059',
     marginRight: 8,
     minWidth: 30,
   },
@@ -1095,12 +1095,12 @@ const styles = StyleSheet.create({
   errorText: {
     marginTop: 12,
     fontSize: 16,
-    color: '#FF6B6B',
+    color: '#210059',
     textAlign: 'center',
     paddingHorizontal: 20,
   },
   retryButton: {
-    backgroundColor: '#FF6B6B',
+    backgroundColor: '#210059',
     paddingHorizontal: 24,
     paddingVertical: 12,
     borderRadius: 8,
@@ -1212,7 +1212,7 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   backButton: {
-    backgroundColor: '#FF6B6B',
+    backgroundColor: '#210059',
     paddingHorizontal: 32,
     paddingVertical: 12,
     borderRadius: 8,
@@ -1223,7 +1223,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   retryButton: {
-    backgroundColor: '#FF6B6B',
+    backgroundColor: '#210059',
     paddingHorizontal: 24,
     paddingVertical: 10,
     borderRadius: 8,

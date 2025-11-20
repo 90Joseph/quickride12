@@ -5,7 +5,7 @@ export default function AdminLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: '#FF6B6B',
+        tabBarActiveTintColor: '#210059',
         tabBarInactiveTintColor: '#999',
         tabBarStyle: {
           backgroundColor: '#FFF',
@@ -20,7 +20,7 @@ export default function AdminLayout() {
           fontWeight: '600',
         },
         headerStyle: {
-          backgroundColor: '#FF6B6B',
+          backgroundColor: '#210059',
         },
         headerTintColor: '#FFF',
         headerTitleStyle: {

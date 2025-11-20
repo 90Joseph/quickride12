@@ -538,7 +538,7 @@ function RiderAvailableContent() {
     <View style={styles.orderCard}>
       <View style={styles.orderHeader}>
         <View style={styles.restaurantInfo}>
-          <Ionicons name="restaurant" size={24} color="#FF6B6B" />
+          <Ionicons name="restaurant" size={24} color="#210059" />
           <View style={styles.restaurantDetails}>
             <Text style={styles.restaurantName}>{item.restaurant_name}</Text>
             <Text style={styles.customerName}>Deliver to: {item.customer_name}</Text>
@@ -599,7 +599,7 @@ function RiderAvailableContent() {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#FF6B6B" />
+          <ActivityIndicator size="large" color="#210059" />
         </View>
       </SafeAreaView>
     );
@@ -632,7 +632,7 @@ function RiderAvailableContent() {
             <Ionicons 
               name={isAvailable ? "checkmark-circle" : "close-circle"} 
               size={20} 
-              color={isAvailable ? "#4CAF50" : "#FF6B6B"} 
+              color={isAvailable ? "#4CAF50" : "#210059"} 
             />
             <Text style={styles.statusText}>
               {isAvailable ? 'Available' : 'Offline'}
@@ -641,7 +641,7 @@ function RiderAvailableContent() {
               value={isAvailable}
               onValueChange={toggleAvailability}
               trackColor={{ false: '#FFE0E0', true: '#C8E6C9' }}
-              thumbColor={isAvailable ? '#4CAF50' : '#FF6B6B'}
+              thumbColor={isAvailable ? '#4CAF50' : '#210059'}
               ios_backgroundColor="#FFE0E0"
               style={{ transform: [{ scale: 0.8 }] }}
             />
@@ -701,7 +701,7 @@ function RiderAvailableContent() {
           keyExtractor={(item) => item.id}
           contentContainerStyle={styles.listContent}
           refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#FF6B6B']} />
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#210059']} />
           }
           ListEmptyComponent={
             <View style={styles.emptyContainer}>
@@ -769,7 +769,7 @@ function RiderAvailableContent() {
             <ScrollView style={styles.searchResultsContainer}>
               {searching && (
                 <View style={styles.searchLoadingContainer}>
-                  <ActivityIndicator size="small" color="#FF6B6B" />
+                  <ActivityIndicator size="small" color="#210059" />
                   <Text style={styles.searchLoadingText}>Searching...</Text>
                 </View>
               )}
@@ -796,7 +796,7 @@ function RiderAvailableContent() {
                   style={styles.searchResultItem}
                   onPress={() => selectSearchResult(place)}
                 >
-                  <Ionicons name="location" size={24} color="#FF6B6B" />
+                  <Ionicons name="location" size={24} color="#210059" />
                   <View style={styles.searchResultText}>
                     <Text style={styles.searchResultName}>{place.name}</Text>
                     <Text style={styles.searchResultAddress} numberOfLines={2}>
@@ -823,7 +823,7 @@ export default function RiderAvailableScreen() {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#FF6B6B" />
+          <ActivityIndicator size="large" color="#210059" />
         </View>
       </SafeAreaView>
     );
@@ -833,7 +833,7 @@ export default function RiderAvailableScreen() {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.emptyContainer}>
-          <Ionicons name="lock-closed" size={80} color="#FF6B6B" />
+          <Ionicons name="lock-closed" size={80} color="#210059" />
           <Text style={styles.emptyText}>Access Restricted</Text>
           <Text style={styles.emptySubtext}>This screen is only accessible to riders</Text>
           <TouchableOpacity 
@@ -927,7 +927,7 @@ const styles = StyleSheet.create({
   amount: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#FF6B6B',
+    color: '#210059',
   },
   addressContainer: {
     flexDirection: 'row',
@@ -953,7 +953,7 @@ const styles = StyleSheet.create({
   statusText: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#FF6B6B',
+    color: '#210059',
   },
   navigationButton: {
     flexDirection: 'row',
@@ -1392,7 +1392,7 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   serviceTabActive: {
-    backgroundColor: '#FF6B6B',
+    backgroundColor: '#210059',
   },
   serviceTabText: {
     fontSize: 13,

@@ -148,7 +148,7 @@ export default function RestaurantProfileScreen() {
       icon: {
         path: google.maps.SymbolPath.CIRCLE,
         scale: 20,
-        fillColor: '#FF6B6B',
+        fillColor: '#210059',
         fillOpacity: 1,
         strokeColor: '#FFF',
         strokeWeight: 5,
@@ -172,9 +172,9 @@ export default function RestaurantProfileScreen() {
       map: map,
       center: location,
       radius: 50,
-      fillColor: '#FF6B6B',
+      fillColor: '#210059',
       fillOpacity: 0.15,
-      strokeColor: '#FF6B6B',
+      strokeColor: '#210059',
       strokeOpacity: 0.5,
       strokeWeight: 2,
     });
@@ -418,7 +418,7 @@ export default function RestaurantProfileScreen() {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#FF6B6B" />
+          <ActivityIndicator size="large" color="#210059" />
         </View>
       </SafeAreaView>
     );
@@ -607,7 +607,7 @@ export default function RestaurantProfileScreen() {
                     style={styles.editLocationButton}
                     onPress={openLocationModal}
                   >
-                    <Ionicons name="location" size={18} color="#FF6B6B" />
+                    <Ionicons name="location" size={18} color="#210059" />
                     <Text style={styles.editLocationText}>Edit Location on Map</Text>
                   </TouchableOpacity>
                 )}
@@ -637,7 +637,7 @@ export default function RestaurantProfileScreen() {
               <Text style={styles.infoValue}>{restaurant.is_open ? '4.5' : 'N/A'}</Text>
             </View>
             <View style={styles.infoCard}>
-              <Ionicons name="time-outline" size={24} color="#FF6B6B" />
+              <Ionicons name="time-outline" size={24} color="#210059" />
               <Text style={styles.infoLabel}>Prep Time</Text>
               <Text style={styles.infoValue}>20-30 min</Text>
             </View>
@@ -700,7 +700,7 @@ export default function RestaurantProfileScreen() {
                     style={styles.searchResultItem}
                     onPress={() => selectSearchResult(place)}
                   >
-                    <Ionicons name="location" size={20} color="#FF6B6B" />
+                    <Ionicons name="location" size={20} color="#210059" />
                     <View style={styles.searchResultTextContainer}>
                       <Text style={styles.searchResultName}>{place.name}</Text>
                       <Text style={styles.searchResultAddress} numberOfLines={1}>
@@ -714,7 +714,7 @@ export default function RestaurantProfileScreen() {
 
             {searching && (
               <View style={styles.searchingIndicator}>
-                <ActivityIndicator size="small" color="#FF6B6B" />
+                <ActivityIndicator size="small" color="#210059" />
                 <Text style={styles.searchingText}>Searching...</Text>
               </View>
             )}
@@ -725,7 +725,7 @@ export default function RestaurantProfileScreen() {
             <View style={styles.mapContainer}>
               {!mapLoaded && (
                 <View style={styles.mapLoading}>
-                  <ActivityIndicator size="large" color="#FF6B6B" />
+                  <ActivityIndicator size="large" color="#210059" />
                   <Text style={styles.mapLoadingText}>Loading map...</Text>
                 </View>
               )}
@@ -749,7 +749,7 @@ export default function RestaurantProfileScreen() {
 
           <View style={styles.locationInfo}>
             <View style={styles.coordinatesCard}>
-              <Ionicons name="navigate" size={20} color="#FF6B6B" />
+              <Ionicons name="navigate" size={20} color="#210059" />
               <View style={styles.coordinatesDetail}>
                 <Text style={styles.coordsLabel}>Latitude</Text>
                 <Text style={styles.coordsValue}>{tempLatitude.toFixed(6)}</Text>
@@ -813,7 +813,7 @@ const styles = StyleSheet.create({
   editButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FF6B6B',
+    backgroundColor: '#210059',
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 20,
@@ -1020,7 +1020,7 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   editLocationText: {
-    color: '#FF6B6B',
+    color: '#210059',
     fontSize: 14,
     fontWeight: '600',
   },
@@ -1160,7 +1160,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 14,
-    backgroundColor: '#FF6B6B',
+    backgroundColor: '#210059',
     borderRadius: 8,
     gap: 8,
   },

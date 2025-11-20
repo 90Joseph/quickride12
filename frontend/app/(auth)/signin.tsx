@@ -80,7 +80,7 @@ export default function SignInScreen() {
             </TouchableOpacity>
 
             <View style={styles.header}>
-              <Ionicons name="fast-food" size={64} color="#FF6B6B" />
+              <Ionicons name="fast-food" size={64} color="#210059" />
               <Text style={styles.title}>Sign In</Text>
               <Text style={styles.subtitle}>Welcome back to QuickBite</Text>
             </View>
@@ -151,7 +151,7 @@ export default function SignInScreen() {
                 style={styles.googleButton}
                 onPress={() => router.back()}
               >
-                <Ionicons name="logo-google" size={20} color="#FF6B6B" />
+                <Ionicons name="logo-google" size={20} color="#210059" />
                 <Text style={styles.googleButtonText}>Continue with Google</Text>
               </TouchableOpacity>
 
@@ -250,7 +250,7 @@ const styles = StyleSheet.create({
     padding: 8,
   },
   signInButton: {
-    backgroundColor: '#FF6B6B',
+    backgroundColor: '#210059',
     padding: 18,
     borderRadius: 12,
     alignItems: 'center',
@@ -283,11 +283,11 @@ const styles = StyleSheet.create({
     padding: 18,
     borderRadius: 12,
     borderWidth: 2,
-    borderColor: '#FF6B6B',
+    borderColor: '#210059',
     backgroundColor: '#FFF',
   },
   googleButtonText: {
-    color: '#FF6B6B',
+    color: '#210059',
     fontSize: 16,
     fontWeight: '600',
     marginLeft: 12,
@@ -301,7 +301,7 @@ const styles = StyleSheet.create({
     color: '#666',
   },
   registerLinkBold: {
-    color: '#FF6B6B',
+    color: '#210059',
     fontWeight: '600',
   },
 });

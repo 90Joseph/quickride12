@@ -50,7 +50,7 @@ export default function DealsScreen() {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#FF6B6B" />
+          <ActivityIndicator size="large" color="#210059" />
         </View>
       </SafeAreaView>
     );
@@ -74,7 +74,7 @@ export default function DealsScreen() {
         {/* Main Promo Banner */}
         <View style={styles.mainBannerContainer}>
           <LinearGradient
-            colors={['#FF6B6B', '#FF8E53']}
+            colors={['#210059', '#FF8E53']}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
             style={styles.mainBanner}
@@ -167,7 +167,7 @@ export default function DealsScreen() {
                 onPress={() => router.push(`/restaurant/${restaurant.id}` as any)}
               >
                 <Text style={styles.restaurantChipText}>{restaurant.name}</Text>
-                <Ionicons name="chevron-forward" size={16} color="#FF6B6B" />
+                <Ionicons name="chevron-forward" size={16} color="#210059" />
               </TouchableOpacity>
             ))}
           </View>
@@ -340,7 +340,7 @@ const styles = StyleSheet.create({
   dealCode: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#FF6B6B',
+    color: '#210059',
   },
 
   // Restaurants Grid

@@ -234,7 +234,7 @@ export default function CheckoutScreen() {
       icon: {
         path: google.maps.SymbolPath.CIRCLE,
         scale: 15,
-        fillColor: '#FF6B6B',
+        fillColor: '#210059',
         fillOpacity: 1,
         strokeColor: '#FFF',
         strokeWeight: 3,
@@ -397,7 +397,7 @@ export default function CheckoutScreen() {
         icon: {
           path: google.maps.SymbolPath.CIRCLE,
           scale: 18,
-          fillColor: '#FF6B6B',
+          fillColor: '#210059',
           fillOpacity: 1,
           strokeColor: '#FFF',
           strokeWeight: 4,
@@ -410,9 +410,9 @@ export default function CheckoutScreen() {
         map: map,
         center: location,
         radius: 30,
-        fillColor: '#FF6B6B',
+        fillColor: '#210059',
         fillOpacity: 0.2,
-        strokeColor: '#FF6B6B',
+        strokeColor: '#210059',
         strokeOpacity: 0.6,
         strokeWeight: 2,
       });
@@ -635,7 +635,7 @@ export default function CheckoutScreen() {
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Order from</Text>
             <View style={styles.restaurantCard}>
-              <Ionicons name="restaurant" size={24} color="#FF6B6B" />
+              <Ionicons name="restaurant" size={24} color="#210059" />
               <Text style={styles.restaurantName}>{restaurantName}</Text>
             </View>
           </View>
@@ -654,14 +654,14 @@ export default function CheckoutScreen() {
                     style={styles.quantityButton}
                     onPress={() => handleDecreaseQuantity(item.menu_item_id)}
                   >
-                    <Ionicons name="remove" size={20} color="#FF6B6B" />
+                    <Ionicons name="remove" size={20} color="#210059" />
                   </TouchableOpacity>
                   <Text style={styles.quantityText}>{item.quantity}</Text>
                   <TouchableOpacity
                     style={styles.quantityButton}
                     onPress={() => handleIncreaseQuantity(item.menu_item_id)}
                   >
-                    <Ionicons name="add" size={20} color="#FF6B6B" />
+                    <Ionicons name="add" size={20} color="#210059" />
                   </TouchableOpacity>
                 </View>
                 <Text style={styles.orderItemTotal}>
@@ -706,7 +706,7 @@ export default function CheckoutScreen() {
             <View style={styles.inputGroup} ref={phoneInputRef}>
               <Text style={styles.label}>Phone Number *</Text>
               <View style={[styles.inputContainer, phoneError && styles.inputContainerError]}>
-                <Ionicons name="call-outline" size={20} color={phoneError ? "#FF6B6B" : "#666"} style={styles.inputIcon} />
+                <Ionicons name="call-outline" size={20} color={phoneError ? "#210059" : "#666"} style={styles.inputIcon} />
                 <TextInput
                   style={styles.input}
                   placeholder="+63 917 123 4567"
@@ -875,7 +875,7 @@ export default function CheckoutScreen() {
             <View style={styles.mapPickerContainer}>
               {!mapLoaded && (
                 <View style={styles.mapLoading}>
-                  <ActivityIndicator size="large" color="#FF6B6B" />
+                  <ActivityIndicator size="large" color="#210059" />
                   <Text style={styles.mapLoadingText}>Loading map...</Text>
                 </View>
               )}
@@ -895,7 +895,7 @@ export default function CheckoutScreen() {
           {/* Address Display */}
           <View style={styles.mapAddressContainer}>
             <View style={styles.mapAddressCard}>
-              <Ionicons name="location" size={24} color="#FF6B6B" />
+              <Ionicons name="location" size={24} color="#210059" />
               <View style={styles.mapAddressTextContainer}>
                 <Text style={styles.mapAddressLabel}>Delivery Address</Text>
                 <Text style={styles.mapAddressText} numberOfLines={2}>
@@ -942,7 +942,7 @@ export default function CheckoutScreen() {
             <View style={styles.mapPickerContainer}>
               {!verificationMapLoaded && (
                 <View style={styles.mapLoading}>
-                  <ActivityIndicator size="large" color="#FF6B6B" />
+                  <ActivityIndicator size="large" color="#210059" />
                   <Text style={styles.mapLoadingText}>Loading verification map...</Text>
                 </View>
               )}
@@ -962,7 +962,7 @@ export default function CheckoutScreen() {
           {/* Address Display */}
           <View style={styles.mapAddressContainer}>
             <View style={styles.mapAddressCard}>
-              <Ionicons name="location" size={24} color="#FF6B6B" />
+              <Ionicons name="location" size={24} color="#210059" />
               <View style={styles.mapAddressTextContainer}>
                 <Text style={styles.mapAddressLabel}>Delivery Address</Text>
                 <Text style={styles.mapAddressText} numberOfLines={3}>
@@ -991,7 +991,7 @@ export default function CheckoutScreen() {
                 setTimeout(() => setShowMapPicker(true), 300);
               }}
             >
-              <Ionicons name="pencil" size={20} color="#FF6B6B" />
+              <Ionicons name="pencil" size={20} color="#210059" />
               <Text style={styles.editLocationText}>Edit Location</Text>
             </TouchableOpacity>
             
@@ -1158,13 +1158,13 @@ const styles = StyleSheet.create({
     minHeight: 56,
   },
   inputContainerError: {
-    borderColor: '#FF6B6B',
+    borderColor: '#210059',
     borderWidth: 2,
     backgroundColor: '#FFF5F5',
   },
   errorText: {
     fontSize: 12,
-    color: '#FF6B6B',
+    color: '#210059',
     marginTop: 4,
     marginLeft: 4,
   },
@@ -1235,7 +1235,7 @@ const styles = StyleSheet.create({
   totalValue: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#FF6B6B',
+    color: '#210059',
   },
   paymentCard: {
     flexDirection: 'row',
@@ -1322,7 +1322,7 @@ const styles = StyleSheet.create({
     zIndex: 1000,
   },
   placeOrderButton: {
-    backgroundColor: '#FF6B6B',
+    backgroundColor: '#210059',
     padding: 18,
     borderRadius: 12,
     alignItems: 'center',
@@ -1354,7 +1354,7 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   backButton: {
-    backgroundColor: '#FF6B6B',
+    backgroundColor: '#210059',
     paddingHorizontal: 24,
     paddingVertical: 12,
     borderRadius: 12,
@@ -1367,7 +1367,7 @@ const styles = StyleSheet.create({
   // Map Picker Styles
   mapButton: {
     flexDirection: 'row',
-    backgroundColor: '#FF6B6B',
+    backgroundColor: '#210059',
     paddingVertical: 12,
     paddingHorizontal: 16,
     borderRadius: 8,
@@ -1498,7 +1498,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     backgroundColor: '#FFF',
     borderWidth: 2,
-    borderColor: '#FF6B6B',
+    borderColor: '#210059',
     paddingVertical: 14,
     borderRadius: 12,
     alignItems: 'center',
@@ -1507,7 +1507,7 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   editLocationText: {
-    color: '#FF6B6B',
+    color: '#210059',
     fontSize: 15,
     fontWeight: '600',
   },

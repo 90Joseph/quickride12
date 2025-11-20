@@ -127,7 +127,7 @@ export default function GCashPaymentScreen() {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.errorContainer}>
-          <Ionicons name="alert-circle-outline" size={64} color="#FF6B6B" />
+          <Ionicons name="alert-circle-outline" size={64} color="#210059" />
           <Text style={styles.errorText}>Failed to load payment details</Text>
           <TouchableOpacity style={styles.retryButton} onPress={() => router.back()}>
             <Text style={styles.retryButtonText}>Go Back</Text>
@@ -279,7 +279,7 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   retryButton: {
-    backgroundColor: '#FF6B6B',
+    backgroundColor: '#210059',
     paddingHorizontal: 24,
     paddingVertical: 12,
     borderRadius: 12,
