@@ -97,7 +97,7 @@ export default function HomeScreen() {
       title: 'Get 50% Off\nYour First Order!',
       buttonText: 'Order Now',
       emoji: '🍟',
-      colors: ['#210059', '#FF8E53'],
+      colors: ['#210059', '#5B21B6'],
     },
     {
       id: 2,

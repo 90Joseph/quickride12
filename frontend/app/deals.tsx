@@ -74,7 +74,7 @@ export default function DealsScreen() {
         {/* Main Promo Banner */}
         <View style={styles.mainBannerContainer}>
           <LinearGradient
-            colors={['#210059', '#FF8E53']}
+            colors={['#210059', '#5B21B6']}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
             style={styles.mainBanner}
