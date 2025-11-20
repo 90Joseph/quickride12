@@ -76,6 +76,10 @@ export default function HomeScreen() {
   });
   const [editingLocation, setEditingLocation] = useState<'home' | 'work' | 'school' | null>(null);
   
+  // Service type selector
+  const [serviceType, setServiceType] = useState<'delivery' | 'pickup'>('delivery');
+  const [showServicePicker, setShowServicePicker] = useState(false);
+  
   // Map picker states
   const [mapLoaded, setMapLoaded] = useState(false);
   const [tempLocation, setTempLocation] = useState({ lat: 14.5547, lng: 121.0244 });
