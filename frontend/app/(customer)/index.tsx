@@ -1561,6 +1561,72 @@ const styles = StyleSheet.create({
     backgroundColor: '#210059',
   },
 
+  // Service Type Selector
+  serviceTypeContainer: {
+    paddingHorizontal: 20,
+    marginTop: 16,
+    marginBottom: 8,
+  },
+  serviceSelectorButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#F8F8FF',
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#E0E0FF',
+    gap: 10,
+  },
+  serviceTypeText: {
+    flex: 1,
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#210059',
+  },
+  servicePickerDropdown: {
+    marginTop: 8,
+    backgroundColor: '#FFF',
+    borderRadius: 12,
+    padding: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  serviceOption: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 16,
+    borderRadius: 8,
+    gap: 12,
+  },
+  serviceOptionActive: {
+    backgroundColor: '#F8F8FF',
+  },
+  serviceOptionText: {
+    flex: 1,
+  },
+  serviceOptionTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#333',
+    marginBottom: 2,
+  },
+  serviceOptionTitleActive: {
+    color: '#210059',
+  },
+  serviceOptionSubtitle: {
+    fontSize: 12,
+    color: '#666',
+  },
+  serviceDivider: {
+    height: 1,
+    backgroundColor: '#F0F0F0',
+    marginVertical: 4,
+  },
+
   // Search Section
   searchSection: {
     flexDirection: 'row',
