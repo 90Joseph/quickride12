@@ -349,6 +349,7 @@ export default function HomeScreen() {
       if (saved.address) {
         setSelectedLocation(saved.address);
         setTempLocation(saved.coordinates);
+        setSelectedLocationType(type); // Update the location type
         setShowQuickLocations(false);
         console.log(`✅ ${type} location selected:`, saved);
       } else {
