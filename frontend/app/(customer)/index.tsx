@@ -1686,63 +1686,34 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
   },
-  favoriteButton: {
+  startOrderOverlay: {
     position: 'absolute',
-    top: 12,
-    right: 12,
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: 'rgba(0, 0, 0, 0.4)',
-    justifyContent: 'center',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    padding: 16,
+    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+  },
+  startOrderButton: {
+    backgroundColor: '#210059',
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 8,
     alignItems: 'center',
+  },
+  startOrderButtonText: {
+    color: '#FFF',
+    fontSize: 14,
+    fontWeight: '700',
   },
   cardContent: {
     padding: 16,
   },
   cardTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 4,
-  },
-  cardSubtitle: {
-    fontSize: 14,
-    color: '#666',
-    marginBottom: 12,
-  },
-  cardFooter: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  cardRating: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-  },
-  ratingText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#333',
-  },
-  reviewCount: {
-    fontSize: 12,
-    color: '#999',
-  },
-  cardDeliveryInfo: {
-    flexDirection: 'row',
-    gap: 16,
-  },
-  deliveryItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-  },
-  deliveryText: {
-    fontSize: 12,
-    color: '#666',
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#000',
+    marginBottom: 0,
   },
 
   // Empty State
