@@ -37,14 +37,11 @@ interface Restaurant {
 const { width } = Dimensions.get('window');
 
 const CATEGORIES = [
-  { id: '1', name: 'Burger', icon: '🍔', color: '#210059' },
-  { id: '2', name: 'Pizza', icon: '🍕', color: '#000000' },
-  { id: '3', name: 'Salad', icon: '🥗', color: '#4CAF50' },
-  { id: '4', name: 'Sushi', icon: '🍣', color: '#000000' },
-  { id: '5', name: 'Noodles', icon: '🍜', color: '#FF9800' },
-  { id: '6', name: 'Dessert', icon: '🍰', color: '#E91E63' },
-  { id: '7', name: 'Drinks', icon: '🥤', color: '#2196F3' },
-  { id: '8', name: 'More', icon: '➕', color: '#9E9E9E' },
+  { id: 'all', name: 'All' },
+  { id: 'main', name: 'Main Course' },
+  { id: 'desserts', name: 'Desserts' },
+  { id: 'drinks', name: 'Drinks' },
+  { id: 'snacks', name: 'Snacks' },
 ];
 
 export default function HomeScreen() {
