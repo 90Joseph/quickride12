@@ -1560,11 +1560,11 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   bannerTitle: {
-    fontSize: 28,
+    fontSize: 22,
     fontWeight: 'bold',
     color: '#FFF',
-    marginBottom: 16,
-    lineHeight: 34,
+    marginBottom: 12,
+    lineHeight: 28,
   },
   bannerButton: {
     backgroundColor: '#000',
