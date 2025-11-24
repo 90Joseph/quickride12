@@ -772,18 +772,17 @@ export default function HomeScreen() {
     return (
       <TouchableOpacity
         key={category.id}
-        style={styles.categoryItem}
+        style={[
+          styles.categoryPill,
+          isSelected && styles.categoryPillSelected
+        ]}
         onPress={() => handleCategorySelect(category.id)}
         activeOpacity={0.7}
       >
-        <View style={[
-          styles.categoryIcon, 
-          { backgroundColor: category.color },
-          isSelected && styles.categoryIconSelected
+        <Text style={[
+          styles.categoryPillText,
+          isSelected && styles.categoryPillTextSelected
         ]}>
-          <Text style={styles.categoryEmoji}>{category.icon}</Text>
-        </View>
-        <Text style={[styles.categoryName, isSelected && styles.categoryNameSelected]}>
           {category.name}
         </Text>
       </TouchableOpacity>
