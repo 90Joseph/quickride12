@@ -72,6 +72,7 @@ export default function HomeScreen() {
     school: { address: '', coordinates: { lat: 0, lng: 0 } },
   });
   const [editingLocation, setEditingLocation] = useState<'home' | 'work' | 'school' | null>(null);
+  const [selectedLocationType, setSelectedLocationType] = useState<'home' | 'work' | 'school'>('home');
   
   // Service type selector
   const [serviceType, setServiceType] = useState<'delivery' | 'pickup'>('delivery');
