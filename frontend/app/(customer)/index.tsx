@@ -814,17 +814,6 @@ export default function HomeScreen() {
               <Text style={styles.closedText}>Closed</Text>
             </View>
           )}
-          
-          {/* Start New Order Button Overlay */}
-          <View style={styles.startOrderOverlay}>
-            <TouchableOpacity 
-              style={styles.startOrderButton}
-              onPress={() => router.push(`/restaurant/${item.id}` as any)}
-              activeOpacity={0.8}
-            >
-              <Text style={styles.startOrderButtonText}>Start New Order</Text>
-            </TouchableOpacity>
-          </View>
         </View>
 
         <View style={styles.cardContent}>
