@@ -1676,7 +1676,7 @@ const styles = StyleSheet.create({
   cardImageContainer: {
     position: 'relative',
     width: '100%',
-    height: 200,
+    height: 180,
   },
   cardImage: {
     width: '100%',
