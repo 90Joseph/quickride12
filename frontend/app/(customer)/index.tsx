@@ -1513,7 +1513,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
 
-  // Hero Banner
+  // Hero Banner (New Larger Design)
+  newBannerContainer: {
+    paddingHorizontal: 20,
+    marginTop: 24,
+  },
   bannerContainer: {
     paddingHorizontal: 20,
     marginTop: 20,
