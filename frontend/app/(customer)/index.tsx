@@ -1579,13 +1579,13 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   bannerImageContainer: {
-    width: 80,
-    height: 80,
+    width: 60,
+    height: 60,
     justifyContent: 'center',
     alignItems: 'center',
   },
   bannerEmoji: {
-    fontSize: 64,
+    fontSize: 48,
   },
 
   // Pagination Dots
