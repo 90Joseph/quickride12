@@ -1535,12 +1535,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   heroBanner: {
-    borderRadius: 20,
-    padding: 24,
+    borderRadius: 16,
+    padding: 20,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    minHeight: 160,
+    minHeight: 130,
     marginRight: 0,
   },
   bannerContent: {
