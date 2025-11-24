@@ -1719,10 +1719,10 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   cardContent: {
-    padding: 16,
+    padding: 12,
   },
   cardTitle: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: '700',
     color: '#000',
     marginBottom: 0,
