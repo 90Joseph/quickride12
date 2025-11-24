@@ -704,6 +704,7 @@ export default function HomeScreen() {
           coordinates: tempLocation
         }
       });
+      setSelectedLocationType(editingLocation); // Update the location type
       console.log(`✅ ${editingLocation} location saved:`, { address, coordinates: tempLocation });
       setEditingLocation(null);
     }
