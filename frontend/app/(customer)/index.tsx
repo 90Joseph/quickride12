@@ -1374,6 +1374,17 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#FFFFFF',
   },
+  topNavBar: {
+    backgroundColor: '#210059',
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    borderBottomWidth: 0,
+  },
+  topNavText: {
+    color: '#FFFFFF',
+    fontSize: 18,
+    fontWeight: '700',
+  },
   scrollView: {
     flex: 1,
   },
