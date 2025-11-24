@@ -840,13 +840,18 @@ export default function HomeScreen() {
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         {/* Header - Always Visible */}
         <View style={styles.header}>
-          <View style={styles.deliverToContainer}>
-            <Ionicons name="location-sharp" size={18} color="#000" />
+          <TouchableOpacity 
+            style={styles.deliverToContainer}
+            onPress={handleLocationPress}
+            activeOpacity={0.7}
+          >
+            <Ionicons name="location-sharp" size={18} color="#210059" />
             <View style={styles.deliverToTextContainer}>
               <Text style={styles.deliverToLabel}>Deliver to</Text>
               <Text style={styles.deliverToValue}>HOME</Text>
             </View>
-          </View>
+            <Ionicons name="chevron-down" size={16} color="#666" style={{ marginLeft: 4 }} />
+          </TouchableOpacity>
           <TouchableOpacity 
             style={styles.profileButton}
             onPress={() => router.push('/(customer)/profile')}
