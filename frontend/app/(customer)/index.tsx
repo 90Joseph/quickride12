@@ -1861,7 +1861,11 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   searchResults: {
-    gap: 0,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+    gap: 16,
   },
   noResults: {
     alignItems: 'center',
