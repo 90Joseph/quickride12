@@ -969,17 +969,23 @@ export default function HomeScreen() {
           </TouchableOpacity>
         </View>
 
-        {/* Restaurant Grid */}
-        <View style={styles.restaurantsGrid}>
-          {filteredRestaurants.length > 0 ? (
-            filteredRestaurants.map(renderRestaurantCard)
-          ) : (
-            <View style={styles.emptyContainer}>
-              <Ionicons name="restaurant-outline" size={64} color="#CCC" />
-              <Text style={styles.emptyText}>No restaurants found</Text>
-            </View>
-          )}
-        </View>
+        {/* Restaurant Carousel */}
+        {filteredRestaurants.length > 0 ? (
+          <ScrollView 
+            horizontal 
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.restaurantCarousel}
+            snapToInterval={Platform.OS === 'web' ? undefined : 180}
+            decelerationRate="fast"
+          >
+            {filteredRestaurants.map(renderRestaurantCard)}
+          </ScrollView>
+        ) : (
+          <View style={styles.emptyContainer}>
+            <Ionicons name="restaurant-outline" size={64} color="#CCC" />
+            <Text style={styles.emptyText}>No restaurants found</Text>
+          </View>
+        )}
 
         {/* Bottom Padding */}
         <View style={{ height: 100 }} />
