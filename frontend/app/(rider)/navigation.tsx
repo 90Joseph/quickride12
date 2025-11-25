@@ -1417,11 +1417,11 @@ const fetchRouteFromDirectionsAPI = async (origin: any, destination: any, map: a
     }
     previousLocationRef.current = userLocation;
     
-    // Smoothly animate marker to new position
+    // Smoothly animate marker to new position (faster animation for more responsiveness)
     const oldPosition = riderMarkerRef.current.getPosition();
     if (oldPosition) {
-      // Animate marker movement over 1 second
-      const steps = 30; // Number of animation steps
+      // Faster animation: 500ms instead of 1 second for more responsive feel
+      const steps = 15; // Fewer steps for faster animation
       const latStep = (newPosition.lat() - oldPosition.lat()) / steps;
       const lngStep = (newPosition.lng() - oldPosition.lng()) / steps;
       
@@ -1434,7 +1434,7 @@ const fetchRouteFromDirectionsAPI = async (origin: any, destination: any, map: a
         
         riderMarkerRef.current.setPosition(interpolatedPosition);
         
-        // Also update rotation
+        // Update marker rotation to match direction
         const icon = riderMarkerRef.current.getIcon();
         if (icon && typeof icon === 'object' && bearing !== 0) {
           riderMarkerRef.current.setIcon({
@@ -1443,13 +1443,101 @@ const fetchRouteFromDirectionsAPI = async (origin: any, destination: any, map: a
           });
         }
         
+        // Update spotlight cone in real-time to follow marker
+        if (directionConeRef.current && bearing !== 0) {
+          const coneSize = 0.001; // Spotlight cone size
+          const coneAngle = 50; // Cone width in degrees
+          
+          const conePath = [];
+          conePath.push(interpolatedPosition); // Start at current rider position
+          
+          // Create arc for the spotlight cone pointing in direction of travel
+          for (let i = -coneAngle / 2; i <= coneAngle / 2; i += 5) {
+            const angle = bearing + i;
+            const point = google.maps.geometry.spherical.computeOffset(
+              interpolatedPosition,
+              coneSize * 111000, // Convert to meters (larger spotlight)
+              angle
+            );
+            conePath.push(point);
+          }
+          conePath.push(interpolatedPosition); // Close the path
+          
+          // Update the spotlight cone path
+          directionConeRef.current.setPaths(conePath);
+        } else if (!directionConeRef.current && bearing !== 0) {
+          // Create spotlight cone if it doesn't exist
+          const coneSize = 0.001;
+          const coneAngle = 50;
+          
+          const conePath = [];
+          conePath.push(interpolatedPosition);
+          
+          for (let i = -coneAngle / 2; i <= coneAngle / 2; i += 5) {
+            const angle = bearing + i;
+            const point = google.maps.geometry.spherical.computeOffset(
+              interpolatedPosition,
+              coneSize * 111000,
+              angle
+            );
+            conePath.push(point);
+          }
+          conePath.push(interpolatedPosition);
+          
+          directionConeRef.current = new google.maps.Polygon({
+            paths: conePath,
+            map: mapInstanceRef.current,
+            fillColor: '#4285F4',
+            fillOpacity: 0.25,
+            strokeColor: '#4285F4',
+            strokeOpacity: 0.4,
+            strokeWeight: 1,
+            zIndex: 999, // Below marker but above map
+          });
+        }
+        
         if (currentStep >= steps) {
           clearInterval(animationInterval);
         }
-      }, 1000 / steps); // Complete animation in ~1 second
+      }, 500 / steps); // Complete animation in 500ms for faster response
     } else {
       // No old position, just set directly
       riderMarkerRef.current.setPosition(newPosition);
+      
+      // Also create/update spotlight cone immediately
+      if (bearing !== 0) {
+        const coneSize = 0.001;
+        const coneAngle = 50;
+        
+        const conePath = [];
+        conePath.push(newPosition);
+        
+        for (let i = -coneAngle / 2; i <= coneAngle / 2; i += 5) {
+          const angle = bearing + i;
+          const point = google.maps.geometry.spherical.computeOffset(
+            newPosition,
+            coneSize * 111000,
+            angle
+          );
+          conePath.push(point);
+        }
+        conePath.push(newPosition);
+        
+        if (directionConeRef.current) {
+          directionConeRef.current.setPaths(conePath);
+        } else {
+          directionConeRef.current = new google.maps.Polygon({
+            paths: conePath,
+            map: mapInstanceRef.current,
+            fillColor: '#4285F4',
+            fillOpacity: 0.25,
+            strokeColor: '#4285F4',
+            strokeOpacity: 0.4,
+            strokeWeight: 1,
+            zIndex: 999,
+          });
+        }
+      }
     }
     
     // Smoothly pan map to follow rider (only if not in active navigation mode)
