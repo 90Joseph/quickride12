@@ -606,6 +606,7 @@ function RiderNavigationContent() {
     
     // Store rider marker in ref so it can be updated later
     riderMarkerRef.current = riderMarker;
+    console.log('✅ [LOADMAP] Rider marker created and stored in ref:', riderMarkerRef.current ? 'SUCCESS' : 'FAILED');
 
     let pickupLocation, dropoffLocation;
 
