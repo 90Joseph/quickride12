@@ -603,6 +603,9 @@ function RiderNavigationContent() {
       title: 'Your Location (Rider)',
       zIndex: 1000,
     });
+    
+    // Store rider marker in ref so it can be updated later
+    riderMarkerRef.current = riderMarker;
 
     let pickupLocation, dropoffLocation;
 
