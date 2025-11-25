@@ -547,14 +547,22 @@ function RiderNavigationContent() {
     // Create arrow icon for rider (navigation arrow)
     const createRiderArrowIcon = () => {
       const svg = `
-        <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40">
+        <svg xmlns="http://www.w3.org/2000/svg" width="80" height="100" viewBox="0 0 80 100">
           <defs>
             <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
               <feDropShadow dx="0" dy="2" stdDeviation="2" flood-opacity="0.3"/>
             </filter>
+            <linearGradient id="spotlightGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" style="stop-color:#4285F4;stop-opacity:0.6" />
+              <stop offset="100%" style="stop-color:#4285F4;stop-opacity:0.05" />
+            </linearGradient>
           </defs>
-          <circle cx="20" cy="20" r="18" fill="#4285F4" filter="url(#shadow)"/>
-          <path d="M 20 8 L 27 25 L 20 22 L 13 25 Z" fill="white"/>
+          <!-- Spotlight cone (direction indicator) -->
+          <path d="M 40 50 L 20 10 L 60 10 Z" fill="url(#spotlightGradient)" opacity="0.5"/>
+          <!-- Main blue circle -->
+          <circle cx="40" cy="50" r="18" fill="#4285F4" filter="url(#shadow)"/>
+          <!-- White arrow pointing up -->
+          <path d="M 40 38 L 47 55 L 40 52 L 33 55 Z" fill="white"/>
         </svg>
       `;
       return 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(svg);
