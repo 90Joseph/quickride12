@@ -1459,6 +1459,29 @@ const fetchRouteFromDirectionsAPI = async (origin: any, destination: any, map: a
       bearing = google.maps.geometry.spherical.computeHeading(prevLatLng, newPosition);
       setCurrentBearing(bearing);
       console.log('🧭 [MARKER UPDATE] Bearing calculated:', bearing);
+      
+      // Calculate distance traveled for progress
+      const distanceTraveled = google.maps.geometry.spherical.computeDistanceBetween(prevLatLng, newPosition);
+      setTraveledDistance((prev) => prev + distanceTraveled);
+      
+      // Update progress bar
+      if (totalRouteDistance > 0) {
+        const progress = (traveledDistance / totalRouteDistance) * 100;
+        setRouteProgress(Math.min(100, progress));
+      }
+      
+      // Update current step for turn-by-turn instructions
+      if (navigationSteps.length > 0) {
+        // Find the current step based on distance
+        let accumulatedDistance = 0;
+        for (const step of navigationSteps) {
+          accumulatedDistance += step.distance.value;
+          if (traveledDistance < accumulatedDistance) {
+            setCurrentStep(step);
+            break;
+          }
+        }
+      }
     }
     previousLocationRef.current = userLocation;
     
