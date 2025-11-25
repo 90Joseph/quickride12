@@ -556,6 +556,11 @@ function RiderNavigationContent() {
     // Store map instance in ref to prevent re-initialization
     mapInstanceRef.current = map;
     setMapLoaded(true);
+    
+    // Disable auto-recenter when user manually drags the map
+    google.maps.event.addListener(map, 'dragstart', () => {
+      setAutoRecenter(false);
+    });
     console.log('✅ Map initialized successfully');
 
     // Create arrow icon for rider (navigation arrow)
