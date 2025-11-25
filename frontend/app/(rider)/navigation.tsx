@@ -219,8 +219,17 @@ function RiderNavigationContent() {
       // Calculate heading
       const heading = google.maps.geometry.spherical.computeHeading(prevPos, currPos);
       
-      // Smooth camera rotation and zoom to rider
-      mapInstanceRef.current.panTo(currentPosition);
+      // Only pan to rider if auto-recenter is enabled
+      if (autoRecenter) {
+        // Mark as programmatic so it doesn't trigger user interaction listeners
+        mapInstanceRef.current.set('programmatic_center', true);
+        mapInstanceRef.current.panTo(currentPosition);
+        setTimeout(() => {
+          if (mapInstanceRef.current) {
+            mapInstanceRef.current.set('programmatic_center', false);
+          }
+        }, 100);
+      }
       
       // Set camera heading (rotation) to face direction of travel
       if (mapInstanceRef.current.setHeading) {
@@ -232,18 +241,20 @@ function RiderNavigationContent() {
         mapInstanceRef.current.setTilt(45); // 45 degree tilt
       }
       
-      // Maintain good zoom level for navigation
-      if (mapInstanceRef.current.getZoom() < 17) {
+      // Maintain good zoom level for navigation (but only if auto-recenter is on)
+      if (autoRecenter && mapInstanceRef.current.getZoom() < 17) {
         mapInstanceRef.current.setZoom(17);
       }
 
-      console.log(`🧭 Camera updated - Heading: ${heading.toFixed(0)}°, Position: ${currentPosition.lat.toFixed(6)}, ${currentPosition.lng.toFixed(6)}`);
+      if (autoRecenter) {
+        console.log(`🧭 Camera updated - Heading: ${heading.toFixed(0)}°, Position: ${currentPosition.lat.toFixed(6)}, ${currentPosition.lng.toFixed(6)}`);
+      }
     }
 
     // Store current location as previous for next update
     previousLocationRef.current = userLocation;
 
-  }, [userLocation?.latitude, userLocation?.longitude, isNavigating]); // Update when location changes
+  }, [userLocation?.latitude, userLocation?.longitude, isNavigating, autoRecenter]); // Update when location changes
 
   // Initialize map only once when job ID changes
   useEffect(() => {
