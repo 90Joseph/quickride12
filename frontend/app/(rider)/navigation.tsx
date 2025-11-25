@@ -174,10 +174,10 @@ function RiderNavigationContent() {
     // Send initial location update
     updateRiderLocation();
     
-    // Send location updates every 5 seconds
+    // Send location updates every 2 seconds for high sensitivity
     const updateInterval = setInterval(() => {
       updateRiderLocation();
-    }, 5000);
+    }, 2000);
     
     return () => clearInterval(updateInterval);
   }, [userLocation?.latitude, userLocation?.longitude]); // Update when location changes
