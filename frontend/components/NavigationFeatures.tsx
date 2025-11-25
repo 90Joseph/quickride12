@@ -328,6 +328,7 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 5,
     zIndex: 10,
+    cursor: 'pointer' as any, // Make it clickable on web
   },
 
   // Alternative Routes Styles
