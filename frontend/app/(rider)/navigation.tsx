@@ -1426,24 +1426,14 @@ const fetchRouteFromDirectionsAPI = async (origin: any, destination: any, map: a
 
   // Update rider marker position in real-time (works for both navigation and idle modes)
   useEffect(() => {
-    console.log('🔄 [MARKER UPDATE] useEffect triggered');
-    console.log('   - userLocation:', userLocation);
-    console.log('   - mapInstanceRef.current:', mapInstanceRef.current ? 'EXISTS' : 'NULL');
-    console.log('   - riderMarkerRef.current:', riderMarkerRef.current ? 'EXISTS' : 'NULL');
-    console.log('   - Platform.OS:', Platform.OS);
-    
     if (!userLocation || !mapInstanceRef.current || !riderMarkerRef.current) {
-      console.log('❌ [MARKER UPDATE] Skipping - missing requirements');
       return;
     }
     
     const google = (window as any).google;
     if (!google || !google.maps) {
-      console.log('❌ [MARKER UPDATE] Google Maps not loaded');
       return;
     }
-    
-    console.log('✅ [MARKER UPDATE] All checks passed - starting marker animation');
     
     const newPosition = new google.maps.LatLng(userLocation.latitude, userLocation.longitude);
     
@@ -1456,7 +1446,6 @@ const fetchRouteFromDirectionsAPI = async (origin: any, destination: any, map: a
       );
       bearing = google.maps.geometry.spherical.computeHeading(prevLatLng, newPosition);
       setCurrentBearing(bearing);
-      console.log('🧭 [MARKER UPDATE] Bearing calculated:', bearing);
       
       // Calculate distance traveled for progress
       const distanceTraveled = google.maps.geometry.spherical.computeDistanceBetween(prevLatLng, newPosition);
@@ -1470,7 +1459,6 @@ const fetchRouteFromDirectionsAPI = async (origin: any, destination: any, map: a
       
       // Update current step for turn-by-turn instructions
       if (navigationSteps.length > 0) {
-        // Find the current step based on distance
         let accumulatedDistance = 0;
         for (const step of navigationSteps) {
           accumulatedDistance += step.distance.value;
@@ -1483,64 +1471,62 @@ const fetchRouteFromDirectionsAPI = async (origin: any, destination: any, map: a
     }
     previousLocationRef.current = userLocation;
     
-    // Smoothly animate marker to new position (faster animation for more responsiveness)
+    // Smoothly animate marker to new position
     const oldPosition = riderMarkerRef.current.getPosition();
     if (oldPosition) {
-      console.log('📍 [MARKER UPDATE] Starting animation from', {
-        oldLat: oldPosition.lat(),
-        oldLng: oldPosition.lng(),
-        newLat: newPosition.lat(),
-        newLng: newPosition.lng()
-      });
-      
-      // Faster animation: 500ms instead of 1 second for more responsive feel
-      const steps = 15; // Fewer steps for faster animation
+      const steps = 15;
       const latStep = (newPosition.lat() - oldPosition.lat()) / steps;
       const lngStep = (newPosition.lng() - oldPosition.lng()) / steps;
       
-      let currentStep = 0;
+      let animStep = 0;
       const animationInterval = setInterval(() => {
-        currentStep++;
-        const interpolatedLat = oldPosition.lat() + (latStep * currentStep);
-        const interpolatedLng = oldPosition.lng() + (lngStep * currentStep);
-        const interpolatedPosition = new google.maps.LatLng(interpolatedLat, interpolatedLng);
+        animStep++;
         
-        riderMarkerRef.current.setPosition(interpolatedPosition);
-        console.log(`🎬 [MARKER UPDATE] Animation step ${currentStep}/${steps}`);
-        
-        // Update marker rotation to match direction
-        const icon = riderMarkerRef.current.getIcon();
-        if (icon && typeof icon === 'object' && bearing !== 0) {
-          riderMarkerRef.current.setIcon({
-            ...icon,
-            rotation: bearing,
-          });
+        if (animStep > steps) {
+          clearInterval(animationInterval);
+          return;
         }
         
-        // Update spotlight cone in real-time to follow marker
+        const interpolatedLat = oldPosition.lat() + (latStep * animStep);
+        const interpolatedLng = oldPosition.lng() + (lngStep * animStep);
+        const interpolatedPosition = new google.maps.LatLng(interpolatedLat, interpolatedLng);
+        
+        if (riderMarkerRef.current) {
+          riderMarkerRef.current.setPosition(interpolatedPosition);
+        }
+        
+        // Update marker rotation
+        if (riderMarkerRef.current) {
+          const icon = riderMarkerRef.current.getIcon();
+          if (icon && typeof icon === 'object' && bearing !== 0) {
+            riderMarkerRef.current.setIcon({
+              ...icon,
+              rotation: bearing,
+            });
+          }
+        }
+        
+        // Update spotlight cone
         if (directionConeRef.current && bearing !== 0) {
-          const coneSize = 0.001; // Spotlight cone size
-          const coneAngle = 50; // Cone width in degrees
+          const coneSize = 0.001;
+          const coneAngle = 50;
           
           const conePath = [];
-          conePath.push(interpolatedPosition); // Start at current rider position
+          conePath.push(interpolatedPosition);
           
-          // Create arc for the spotlight cone pointing in direction of travel
           for (let i = -coneAngle / 2; i <= coneAngle / 2; i += 5) {
             const angle = bearing + i;
             const point = google.maps.geometry.spherical.computeOffset(
               interpolatedPosition,
-              coneSize * 111000, // Convert to meters (larger spotlight)
+              coneSize * 111000,
               angle
             );
             conePath.push(point);
           }
-          conePath.push(interpolatedPosition); // Close the path
+          conePath.push(interpolatedPosition);
           
-          // Update the spotlight cone path
           directionConeRef.current.setPaths(conePath);
-        } else if (!directionConeRef.current && bearing !== 0) {
-          // Create spotlight cone if it doesn't exist
+        } else if (!directionConeRef.current && bearing !== 0 && mapInstanceRef.current) {
           const coneSize = 0.001;
           const coneAngle = 50;
           
@@ -1566,14 +1552,10 @@ const fetchRouteFromDirectionsAPI = async (origin: any, destination: any, map: a
             strokeColor: '#4285F4',
             strokeOpacity: 0.4,
             strokeWeight: 1,
-            zIndex: 999, // Below marker but above map
+            zIndex: 999,
           });
         }
-        
-        if (currentStep >= steps) {
-          clearInterval(animationInterval);
-        }
-      }, 500 / steps); // Complete animation in 500ms for faster response
+      }, 500 / steps);
     } else {
       // No old position, just set directly
       riderMarkerRef.current.setPosition(newPosition);
