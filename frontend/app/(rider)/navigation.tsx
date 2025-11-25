@@ -1896,8 +1896,6 @@ const fetchRouteFromDirectionsAPI = async (origin: any, destination: any, map: a
             <RecenterButton
               onPress={() => {
                 console.log('🎯 Recenter button clicked');
-                console.log('   - mapInstanceRef.current:', mapInstanceRef.current ? 'EXISTS' : 'NULL');
-                console.log('   - userLocation:', userLocation);
                 
                 if (mapInstanceRef.current && userLocation) {
                   const google = (window as any).google;
@@ -1906,15 +1904,12 @@ const fetchRouteFromDirectionsAPI = async (origin: any, destination: any, map: a
                       userLocation.latitude,
                       userLocation.longitude
                     );
-                    console.log('✅ Panning to position:', position.lat(), position.lng());
+                    console.log('✅ Recentering and enabling auto-follow');
                     mapInstanceRef.current.panTo(position);
                     mapInstanceRef.current.setZoom(17);
-                    console.log('✅ Recenter complete');
-                  } else {
-                    console.log('❌ Google Maps API not available');
+                    setAutoRecenter(true); // Re-enable auto-centering
+                    console.log('✅ Recenter complete, auto-follow enabled');
                   }
-                } else {
-                  console.log('❌ Missing mapInstanceRef or userLocation');
                 }
               }}
             />
