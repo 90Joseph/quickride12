@@ -217,19 +217,31 @@ frontend:
              - Marker Size: scaledSize(80, 100) matches SVG dimensions
              - Anchor Point: (40, 50) centered on blue circle
           
+          3. ✅ Real-Time Marker Movement (Lines 605-608, 1399-1461):
+             - Marker now moves smoothly as rider travels
+             - 30-step animation over 1 second for smooth gliding
+             - Automatic rotation based on direction of travel
+             - Map auto-pans to follow rider position
+             - Updates every 5 seconds with location changes
+             - Mimics native Google Maps live navigation behavior
+          
           RESULT:
           - Route lines display with thick blue Google Maps styling
           - Rider marker shows blue arrow with forward spotlight cone
-          - Both features closely mimic native Google Maps navigation experience
+          - Marker smoothly animates to new positions in real-time
+          - Map follows rider automatically like Google Maps navigation
+          - All features closely mimic native Google Maps navigation experience
           
           FILES MODIFIED:
           - /app/frontend/app/(rider)/navigation.tsx
             * createRiderArrowIcon() function (lines 548-569)
-            * Marker configuration (lines 595-605)
+            * Marker configuration with ref storage (lines 595-608)
             * fetchRouteFromDirectionsAPI polylineOptions (lines 825-831)
+            * Real-time marker update useEffect (lines 1399-1461)
           
           DOCUMENTATION:
-          - Created /app/GOOGLE_MAPS_NATIVE_STYLING_UPDATE.md with full implementation details
+          - Created /app/GOOGLE_MAPS_NATIVE_STYLING_UPDATE.md with styling details
+          - Created /app/REALTIME_MARKER_MOVEMENT.md with movement implementation details
 
   - task: "Rider Navigation Screen with Live Directions"
     implemented: true
