@@ -1597,11 +1597,11 @@ const fetchRouteFromDirectionsAPI = async (origin: any, destination: any, map: a
       }
     }
     
-    // Smoothly pan map to follow rider (only if not in active navigation mode)
-    if (!isNavigating && mapInstanceRef.current) {
+    // Smoothly pan map to follow rider only if auto-recenter is enabled
+    if (autoRecenter && mapInstanceRef.current) {
       mapInstanceRef.current.panTo(newPosition);
     }
-  }, [userLocation, currentBearing, isNavigating]);
+  }, [userLocation, currentBearing, autoRecenter]);
 
   // Initialize idle map (no active job) - MOVED TO TOP TO FIX HOOKS ERROR
   useEffect(() => {
