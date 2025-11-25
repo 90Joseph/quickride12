@@ -1435,6 +1435,13 @@ const fetchRouteFromDirectionsAPI = async (origin: any, destination: any, map: a
     // Smoothly animate marker to new position (faster animation for more responsiveness)
     const oldPosition = riderMarkerRef.current.getPosition();
     if (oldPosition) {
+      console.log('📍 [MARKER UPDATE] Starting animation from', {
+        oldLat: oldPosition.lat(),
+        oldLng: oldPosition.lng(),
+        newLat: newPosition.lat(),
+        newLng: newPosition.lng()
+      });
+      
       // Faster animation: 500ms instead of 1 second for more responsive feel
       const steps = 15; // Fewer steps for faster animation
       const latStep = (newPosition.lat() - oldPosition.lat()) / steps;
@@ -1448,6 +1455,7 @@ const fetchRouteFromDirectionsAPI = async (origin: any, destination: any, map: a
         const interpolatedPosition = new google.maps.LatLng(interpolatedLat, interpolatedLng);
         
         riderMarkerRef.current.setPosition(interpolatedPosition);
+        console.log(`🎬 [MARKER UPDATE] Animation step ${currentStep}/${steps}`);
         
         // Update marker rotation to match direction
         const icon = riderMarkerRef.current.getIcon();
