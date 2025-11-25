@@ -86,10 +86,23 @@ interface RecenterButtonProps {
 }
 
 export const RecenterButton: React.FC<RecenterButtonProps> = ({ onPress }) => {
+  const handlePress = () => {
+    console.log('🔘 RecenterButton component clicked!');
+    if (onPress) {
+      onPress();
+    } else {
+      console.log('❌ No onPress handler provided to RecenterButton');
+    }
+  };
+
   return (
-    <TouchableOpacity style={styles.recenterButton} onPress={onPress}>
+    <Pressable 
+      style={styles.recenterButton} 
+      onPress={handlePress}
+      onPressIn={() => console.log('👆 Button press detected')}
+    >
       <Ionicons name="locate" size={24} color="#4285F4" />
-    </TouchableOpacity>
+    </Pressable>
   );
 };
 
