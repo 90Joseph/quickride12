@@ -136,11 +136,6 @@ function RiderNavigationContent() {
   const riderMarkerRef = useRef<any>(null);
   const directionConeRef = useRef<any>(null);
   const previousLocationRef = useRef<any>(null); // Store previous location for bearing calculation
-  
-  // Debug: Log when riderMarkerRef changes
-  useEffect(() => {
-    console.log('🎯 [DEBUG] riderMarkerRef changed:', riderMarkerRef.current ? 'EXISTS' : 'NULL');
-  }, [riderMarkerRef.current]);
   const [showLocationEditor, setShowLocationEditor] = useState(false);
   const [riderLocationAddress, setRiderLocationAddress] = useState('Fetching location...');
   const [showLocationSearchModal, setShowLocationSearchModal] = useState(false);
