@@ -2040,9 +2040,16 @@ const fetchRouteFromDirectionsAPI = async (origin: any, destination: any, map: a
             </View>
             <TouchableOpacity
               style={styles.congratsButton}
-              onPress={() => {
-                console.log('👆 Continue button clicked - hiding congrats');
+              onPress={async () => {
+                console.log('👆 Continue button clicked - hiding congrats and clearing job');
                 setShowCongrats(false);
+                setCurrentJob(null); // Clear the completed job
+                setCompletedDeliveryFee('0'); // Reset delivery fee
+                
+                // Fetch new nearby orders
+                console.log('🔍 Fetching nearby orders for next delivery...');
+                await fetchCurrentJob(); // This will update currentJob state
+                await fetchNearbyOrders(); // Get new nearby orders
               }}
             >
               <Text style={styles.congratsButtonText}>Continue</Text>
