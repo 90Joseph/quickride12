@@ -829,11 +829,12 @@ const fetchRouteFromDirectionsAPI = async (origin: any, destination: any, map: a
       suppressMarkers: true, // We'll keep our custom markers
       polylineOptions: {
         strokeColor: routeColor, // Use provided color (blue for route 1, green for route 2)
-        strokeWeight: 8, // Thick line like Google Maps navigation
+        strokeWeight: 8, // Thick line like Google Maps navigation (pixels, won't scale with zoom)
         strokeOpacity: 1.0, // Full opacity
         zIndex: 1000, // High z-index to ensure visibility
         geodesic: true, // Follow earth's curvature
       },
+      preserveViewport: true, // Don't auto-zoom/pan when route is rendered
       preserveViewport: true, // Keep current viewport
     });
 
