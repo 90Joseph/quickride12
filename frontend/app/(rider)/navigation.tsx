@@ -24,9 +24,7 @@ import api from '../../utils/api';
 import { useAuthStore } from '../../store/authStore';
 import {
   ETADisplay,
-  TurnByTurnInstructions,
   RecenterButton,
-  AlternativeRoutes,
   LaneGuidance,
   ProgressBar,
 } from '../../components/NavigationFeatures';
