@@ -149,12 +149,7 @@ function RiderNavigationContent() {
   const [routeProgress, setRouteProgress] = useState<number>(0);
   const [totalRouteDistance, setTotalRouteDistance] = useState<number>(0);
   const [traveledDistance, setTraveledDistance] = useState<number>(0);
-  const [autoRecenter, setAutoRecenter] = useState<boolean>(true); // Track if map should auto-follow rider
-  
-  // Debug: Log when autoRecenter changes
-  useEffect(() => {
-    console.log('🎚️ autoRecenter state changed to:', autoRecenter);
-  }, [autoRecenter]);
+  const autoRecenterRef = useRef<boolean>(true); // Track if map should auto-follow rider (using ref for immediate updates)
   const [showLocationEditor, setShowLocationEditor] = useState(false);
   const [riderLocationAddress, setRiderLocationAddress] = useState('Fetching location...');
   const [showLocationSearchModal, setShowLocationSearchModal] = useState(false);
