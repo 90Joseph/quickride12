@@ -591,14 +591,14 @@ function RiderNavigationContent() {
       return 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(svg);
     };
 
-    // Current location marker (rider) - Arrow icon
+    // Current location marker (rider) - Arrow icon with spotlight
     const riderMarker = new google.maps.Marker({
       position: userPosition,
       map,
       icon: {
         url: createRiderArrowIcon(),
-        scaledSize: new google.maps.Size(40, 40),
-        anchor: new google.maps.Point(20, 20),
+        scaledSize: new google.maps.Size(80, 100),
+        anchor: new google.maps.Point(40, 50), // Center of the circle
       },
       title: 'Your Location (Rider)',
       zIndex: 1000,
