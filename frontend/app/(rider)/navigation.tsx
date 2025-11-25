@@ -1636,7 +1636,7 @@ const fetchRouteFromDirectionsAPI = async (origin: any, destination: any, map: a
     }
     
     // Smoothly pan map to follow rider only if auto-recenter is enabled
-    if (autoRecenter && mapInstanceRef.current) {
+    if (autoRecenterRef.current && mapInstanceRef.current) {
       // Mark this as programmatic pan so it doesn't trigger the center_changed listener
       mapInstanceRef.current.set('programmatic_center', true);
       mapInstanceRef.current.panTo(newPosition);
@@ -1647,7 +1647,7 @@ const fetchRouteFromDirectionsAPI = async (origin: any, destination: any, map: a
         }
       }, 100);
     }
-  }, [userLocation, currentBearing, autoRecenter]);
+  }, [userLocation, currentBearing]);
 
   // Initialize idle map (no active job) - MOVED TO TOP TO FIX HOOKS ERROR
   useEffect(() => {
