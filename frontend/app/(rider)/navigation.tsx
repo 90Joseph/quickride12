@@ -2024,8 +2024,6 @@ const fetchRouteFromDirectionsAPI = async (origin: any, destination: any, map: a
       {currentScreen}
       {showCongrats && (
         <View style={styles.congratsOverlay}>
-          {console.log('🎉🎉🎉 RENDERING CONGRATS MODAL - showCongrats is TRUE 🎉🎉🎉')}
-          {console.log('Completed delivery fee:', completedDeliveryFee)}
           <View style={styles.congratsCard}>
             <View style={styles.congratsIconContainer}>
               <Ionicons name="checkmark-circle" size={80} color="#4CAF50" />
