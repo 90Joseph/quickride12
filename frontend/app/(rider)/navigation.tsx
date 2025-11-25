@@ -1867,6 +1867,70 @@ const fetchRouteFromDirectionsAPI = async (origin: any, destination: any, map: a
           </View>
         )}
 
+        {/* Modern Google Maps Navigation Features */}
+        {Platform.OS === 'web' && (
+          <>
+            {/* 13. Progress Bar */}
+            <ProgressBar progress={routeProgress} />
+
+            {/* 1. ETA & Distance Display */}
+            <ETADisplay 
+              eta={etaToDestination || 'Calculating...'} 
+              distance={distanceToDestination || 'Calculating...'}
+            />
+
+            {/* 2. Turn-by-Turn Instructions */}
+            {currentStep && (
+              <TurnByTurnInstructions currentStep={currentStep} />
+            )}
+
+            {/* 9. Lane Guidance */}
+            {currentStep?.lanes && (
+              <LaneGuidance laneInfo={currentStep.lanes} />
+            )}
+
+            {/* 8. Alternative Routes */}
+            <AlternativeRoutes
+              routes={alternativeRoutes}
+              selectedIndex={selectedRouteIndex}
+              onSelectRoute={(index) => {
+                setSelectedRouteIndex(index);
+                // Reload route with selected alternative
+                const google = (window as any).google;
+                if (google && mapInstanceRef.current && currentJob) {
+                  const { restaurant_location, customer_location } = currentJob.data;
+                  if (restaurant_location && customer_location) {
+                    fetchRouteFromDirectionsAPI(
+                      { lat: userLocation.latitude, lng: userLocation.longitude },
+                      orderStatus === 'picked_up' 
+                        ? { lat: customer_location.latitude, lng: customer_location.longitude }
+                        : { lat: restaurant_location.latitude, lng: restaurant_location.longitude },
+                      mapInstanceRef.current
+                    );
+                  }
+                }
+              }}
+            />
+
+            {/* 6. Recenter Button */}
+            <RecenterButton
+              onPress={() => {
+                if (mapInstanceRef.current && userLocation) {
+                  const google = (window as any).google;
+                  if (google) {
+                    const position = new google.maps.LatLng(
+                      userLocation.latitude,
+                      userLocation.longitude
+                    );
+                    mapInstanceRef.current.panTo(position);
+                    mapInstanceRef.current.setZoom(17);
+                  }
+                }
+              }}
+            />
+          </>
+        )}
+
         {/* Draggable Bottom Sheet for Active Navigation */}
         <BottomSheet
           ref={bottomSheetRef}
