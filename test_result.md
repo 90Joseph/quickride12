@@ -1082,7 +1082,7 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Google Maps Native Styling for Rider Navigation"
+    - "Google Maps Zoom Scaling Issue - Marker and Polyline"
     - "Real-time Marker Movement with Spotlight"
   stuck_tasks:
     - "Map Verification Modal in Checkout"
