@@ -1398,10 +1398,24 @@ const fetchRouteFromDirectionsAPI = async (origin: any, destination: any, map: a
 
   // Update rider marker position in real-time (works for both navigation and idle modes)
   useEffect(() => {
-    if (!userLocation || !mapInstanceRef.current || !riderMarkerRef.current) return;
+    console.log('🔄 [MARKER UPDATE] useEffect triggered');
+    console.log('   - userLocation:', userLocation);
+    console.log('   - mapInstanceRef.current:', mapInstanceRef.current ? 'EXISTS' : 'NULL');
+    console.log('   - riderMarkerRef.current:', riderMarkerRef.current ? 'EXISTS' : 'NULL');
+    console.log('   - Platform.OS:', Platform.OS);
+    
+    if (!userLocation || !mapInstanceRef.current || !riderMarkerRef.current) {
+      console.log('❌ [MARKER UPDATE] Skipping - missing requirements');
+      return;
+    }
     
     const google = (window as any).google;
-    if (!google || !google.maps) return;
+    if (!google || !google.maps) {
+      console.log('❌ [MARKER UPDATE] Google Maps not loaded');
+      return;
+    }
+    
+    console.log('✅ [MARKER UPDATE] All checks passed - starting marker animation');
     
     const newPosition = new google.maps.LatLng(userLocation.latitude, userLocation.longitude);
     
@@ -1414,6 +1428,7 @@ const fetchRouteFromDirectionsAPI = async (origin: any, destination: any, map: a
       );
       bearing = google.maps.geometry.spherical.computeHeading(prevLatLng, newPosition);
       setCurrentBearing(bearing);
+      console.log('🧭 [MARKER UPDATE] Bearing calculated:', bearing);
     }
     previousLocationRef.current = userLocation;
     
