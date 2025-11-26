@@ -163,21 +163,55 @@ function RiderNavigationContent() {
     }
 
     fetchCurrentJob();
-    getUserLocation();
     
     // Refresh job every 10 seconds
     const jobInterval = setInterval(() => {
       fetchCurrentJob();
     }, 10000);
     
-    // Update location every 2 seconds for high sensitivity (like Google Maps)
-    const locationInterval = setInterval(() => {
-      getUserLocation();
-    }, 2000);
+    // Start continuous GPS tracking with watchPosition for real-time updates
+    let watchId: number | null = null;
+    
+    if (typeof navigator !== 'undefined' && navigator.geolocation) {
+      console.log('🛰️ Starting continuous GPS tracking (real-time)...');
+      
+      watchId = navigator.geolocation.watchPosition(
+        (position) => {
+          const location = {
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+            speed: position.coords.speed, // Speed in m/s
+            heading: position.coords.heading, // Direction in degrees
+            accuracy: position.coords.accuracy, // Accuracy in meters
+          };
+          
+          console.log('📍 REALTIME GPS:', {
+            lat: location.latitude.toFixed(6),
+            lng: location.longitude.toFixed(6),
+            speed: location.speed ? `${(location.speed * 3.6).toFixed(1)} km/h` : 'N/A',
+            heading: location.heading ? `${location.heading.toFixed(0)}°` : 'N/A',
+            accuracy: `${location.accuracy.toFixed(0)}m`
+          });
+          
+          setUserLocation(location);
+        },
+        (error) => {
+          console.error('❌ GPS Error:', error.message);
+        },
+        {
+          enableHighAccuracy: true, // Use GPS, not network
+          maximumAge: 0, // Don't use cached positions
+          timeout: 5000, // Timeout for each update
+        }
+      );
+    }
     
     return () => {
       clearInterval(jobInterval);
-      clearInterval(locationInterval);
+      if (watchId !== null) {
+        console.log('🛑 Stopping GPS tracking');
+        navigator.geolocation.clearWatch(watchId);
+      }
     };
   }, [user, authLoading]); // Depend on user and authLoading
 
