@@ -287,11 +287,19 @@ function RiderNavigationContent() {
           const location = {
             latitude: position.coords.latitude,
             longitude: position.coords.longitude,
+            speed: position.coords.speed, // Speed in m/s
+            heading: position.coords.heading, // Direction in degrees
           };
+          console.log('📍 GPS Update:', {
+            lat: location.latitude.toFixed(6),
+            lng: location.longitude.toFixed(6),
+            speed: location.speed ? `${(location.speed * 3.6).toFixed(1)} km/h` : 'N/A',
+            heading: location.heading ? `${location.heading.toFixed(0)}°` : 'N/A'
+          });
           setUserLocation(location);
         },
         (error) => {
-          console.error('❌ Error getting location:', error);
+          console.error('❌ Error getting location:', error.message);
           // Fallback to real location in Manila (Makati CBD)
           const fallbackLocation = {
             latitude: 14.5547,
@@ -301,9 +309,9 @@ function RiderNavigationContent() {
           setUserLocation(fallbackLocation);
         },
         {
-          enableHighAccuracy: true,
+          enableHighAccuracy: true, // Use GPS, not network location
           timeout: 10000,
-          maximumAge: 0
+          maximumAge: 0 // Always get fresh location, no caching
         }
       );
     } else {
