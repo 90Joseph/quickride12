@@ -142,9 +142,8 @@ function RiderNavigationContent() {
   const riderMarkerRef = useRef<any>(null);
   const directionConeRef = useRef<any>(null);
   const previousLocationRef = useRef<any>(null); // Store previous location for bearing calculation
-  const traveledPathRef = useRef<any[]>([]); // Store actual GPS coordinates traveled
-  const traveledPolylineRef = useRef<any>(null); // The highlighted polyline showing actual path
-  const plannedPolylineRef = useRef<any>(null); // The grey planned route polyline
+  const currentRoutePathRef = useRef<any[]>([]); // Store the current planned route path for deviation detection
+  const lastRerouteTimeRef = useRef<number>(0); // Track when we last recalculated to avoid too frequent updates
   
   // Modern Google Maps features
   const [alternativeRoutes, setAlternativeRoutes] = useState<any[]>([]);
