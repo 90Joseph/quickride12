@@ -914,18 +914,17 @@ const fetchRouteFromDirectionsAPI = async (origin: any, destination: any, map: a
 
     const directionsService = new google.maps.DirectionsService();
     
-    // Create renderer with Google Maps navigation styling (thick blue line)
+    // Create renderer with grey/faded styling for planned route (will be behind the traveled path)
     const directionsRenderer = new google.maps.DirectionsRenderer({
       suppressMarkers: true, // We'll keep our custom markers
       polylineOptions: {
-        strokeColor: routeColor, // Use provided color (blue for route 1, green for route 2)
-        strokeWeight: 8, // Thick line like Google Maps navigation (pixels, won't scale with zoom)
-        strokeOpacity: 1.0, // Full opacity
-        zIndex: 1000, // High z-index to ensure visibility
+        strokeColor: '#BDBDBD', // Grey color for planned route
+        strokeWeight: 6, // Slightly thinner than traveled path
+        strokeOpacity: 0.6, // Semi-transparent
+        zIndex: 1000, // Below the traveled path (2000)
         geodesic: true, // Follow earth's curvature
       },
       preserveViewport: true, // Don't auto-zoom/pan when route is rendered
-      preserveViewport: true, // Keep current viewport
     });
 
     console.log('✅ DirectionsService and DirectionsRenderer created');
