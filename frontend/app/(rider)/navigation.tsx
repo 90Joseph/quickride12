@@ -1546,26 +1546,40 @@ const fetchRouteFromDirectionsAPI = async (origin: any, destination: any, map: a
     }
     previousLocationRef.current = userLocation;
     
-    // Add current position to traveled path
-    traveledPathRef.current.push(newPosition);
-    console.log(`🛣️ Traveled path length: ${traveledPathRef.current.length} points`);
-    
-    // Update or create the traveled polyline (highlighted blue line)
-    if (traveledPolylineRef.current) {
-      // Update existing polyline with new path
-      traveledPolylineRef.current.setPath(traveledPathRef.current);
-    } else {
-      // Create new traveled polyline
-      traveledPolylineRef.current = new google.maps.Polyline({
-        path: traveledPathRef.current,
-        map: mapInstanceRef.current,
-        strokeColor: '#4285F4', // Google Maps blue
-        strokeOpacity: 1.0,
-        strokeWeight: 8, // Thick highlighted line
-        zIndex: 2000, // Above everything else
-        geodesic: true,
-      });
-      console.log('✅ Created traveled path polyline');
+    // Check if rider has deviated from the planned route (Google Maps rerouting logic)
+    if (currentRoutePathRef.current.length > 0 && mapInstanceRef.current) {
+      const now = Date.now();
+      const timeSinceLastReroute = now - lastRerouteTimeRef.current;
+      
+      // Check if rider is far from the route (more than 50 meters)
+      let closestDistance = Infinity;
+      for (const routePoint of currentRoutePathRef.current) {
+        const distance = google.maps.geometry.spherical.computeDistanceBetween(newPosition, routePoint);
+        if (distance < closestDistance) {
+          closestDistance = distance;
+        }
+      }
+      
+      // If more than 50m off route and at least 10 seconds since last reroute, recalculate
+      if (closestDistance > 50 && timeSinceLastReroute > 10000) {
+        console.log(`🔄 OFF ROUTE! Distance from route: ${closestDistance.toFixed(0)}m - Recalculating...`);
+        lastRerouteTimeRef.current = now;
+        
+        // Recalculate route from current position to destination
+        if (currentJob && currentJob.data) {
+          const { restaurant_location, customer_location } = currentJob.data;
+          const destination = orderStatus === 'picked_up' 
+            ? { lat: customer_location.latitude, lng: customer_location.longitude }
+            : { lat: restaurant_location.latitude, lng: restaurant_location.longitude };
+          
+          // Recalculate route
+          fetchRouteFromDirectionsAPI(
+            { lat: userLocation.latitude, lng: userLocation.longitude },
+            destination,
+            mapInstanceRef.current
+          );
+        }
+      }
     }
     
     // Smoothly animate marker to new position
