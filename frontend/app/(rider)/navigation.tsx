@@ -680,23 +680,27 @@ function RiderNavigationContent() {
       return 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(svg);
     };
 
-    // Current location marker (rider) - Arrow icon with spotlight
+    // Create rider marker using Google Maps arrow symbol for proper rotation
     const riderMarker = new google.maps.Marker({
       position: userPosition,
       map,
       icon: {
-        url: createRiderArrowIcon(),
-        scaledSize: new google.maps.Size(80, 100),
-        anchor: new google.maps.Point(40, 50), // Center of the circle
+        path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
+        scale: 6,
+        fillColor: '#4285F4',
+        fillOpacity: 1.0,
+        strokeColor: '#FFFFFF',
+        strokeWeight: 2,
+        rotation: 0, // Will be updated with GPS heading
       },
       title: 'Your Location (Rider)',
       zIndex: 1000,
-      optimized: false, // Prevent marker from scaling with zoom
+      optimized: false,
     });
     
     // Store rider marker in ref so it can be updated later
     riderMarkerRef.current = riderMarker;
-    console.log('✅ [LOADMAP] Rider marker created and stored in ref:', riderMarkerRef.current ? 'SUCCESS' : 'FAILED');
+    console.log('✅ [LOADMAP] Rider marker created with Google Maps arrow symbol');
 
     let pickupLocation, dropoffLocation;
 
