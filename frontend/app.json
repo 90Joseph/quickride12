@@ -18,7 +18,13 @@
       "bundleIdentifier": "com.quickride.ph",
       "infoPlist": {
         "NSLocationWhenInUseUsageDescription": "QuickRide needs your location to show nearby restaurants and track deliveries.",
-        "NSCameraUsageDescription": "QuickRide needs camera access to upload restaurant photos."
+        "NSLocationAlwaysAndWhenInUseUsageDescription": "QuickRide needs continuous access to your location to track your delivery route and provide accurate navigation.",
+        "NSLocationAlwaysUsageDescription": "QuickRide needs continuous access to your location to track your delivery route and provide accurate navigation.",
+        "NSCameraUsageDescription": "QuickRide needs camera access to upload restaurant photos.",
+        "UIBackgroundModes": ["location"]
+      },
+      "config": {
+        "googleMapsApiKey": "AIzaSyA0m1oRlXLQWjxacqjEJ6zJW3WvmOWvQkQ"
       }
     },
     "android": {
