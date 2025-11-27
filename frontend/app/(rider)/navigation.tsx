@@ -2263,13 +2263,27 @@ const fetchRouteFromDirectionsAPI = async (origin: any, destination: any, map: a
             <TouchableOpacity
               style={styles.congratsButton}
               onPress={async () => {
-                console.log('👆 Continue button clicked - clearing job and returning to idle');
+                console.log('👆 Continue button clicked - clearing job and routes');
+                
+                // EXPLICIT route clearing as failsafe
+                if (directionsRenderersRef.current?.length > 0) {
+                  console.log('🗑️ Explicitly clearing routes from Continue button');
+                  directionsRenderersRef.current.forEach(renderer => {
+                    if (renderer) {
+                      renderer.setMap(null);
+                    }
+                  });
+                  directionsRenderersRef.current = [];
+                }
+                
                 setShowCongrats(false);
                 setCurrentJob(null); // Clear the completed job
                 setCompletedDeliveryFee('0'); // Reset delivery fee
                 
-                // DO NOT fetch current job again - it will just reload the completed one
-                // Just fetch nearby orders to show available deliveries
+                // Wait 100ms for useEffect to execute before fetching
+                await new Promise(resolve => setTimeout(resolve, 100));
+                
+                // Fetch nearby orders to show available deliveries
                 console.log('🔍 Fetching nearby orders...');
                 await fetchNearbyOrders();
               }}
