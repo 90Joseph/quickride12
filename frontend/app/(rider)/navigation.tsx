@@ -176,7 +176,7 @@ function RiderNavigationContent() {
     let watchId: number | null = null;
     
     if (typeof navigator !== 'undefined' && navigator.geolocation) {
-      console.log('🛰️ Starting continuous GPS tracking (real-time)...');
+      console.log('🛰️ Starting HIGH-FREQUENCY GPS tracking...');
       
       watchId = navigator.geolocation.watchPosition(
         (position) => {
@@ -186,9 +186,10 @@ function RiderNavigationContent() {
             speed: position.coords.speed, // Speed in m/s
             heading: position.coords.heading, // Direction in degrees
             accuracy: position.coords.accuracy, // Accuracy in meters
+            timestamp: position.timestamp, // GPS timestamp
           };
           
-          console.log('📍 REALTIME GPS:', {
+          console.log('📍 GPS:', {
             lat: location.latitude.toFixed(6),
             lng: location.longitude.toFixed(6),
             speed: location.speed ? `${(location.speed * 3.6).toFixed(1)} km/h` : 'N/A',
@@ -202,9 +203,10 @@ function RiderNavigationContent() {
           console.error('❌ GPS Error:', error.message);
         },
         {
-          enableHighAccuracy: true, // Use GPS, not network
-          maximumAge: 0, // Don't use cached positions
-          timeout: 5000, // Timeout for each update
+          enableHighAccuracy: true, // Force GPS (not WiFi/cell tower)
+          maximumAge: 0, // NEVER use cached position - always fresh
+          timeout: 10000, // Allow 10 seconds for GPS lock
+          // These settings force the browser to use GPS at highest frequency
         }
       );
     }
