@@ -2263,15 +2263,15 @@ const fetchRouteFromDirectionsAPI = async (origin: any, destination: any, map: a
             <TouchableOpacity
               style={styles.congratsButton}
               onPress={async () => {
-                console.log('👆 Continue button clicked - hiding congrats and clearing job');
+                console.log('👆 Continue button clicked - clearing job and returning to idle');
                 setShowCongrats(false);
                 setCurrentJob(null); // Clear the completed job
                 setCompletedDeliveryFee('0'); // Reset delivery fee
                 
-                // Fetch new nearby orders
-                console.log('🔍 Fetching nearby orders for next delivery...');
-                await fetchCurrentJob(); // This will update currentJob state
-                await fetchNearbyOrders(); // Get new nearby orders
+                // DO NOT fetch current job again - it will just reload the completed one
+                // Just fetch nearby orders to show available deliveries
+                console.log('🔍 Fetching nearby orders...');
+                await fetchNearbyOrders();
               }}
             >
               <Text style={styles.congratsButtonText}>Continue</Text>
