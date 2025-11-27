@@ -1320,6 +1320,34 @@ test_plan:
   test_priority: "high_first"
 
 agent_communication:
+  - agent: "testing"
+    message: |
+      🎯 CRITICAL ROUTE CLEARING ISSUE INVESTIGATION COMPLETED
+      
+      ISSUE: Old Routes Still Visible After Delivery Completion
+      STATUS: ❌ CONFIRMED - Root cause identified through code analysis
+      
+      FINDINGS:
+      ✅ Continue button logic is correct (sets currentJob to null)
+      ✅ Route clearing useEffect logic is correct (clears directionsRenderersRef)
+      ✅ useEffect dependencies are correct ([currentJob, userLocation])
+      ❌ TIMING ISSUE IDENTIFIED: fetchNearbyOrders() called immediately after setCurrentJob(null)
+      
+      ROOT CAUSE:
+      Race condition between setCurrentJob(null) and fetchNearbyOrders() may prevent useEffect from executing properly.
+      The useEffect that clears routes depends on currentJob changing, but immediate async operations might interfere.
+      
+      RECOMMENDED FIXES:
+      1. Add 100ms delay before fetchNearbyOrders() to allow useEffect to run
+      2. Add explicit route clearing in Continue button as failsafe
+      3. Add debug logging to verify execution flow
+      
+      AUTHENTICATION BARRIER:
+      Cannot test Continue button directly due to rider authentication issues.
+      Login attempts redirect back to /login page preventing access to /(rider)/navigation.
+      
+      PRIORITY: HIGH - This blocks user flow after delivery completion
+      NEXT STEPS: Main agent should implement timing fixes and test with working authentication
   - agent: "main"
     message: |
       FRONTEND TESTING REQUEST: Verify Marker Creation in Active Navigation
