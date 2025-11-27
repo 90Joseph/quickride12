@@ -1528,11 +1528,17 @@ const fetchRouteFromDirectionsAPI = async (origin: any, destination: any, map: a
         previousLocationRef.current.latitude,
         previousLocationRef.current.longitude
       );
-      bearing = google.maps.geometry.spherical.computeHeading(prevLatLng, newPosition);
-      setCurrentBearing(bearing);
       
-      // Calculate distance traveled for progress
+      // Calculate distance between positions to check if rider actually moved
       const distanceTraveled = google.maps.geometry.spherical.computeDistanceBetween(prevLatLng, newPosition);
+      
+      // Only calculate new bearing if rider moved more than 1 meter (reduces jitter when stationary)
+      if (distanceTraveled > 1) {
+        bearing = google.maps.geometry.spherical.computeHeading(prevLatLng, newPosition);
+        setCurrentBearing(bearing);
+        console.log(`🧭 Bearing updated: ${bearing.toFixed(1)}° (moved ${distanceTraveled.toFixed(1)}m)`);
+      }
+      
       setTraveledDistance((prev) => prev + distanceTraveled);
       
       // Update progress bar
