@@ -1641,17 +1641,16 @@ const fetchRouteFromDirectionsAPI = async (origin: any, destination: any, map: a
       }
     }
     
-    // Smoothly pan map to follow rider only if auto-recenter is enabled
+    // INSTANT map centering - no delay for maximum speed GPS tracking
     if (autoRecenterRef.current && mapInstanceRef.current) {
       // Mark this as programmatic pan so it doesn't trigger the center_changed listener
       mapInstanceRef.current.set('programmatic_center', true);
-      mapInstanceRef.current.panTo(newPosition);
-      // Reset flag after a short delay
-      setTimeout(() => {
-        if (mapInstanceRef.current) {
-          mapInstanceRef.current.set('programmatic_center', false);
-        }
-      }, 100);
+      
+      // Use setCenter for INSTANT positioning (no animation delay like panTo)
+      mapInstanceRef.current.setCenter(newPosition);
+      
+      // Reset flag immediately
+      mapInstanceRef.current.set('programmatic_center', false);
     }
   }, [userLocation, currentBearing]);
 
