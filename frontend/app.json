@@ -36,9 +36,15 @@
       "permissions": [
         "ACCESS_FINE_LOCATION",
         "ACCESS_COARSE_LOCATION",
+        "ACCESS_BACKGROUND_LOCATION",
         "CAMERA"
       ],
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyA0m1oRlXLQWjxacqjEJ6zJW3WvmOWvQkQ"
+        }
+      }
     },
     "web": {
       "bundler": "metro",
