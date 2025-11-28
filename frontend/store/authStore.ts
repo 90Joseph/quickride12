@@ -1,23 +1,31 @@
 import { create } from 'zustand';
 import { Platform } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-// Platform-specific storage - using localStorage for web compatibility
+// Platform-specific storage - using AsyncStorage for mobile, localStorage for web
 const storage = {
   async getItem(key: string): Promise<string | null> {
-    if (typeof window !== 'undefined' && window.localStorage) {
+    if (Platform.OS === 'web' && typeof window !== 'undefined' && window.localStorage) {
       return localStorage.getItem(key);
     }
-    return null;
+    // Use AsyncStorage for native platforms
+    return await AsyncStorage.getItem(key);
   },
   async setItem(key: string, value: string): Promise<void> {
-    if (typeof window !== 'undefined' && window.localStorage) {
+    if (Platform.OS === 'web' && typeof window !== 'undefined' && window.localStorage) {
       localStorage.setItem(key, value);
+      return;
     }
+    // Use AsyncStorage for native platforms
+    await AsyncStorage.setItem(key, value);
   },
   async removeItem(key: string): Promise<void> {
-    if (typeof window !== 'undefined' && window.localStorage) {
+    if (Platform.OS === 'web' && typeof window !== 'undefined' && window.localStorage) {
       localStorage.removeItem(key);
+      return;
     }
+    // Use AsyncStorage for native platforms
+    await AsyncStorage.removeItem(key);
   },
 };
 
