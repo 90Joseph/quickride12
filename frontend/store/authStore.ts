@@ -1,5 +1,4 @@
 import { create } from 'zustand';
-import { Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Platform-specific storage - using AsyncStorage for mobile, localStorage for web
