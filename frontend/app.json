@@ -21,7 +21,9 @@
         "NSLocationAlwaysAndWhenInUseUsageDescription": "QuickRide needs continuous access to your location to track your delivery route and provide accurate navigation.",
         "NSLocationAlwaysUsageDescription": "QuickRide needs continuous access to your location to track your delivery route and provide accurate navigation.",
         "NSCameraUsageDescription": "QuickRide needs camera access to upload restaurant photos.",
-        "UIBackgroundModes": ["location"]
+        "UIBackgroundModes": [
+          "location"
+        ]
       },
       "config": {
         "googleMapsApiKey": "AIzaSyA0m1oRlXLQWjxacqjEJ6zJW3WvmOWvQkQ"
@@ -37,7 +39,12 @@
         "ACCESS_FINE_LOCATION",
         "ACCESS_COARSE_LOCATION",
         "ACCESS_BACKGROUND_LOCATION",
-        "CAMERA"
+        "CAMERA",
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.ACCESS_FINE_LOCATION",
+        "android.permission.ACCESS_BACKGROUND_LOCATION",
+        "android.permission.FOREGROUND_SERVICE",
+        "android.permission.FOREGROUND_SERVICE_LOCATION"
       ],
       "edgeToEdgeEnabled": true,
       "config": {
@@ -81,7 +88,11 @@
     },
     "extra": {
       "EXPO_PUBLIC_GOOGLE_MAPS_API_KEY": "AIzaSyA0m1oRlXLQWjxacqjEJ6zJW3WvmOWvQkQ",
-      "EXPO_PUBLIC_MAPBOX_ACCESS_TOKEN": "pk.eyJ1Ijoiam9zZXBoMTE5OCIsImEiOiJjbWhzbmtsa2QxbGh1MmlxNjVwOTJ0ZTdmIn0.HAhJGAQCJhH8VcLJJpCpvQ"
+      "EXPO_PUBLIC_MAPBOX_ACCESS_TOKEN": "pk.eyJ1Ijoiam9zZXBoMTE5OCIsImEiOiJjbWhzbmtsa2QxbGh1MmlxNjVwOTJ0ZTdmIn0.HAhJGAQCJhH8VcLJJpCpvQ",
+      "router": {},
+      "eas": {
+        "projectId": "8dbe8149-d629-46ce-9542-740b87ad2245"
+      }
     }
   }
 }
